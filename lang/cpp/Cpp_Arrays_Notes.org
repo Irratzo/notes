@@ -1,0 +1,191 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+
+
+* Init numeric dynamic C Arrays to zero (value)
+Takeaway: to init dynamic number arrays, use:
+#+BEGIN_SRC C++
+double * arr;
+int n = getN();
+arr = new double[n]{}; //{}: uniformInit (C++11 best-practice)
+arr = new double[n]{}; //(): directInit
+#+END_SRC
+But prefer ~std::vector~ in almost all cases.
+
+
+* Init numeric static C Arrays to zero (value)
+Takeaway: to init number arrays to zero, use:
+#+BEGIN_SRC C++
+T arr[n][m] {}; //C++11
+T arr[n][m] = {}; //C++98
+#+END_SRC
+But prefer ~std::vector~ in almost all cases.
+
+Example code (output below):
+#+BEGIN_SRC C++ :results type verbatim
+
+#include <iostream>
+#include <cmath> //for initArraysToZero()
+#include <algorithm> //for initArraysToZero(), for C++ std::fill
+#include <cstring>  //for initArraysToZero(), for C   memset
+
+using namespace std;
+
+/**
+ * Takeaway: to init static number arrays to zero, use:
+ * T arr[n][m] {}; //2D static arr, C++11
+ * T arr[n][m] = {}; //2D static arr, C++98
+ * Always prefer STL containers (std::vector, ...).
+ * Revert to C arrays only in extreme cases.
+ */
+void initArraysToZero() {
+    int n = 5;
+
+    cout << "why we need to init arrays:" << endl;
+    cout << "\nuninited int array:" << endl;
+    int uvi[n];
+    for (int i = 0; i < n; i++) {
+        cout << uvi[i] << ", ";
+    }
+
+    cout << "\nuninited double array:" << endl;
+    double uvd[n];
+    for (int i = 0; i < n; i++) {
+        cout << uvd[i] << ", ";
+    }
+    cout << endl;
+    cout << "--------------------------------------------\n";
+
+    cout << "\ninited int array with {} (or {0}, same thing):" << endl;
+    int ivi[n]{0};
+    //for val=0, prefer {}
+    for (int i = 0; i < n; i++) {
+        cout << ivi[i] << ", ";
+    }
+    cout << endl;
+
+    cout << "\ninited double array with {0.}:" << endl;
+    double ivd[n]{0.};
+    //for val=0., perefer {}
+    for (int i = 0; i < n; i++) {
+        cout << ivd[i] << ", ";
+    }
+    cout << endl;
+
+    cout << "\ninited double array with {}:" << endl;
+    double ivd2[n]{};
+    //for val=0., perefer {}
+    for (int i = 0; i < n; i++) {
+        cout << ivd2[i] << ", ";
+    }
+    cout << endl;
+
+    cout << "\ninited double 2D array with {0.}:" << endl;
+    cout << "does not work!" << endl;
+    double imd1[n][n]{0.};
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << imd1[i][j] << ", ";
+        }
+        cout << endl;
+    }
+
+    cout << "\ninited double 2D array with {}:" << endl;
+    cout << "does work!" << endl;
+    double imd2[n][n]{};
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << imd2[i][j] << ", ";
+        }
+        cout << endl;
+    }
+
+    cout << "\ninited double 2D array with memset:" << endl;
+    cout << "does work! has dependencies" << endl;
+    //needs <string.h> = <cstring>
+    double imd3[n][n];
+    memset(imd3, 0., sizeof (imd3[0][0]) * n * n);
+    //also works: sizeof(double) instead imd3[0][0]
+    //fill( imd3, imd3 + sizeof(imd3), 0.);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << imd3[i][j] << ", ";
+        }
+        cout << endl;
+    }
+
+    cout << "\ninited double 2D array with std:fill:" << endl;
+    cout << "does work! has dependencies" << endl;
+    //needs <algorithm>
+    double imd4[n][n];
+    fill(&imd4[0][0], &imd4[0][0] + n*n, 0.);
+    //equivalent: sizeof(double) == imd4[0][0]
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << imd4[i][j] << ", ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+  initArraysToZero();
+  return EXIT_SUCCESS;
+}
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+why we need to init arrays:
+
+uninited int array:
+1707971680, 32767, 217141086, 32545, 0, 
+uninited double array:
+2.47033e-323, 4.68718e-310, 6.95323e-310, 6.90605e-310, 7.90505e-323, 
+--------------------------------------------
+
+inited int array with {} (or {0}, same thing):
+0, 0, 0, 0, 0, 
+
+inited double array with {0.}:
+0, 0, 0, 0, 0, 
+
+inited double array with {}:
+0, 0, 0, 0, 0, 
+
+inited double 2D array with {0.}:
+does not work!
+0, 6.90605e-310, 1.69563e-320, 7.41098e-323, 4.68718e-310, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+
+inited double 2D array with {}:
+does work!
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+
+inited double 2D array with memset:
+does work! has dependencies
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+
+inited double 2D array with std:fill:
+does work! has dependencies
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0, 
+0, 0, 0, 0, 0,
+#+end_example
+

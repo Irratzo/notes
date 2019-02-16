@@ -1,0 +1,808 @@
+<2016-12-29 Do> - <2017-01-05 Do>
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+* Jetbrains - A Tour of Modern C++
+  #+BEGIN_QUOTE
+  This should be #+TITLE: Jetbrains - A Tour of Modern C++
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Quelle: [[https://www.youtube.com/watch?v=iWvcoIKSaoc][yt > A Tour of Modern C++]], Upload <2015-07-06>
+  Beispielcode: [[file:~/gitrepos/ModernCpp][beispielcode-original]], 
+
+* Prelude - A Note about Jetbrain's example code
+
+  Seperation of the different examples via multiple header files can be found in
+  the accompanying self-written working Netbeans project [[file:Jetbrains_TourOfModernC++_workingcopy/Jetbrains_TourOfModernC++/main.cpp][Self-Written Working
+  Netbeans Project]].
+  
+** Nifty header tricks
+
+   If you use *gcc*, most of the time you need only one include line for the
+   STL: ~<bits/stdc++.h>~. For other compilers (e.g. VisualStudio), you still
+   have to include everything manually.
+
+   #+BEGIN_SRC C++
+     #if defined(_WIN32) || (defined(__APPLE__) && defined(__MACH__))
+       #include <cstdio>
+       #include <iostream>
+       #include <string>
+       #include <vector>
+       #include <map>
+       #include <algorithm>
+       #include <functional> //for Lambdas, Lambdas_Mine
+       #include <memory>
+       #include <type_traits>
+       #include <initializer_list> //for AutoDeclType, AutoDeclType_Mine
+     #else
+       #include <bits/stdc++.h>
+     #endif
+   #+END_SRC
+
+* Initialization - C++11's Uniform Initialization
+
+  Used headers:
+  #+BEGIN_SRC C++
+    #include "stdafx.h" //Visual C++ Precompiled Header
+    #include <vector>
+    #include <map>
+    #include <algorithm>
+    #include <iostream>
+    #include <functional>
+    using namespace std;
+  #+END_SRC
+
+** Basic examples
+  
+   #+BEGIN_SRC C++
+     struct Person
+     {
+       string name;
+       int age;
+     };
+
+     int main()
+     {
+       //initializing base-types
+       int a = 1; //old way
+       int n{2};  //new way
+       string s{ "foo"};
+
+       //initializing collections
+       //old way:
+       vector<int> vals;
+       vals.push_back(1); //...
+       //new way:
+       vector<int> valss{1,2,3};
+       map<string, string> capitals = {
+         {"UK","London"}
+         {"France","Paris"}
+       };
+  
+       //initializing custom data structures
+       Person p { "Alice", 895};
+
+       getchar();
+       return 0;
+     }
+   #+END_SRC
+
+** Nested initialization
+  
+   Uniform Initialization addresses C++'s most vexing part problem:
+   #+BEGIN_SRC C++
+     struct Adress{
+       //empty
+     };
+
+     struct Person
+     {
+       string name;
+       int age;
+       Adress address;
+
+       //IntelliJ-generated Ctor
+       explicit Person(const Adress& address)
+         : adress(address)
+       {
+       }
+     };
+
+     int main()
+     {
+
+       //suppose I do this:
+       Person p(Address());
+       //this is interpreted as a function declaration
+       //instead of a variable decl! Will not compile.
+
+       //but it works with Uniform Initialization:
+       Person p{ Address() };
+
+       return 0;
+     }
+   #+END_SRC
+
+** Nested initialization with ~initialize_list<T>~
+
+   The problem: we want to use /Uniform Initialization/ to initialize ~Exchange~
+   just with ~rate~, not with ~count~. Specifying a Ctor with an
+   ~initialize_list<T>~ argument does the trick. This thing behaves a bit like a
+   vector. In fact, C++11 uses this container in the background for *all*
+   /Uniform Initializations/, like the ones above.
+   
+   #+BEGIN_SRC C++
+     struct Exhange{
+       int count;
+       float rate[2];
+
+       Exchange(initialize_list<float> r){
+         //do some checking
+         if (r.size() < 2) return;
+         //take first and second element
+         auto i = r.begin();
+         rate[0] = *i;
+         i++;
+         rate[1] = *i;
+       }
+     }
+
+     int main(){
+     //WITHOUT initializer_list Ctor:
+     Exchange e1{ 1,2,3 }; //count=1, rate={2.,3.}
+     Exchange e2{ 1,2 };   //count=1, rate={2.,0.}
+
+     //WITH initializer_list Ctor:
+     Exchange e3{ 1,2 }; //count uninited, rate={1.,2.}
+
+     return 0;
+     }
+   #+END_SRC
+   
+* Declaration - The ~auto~ Specifier & ~decltype~ Keyword
+
+** ~auto~ for simpler Declaration (Example 01)
+
+   The whole business of ~auto~ is that the compiler infers things for you.
+
+   [[http://en.cppreference.com/w/cpp/language/auto][Cppreference: auto: Syntax & Examples]]
+   | ~auto~ /variable initializer/ 	                 | (1) | 	(since C++11) |
+   | ~auto~ /function -> return type/                 | (2) | 	(since C++11) |
+   | ~auto~ /function/ 	                             | (3) | 	(since C++14) |
+   | ~decltype(auto)~ /variable initializer/          | (4) | 	(since C++14) |
+   | ~decltype(auto)~ /function/                      | (5) | 	(since C++14) |
+   | ~auto~ ~::~ 	                                   | (6) | 	(concepts TS) |
+   | cv(optional) ~auto~ /ref(optional) parameter/ 	 | (7) | 	(since C++14) |
+   | ~template~ < ~auto~ /Parameter/ >                | (8) | 	(since C++17) |
+
+  
+   Examples:
+   #+BEGIN_SRC C++
+    auto a = 0;        //inferred to be int
+    auto b = 123.f;    //inferred to be float
+    auto c = L"hello"; //inferred to be: const wchar_t * c (IntelliJ), const const char * (Netbeans)
+    auto d = {1,2,3};  //auto initializer_list for containers is also possible!
+   #+END_SRC
+
+*** /Excursion on C/C++ Basics/: Initialization with Literals
+   
+   The ~L~ prefix above specifies ~c~ as ~const wchar_t *~ instead of ~const char *~:
+
+   | 'a'  | type: ~char~         |
+   | L'a' | type: ~wchar_t~      |
+   |      |                      |
+   | "a"  | type: ~char~         |
+   | L"a" | type: ~wchar_t~      |
+   | U"a" | type: ~char32_t~     |
+   |      |                      |
+   | 1    | type: ~int~          |
+   | 1U   | type: ~unsigned int~ |
+   |      |                      |
+   | 0.5  | type: ~double~       |
+   | 0.5f | type: ~float~        |
+   | 0.5L | type: ~long double~  |
+
+   So, Netbeans C++ documentation does not recognize this specification
+   statically! Background info on ~wchar_t~ (IntelliJ above) from [[https://en.wikipedia.org/wiki/Wide_character][Wikipedia]] : A
+   wide character is a computer character datatype that generally has a size
+   greater than the traditional 8-bit character. The increased datatype size
+   allows for the use of larger coded character sets. The wide characters are
+   defined using datatype wchar_t. The implementation is compiler-specific
+   char16_t or char32_t. wchar_t has nothing to do with Unicode, see [[http://stackoverflow.com/questions/13087219/what-exactly-is-the-l-prefix-in-c][Stack
+   Overflow discussion]].
+
+   
+
+** Iterators for complex types with ~auto~ (Ex. 02)
+
+   #+BEGIN_SRC C++
+     int main(){
+       map<string,vector<double>> ticks;
+
+       //old way:
+       map<string,vector<double>>::iterator it = ticks.begin();
+
+       //new way:
+       auto it = ticks.begin();
+       
+       return 0;
+     }
+   #+END_SRC
+   
+** ~auto~ as Return Type for Functions (Ex. 03)
+
+   C++11 required you to specify the return type with a /trailing Lambda/:
+   #+BEGIN_SRC C++
+     auto meaning_of_life_Cpp11() -> int{
+         return 42;
+     }
+
+     auto meaning_of_life_Cpp14() {
+         return 42;
+     }
+   #+END_SRC
+
+*** Implementation issues (tested on Netbeans 8.1)
+   When the function is included via a *header* file, C++11-style *must* be
+   used. At least in Netbeans it's like that: if the lambda is missing when
+   calling an included function, compilation will fail with message:
+   #+BEGIN_EXAMPLE
+   error: use of 'auto meaning_of_life()' before deduction of 'auto'
+   #+END_EXAMPLE
+
+** ~decltype~ for simpler Template Programming (Ex. 04)
+
+   #+BEGIN_SRC C++
+        template<typename T, typename U>
+        auto add_generic_C11(T t, U u) -> decltype(t+u) {
+          return t+u;
+        }
+
+        auto add_generic_C14(T t, U u){
+          return t+u;
+        }
+
+        int main(){
+          add_generic_C14(3,4.5);                   //7.5
+          add_generic_C14(string("a"),string("b")); //"ab"
+          return 0;
+        }
+   #+END_SRC
+
+*** Implementation issues (tested on Netbeans 8.1)
+   This worked when template and function declaration were directly used (i.e.
+   in the same file, worked with C++11 and C++14-style). However, when the
+   function is included via a *header* file however, even using C++11-style did
+   not work here. Some problem with where to put the template declaration
+   correctly. When I put the template declaration in the header file (which
+   seemed the right thing to do), compiler throws this error:
+   #+BEGIN_EXAMPLE
+   error: template with C linkage:
+   template<typename T, typename U>
+   ^
+   #+END_EXAMPLE
+
+** ~decltype~ for Declaring /and Extracting/ Types (Ex. 05)
+
+   ~decltype~ just means we're getting the type from somewhere. It allows you to
+   extract the type from just about anything.
+
+   #+BEGIN_SRC C++
+     vector<double> values;
+     typedef decltype(values.begin()) doublevalueiterator;
+     typedef decltype(42) myveryowninttype;
+     typedef decltype (add_generic(3, 4.5)) someothertype;
+     typedef decltype (42, 'z') averysillychartype; //only evaluates 'z'
+   #+END_SRC
+
+
+* Field Initialization & Inheritance
+
+** Simpler Default Value Initialization (Ex. 06)
+   
+  C++11 now supports default value initialization just like C#:
+  #+BEGIN_SRC C++
+    class Animal{
+    protected:
+        int legs = 4; //= 4: not possible in C++98!
+    public:
+        explicit Animal(int legs) : legs(legs) {
+        }
+        //explicit: implicit type casting prohibited
+
+        virtual int walk(int steps){
+          return steps * 20; //20 = gait size or sth.
+        }
+    };
+  #+END_SRC
+
+** Simpler Constructor Propagation (Ex. 07)
+
+   C++11 has a very simple way to propagate ~Animal~'s base constructor (i.e.
+   Ctor of superclass):
+
+   #+BEGIN_SRC C++
+     class Human : public Animal {
+     public:
+         Human(): Animal(2) {} //not possible before
+         int walk(int steps) override;
+     };
+   #+END_SRC
+
+   The ~override~ keyword not obligatory. But it's good practice since some IDEs
+   recognize a mismatch if e.g. the base function type changes from ~int~ to
+   ~short~.
+
+** Preventing Override with ~final~ keyword (Ex. 08)
+
+   Also new in C++11: just like in Java, if the function of ~Animal~ were
+   declared with ~final~, ~Human~ would not be allowed to override it. It would
+   produce a compile-time error.
+   #+BEGIN_SRC C++
+   virtual int walk(int steps) final{
+          return steps * 20; //20 = gait size or sth.
+        }
+   #+END_SRC
+   
+** Usage of /Deleted Functions/ (Ex. 09)
+
+   Say in the above ~Human~ example, some smart pointer usage is going on (???), and
+   that is the reason that we want to disallow a Copy-Ctor:
+   #+BEGIN_SRC C++
+     int main(){
+       Human h;
+       Human h2{ h }; //copy-Ctor init
+     }
+   #+END_SRC
+
+   Then C++11 offers the [[http://en.cppreference.com/w/cpp/language/function#Deleted_functions][Deleted Functions]] concept to deal with that easily. We
+   declare a copy constructor, but the declaration is superceded with ~= delete~
+   instead of with the function definition. Now ~h2~ init above will throw an
+   error. Just for an example, we also prohibit overloading the assignment
+   operator.
+   #+BEGIN_SRC C++
+     class Human : public Animal {
+     public:
+         Human(): Animal(2) {} //not possible before
+         Human(const Human &) = delete; //prohibit copy-Ctor init
+         Human& operator=(const Human&) & = delete; //prohibit assignment op. overload
+         int walk(int steps) override;
+     };
+   #+END_SRC
+
+   Example: in Netbeans, the gcc compiler would throw this error:
+   #+BEGIN_EXAMPLE
+   error: use of deleted function 'Human::Human(const Human&)'
+   Human h2{h};
+   #+END_EXAMPLE
+   
+   Deleted Functions have advantages over ~private~ member functions:
+   - the programmer's intent is clearer
+   - no definition needed
+   - C++ takes care to ensure the function cannot be called in any way
+   - better error messages
+   - functions outside classes can be ~delete~'d.
+   
+   Further usage examples (e.g. type-aware overloading) on /Defaulted Functions/
+   and /Deleted Functions/ can be found [[http://www.nosid.org/cxx11-defaulted-deleted-functions.html][here]].
+
+   
+* Lambda Expressions
+
+** Introductory Example (Ex. 10)
+   
+  Lambdas are a quick-way of declaring /anonymous functions/. These can be fed
+  to STL algorithms, as opposed to having your own /Functors/, or declaring
+  ordinary anofunctions and thereby polluting the scope.
+
+  The following example uses C++11's *new* /non-member varieties/ of ~begin()~
+  and ~end()~ (like e.g. ~begin<typename _Tp>(valarray<_Tp>&)~ - many overloaded
+  variations here). These even work on C-Arrays! They make writing generic
+  algorithms a lot easier.
+
+  A C++ lambda expression has the general form:
+  | ~[]~                | ~()~ | -> return type | ~{}~          |
+  | /opt./ capture list | args | /optional/     | function body |
+
+
+  #+BEGIN_SRC C++
+    vector<int> scores{8, 2, 4, 1};
+    for_each(begin(scores), end(scores), [](int n) -> float {
+        cout << n << endl;
+        return n; //optional
+    });
+  #+END_SRC
+
+** Capturing external values (Ex. 11)
+   
+   Let's say the above lambda shall use an external value for comparison:
+   #+BEGIN_SRC C++
+     auto zero = 0;
+     auto is_positive = [](int n){return n > zero;};
+     cout << boolalpha << is_positive(-2) << endl; //with boolalpha, this prints
+                                                   //'false'
+   #+END_SRC
+
+   This code will throw a ****-load of compilation errors with the top error being
+   #+BEGIN_EXAMPLE
+   error: 'zero' is not captured
+   #+END_EXAMPLE
+   
+   External variables can be captured by the /capture list/:
+   | ~[zero]~   | ~[=]~          | ~[&zero]~      | ~[&]         |
+   | /by value/ | all /by value/ | /by reference/ | all /by ref/ |
+   This makes C++ Lambdas much more powerful than Java or C# Lambdas where you
+   are at the mercy of the compiler to determine the capture.
+
+** Lambda, ~auto~, and ~std::function~ (Ex. 12)
+
+   Sometimes, Lambda prevents the use of ~auto~. Example: Resursive Fibonacci
+   one-liner with Lambdas:
+   #+BEGIN_SRC C++
+   auto fib = [](int n){return n < 2 ? 1 : fib(n-1)+fib(n-2);};
+   #+END_SRC
+
+   However, this code would throw the following compile-error:
+   #+BEGIN_EXAMPLE
+   Netbeans: error: use of 'fib' before deduction of 'auto'
+   IntelliJ: error: a variable declared with an auto cannot appear in it's own initializer
+   #+END_EXAMPLE
+
+   Setting the /capture list/ to ~[&fib]~ will not resolve the problem, since in
+   order to resolve ~auto~, the Lambda function body has to be resolved. So this
+   is a rare case where we /cannot use/ ~auto~. Instead, we have to define the
+   type as a ~std::function~, taking and returning an ~int~. Of course, ~fib~
+   has still to be captured!
+   #+BEGIN_SRC C++
+   function<int(int)> fib = [&fib](int n){return n < 2 ? 1 : fib(n-1)+fib(n-2);};
+   #+END_SRC
+
+   
+* Enum Classes (Example 13, 14)
+
+  C++98 ~enum~'s had some problems the C++ architects did not like:
+  #+BEGIN_SRC C++
+    enum OldColor {
+        Red, Green, Blue
+    };
+    OldColor oc = Green; //Enum-vals 'bleed' into this scope, 'Green' is all over the place
+    int g = oc; //automatic int-casting compiles, but often undesired behavior
+  #+END_SRC
+
+  The new construct works much like the one in Java:
+  #+BEGIN_SRC C++
+    enum class NewColor {
+        Red, Green, Blue, Magenta
+    };
+    NewColor nc = NewColor::Magenta;
+    //    int n = nc; //does not work anymore
+  #+END_SRC
+
+  More detailed usage examples can be found [[http://www.learncpp.com/cpp-tutorial/4-5a-enum-classes/][here]] and [[http://www.nosid.org/cxx11-enum.html][here]].
+  
+
+* Range-Based For-Loop Reference
+
+** C++ Loop Reference for Sequence Containers (Ex. 15)
+
+  This section presents a whole compendium of different approaches for looping
+  over a container, taken from SO 1(below) The examples also cover the new
+  C++11-feature /range-based for-loop/. The example sequence container is a
+  ~vector~, the use-case is printing the elements.
+
+  References:
+  - [[http://stackoverflow.com/a/10758845][SO 1]]
+  - [[https://stackoverflow.com/a/409396/8116031][SO 2]] (newer)
+
+  #+BEGIN_SRC C++
+     //containers
+      vector<char> path{'l', 'o', 'o', 'p', 'i', 'n', 'i', 's', 'f', 'u', 'n', '!', '\n'};
+      typedef vector<char> Path2;
+      Path2 path2{'w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', '!', '\n'};
+      vector<int> v{1, 2, 3};
+
+      //C++98 newbie: use a counter (better version, see below)
+      for (int i = 0; i < path.size(); ++i) {
+          cout << path[i];
+      }
+
+      //C++98: use an iterator
+      for (vector<char>::iterator i = path.begin(); i != path.end(); ++i) {
+          cout << *i; //disallow change: use const_iterator
+      }
+
+      //C++11: with auto, non-const iterator
+      for (auto i = path.begin(); i != path.end(); ++i) {
+          cout << *i;
+      }
+
+      //C++11: with auto, and typedef(defined): latter enables using const_iterator
+      for (Path2::const_iterator i = path2.begin(); i != path2.end(); ++i) {
+          cout << *i;
+      }
+
+      //C++98: improved counter version using container's member types.
+      //such types must be available, e.g. via a typedef, like here.
+      //The type for the vector here size_type (returned by size function)
+      for (Path2::size_type i = 0; i < path2.size(); ++i) {
+          cout << path[i];
+      }
+
+      //C++11: range-based for-loop, pass-by-value (PBV), ReadOnly
+      //same syntax for C array?
+      for (int a : v) {
+          a *= -1; //...is not changing v
+      }
+      cout << endl;
+
+      //C++11: range-based for-loop, pass-by-reference (PBR), ReadWrite
+      //same syntax for C array?
+      for (int& a : v) {
+          a *= -1; //... ENABLES CHANGING v
+      }
+      cout << endl;
+
+      //C++11: rbfl, PBR, const, ReadOnly
+      //same syntax for C array?
+      for (const auto& c : path) {
+          cout << c; //recommended style best use this for tasks like cout!
+      }
+
+      //C++11: rbfl: also works on in-place initializer_list
+      //but (at least in Netbeans gcc) only with 'const'
+      //    for (int& x: {...}){ //Netbeans error: binding 'const int' to reference of type 'int&' discards qualifiers
+      for (const char& c :{'i', 'n', 'p', 'l', 'a', 'c', 'e', '\n'}) {
+          cout << c;
+      }
+
+      //C++98: using std::copy and the 'iterator adaptor' ostream_iterator
+      //(also works with only one ostream arg)
+      //GOOD: the only one-liner, but requires specific type
+      copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
+      cout << endl;
+
+      //C++11: using C++98 std::for_each and C++11 Lambda
+      //for_each is 'overkill' for cout, but good for operations, and a one-liner!
+      for_each(path.begin(), path.end(), [] (const auto c) {
+          cout << c;
+      });
+
+      //C++98: using generic << overloading (implementation is also C++98)
+      cout << path;
+  #+END_SRC
+
+  The last example uses a generic approach with globally overloading the ~<<~
+  operator. The implementation is arbitrarily chosen to use the ~std::copy~
+  approach from above:
+  #+BEGIN_SRC C++
+    template <typename T> //already defined in header, but did only work like this
+    ostream& operator<<(ostream& out, const vector<T>& v) {
+        if (!v.empty()) {
+            out << '[';
+            copy(v.begin(), v.end(), ostream_iterator<T>(out, ", "));
+            out << "\b\b]";
+        }
+        return out;
+    }
+  #+END_SRC
+
+** Range-based-for loop: ~first~, ~second~ for Key-Value-Containers (Ex. 16)
+
+   #+BEGIN_SRC C++
+   map<string,int> histogram;
+    
+    //C++11: range-based for-loop, auto, const, PBR
+    for (const auto& pair: histogram){
+        cout << pair.first << ',' << pair.second << endl;
+    }
+   #+END_SRC
+
+   
+* Static ~asserts~ and /Traits/
+
+  [[http://www.youtube.com/watch?v=iWvcoIKSaoc&t=34m13s][Video: Static Asserts & Traits]]
+  /Not part of MATSE module C++ exam content in WS16/.
+
+** ~static_assert~ for Checking Things at Compile-Time (Ex. 17)
+
+   Suppose that I'm making some type which accesses an array. So I have a
+   template with the type generic type ~T~ of the element that we are storing,
+   plus the size of the parameter ~size_t~. *Reminder*: ~size_t~ is a datatype
+   (~typedef~) representing the /size of an object/. Library functions that take
+   sizes /expect them to be of type/ ~size_t~, and the ~sizeof~ operator
+   evaluates to ~size_t~; a common mistake is to assume the type ~size_t~ is the
+   same as primitive type ~unsigned int~ - it is not!
+
+   #+BEGIN_SRC C++
+     template <typename T, size_t Size>
+     class values{
+       T values[Size];
+     };
+   #+END_SRC
+
+   Now suppose, I only want this class to be used if the ~Size~ is greater than
+   one, otherwise I want people to use a /scalar/ (type) instead.
+   ~static_assert~ allows to check this /at compile-time/:
+
+   #+BEGIN_SRC C++
+     template <typename T, size_t Size>
+     class Values{
+       static_assert(Size > 1, "Use a scalar"); //2nd arg: else
+       T values[Size];
+     };
+
+     int main(){
+       Values<int, 3> stuff; //OK!
+       Values<int, 1> trash; //error: Use a scalar
+
+       return 0;
+     };
+   #+END_SRC
+
+** /Traits/ for expanded Compile-Time checking (Ex. 18)
+
+   Suppose we want to expand the ~add_generic(T t, U u)~ function from _*Example
+   04*_ by only accepting /integral types/ (see below) for the first argument. We can use a
+   ~static_assert~ together with the [[http://en.cppreference.com/w/cpp/types/is_integral][Trait]] ~is_integral~ for that.   
+
+   #+BEGIN_SRC C++
+     template<typename T, typename U>
+     auto add_generic_C14(T t, U u){
+            static_assert(is_integral<T>::value, "First value must be integral");
+            return t+u;
+          }
+   #+END_SRC
+
+*** /Excursion on C/C++ Basics/: Integral Type Headers, C++11
+    
+   *Reminder*: Integral types in C++ are:
+   #+BEGIN_EXAMPLE
+   bool, char, signed char, unsigned char, char16_t, char32_t etc., wchar_t,
+   short, int, int8_t .. int64_t, uint8_t etc. long, long long, unsigned short, unsigned int, 
+   unsigned long, unsigned long long, etc.
+   #+END_EXAMPLE
+   
+   =Fixed-width types= like e.g. ~int32_t~ have been introduced into their
+   specific type-header in C++11. For ~int~, that is ~cstdint~. The definitions
+   are:
+   - ~intZ_t~ : signed integer type, width of *exactly* ~Z~ bits
+     (8,16,32,64)
+   - ~int_fastZ_t~: *fastest* signed int type, width *at least* ~Z~ bits
+   - ~int_leastZ_t~: *smallest* signed int type, width *at least* ~Z~ bits
+   - ~intmax_t~: maximum width int type
+   
+   The fast and least types are only for code optimization AFTER implementation.
+
+   ~cstdint~ offers these fine-grained types also for ~uint~ (unsigned), as well
+   as =Macro constants= for these types, like ~INT8_MIN~ representing the
+   *minimum value of an object of type ~int8_t~*.
+
+
+
+
+* Smart Pointers
+
+** ~unique_ptr~ for simpler memory management (Ex. 19)
+
+  Let's say we have an ~Address~ class like this:
+  #+BEGIN_SRC C++
+    class Address {
+        Address(){}
+        string postcode; //and so on...
+    };  
+  #+END_SRC
+  
+  Now let's suppose that we want a *global function* (or factory) to pump out a new
+  ~Address~ object. One way of doing it would be to /return by value/ (*RBV*):
+  #+BEGIN_SRC C++
+    Address create_address(string postcode){
+      public:
+        Address address{};
+        address.postcode = postcode;
+        return address;
+    }
+  #+END_SRC
+
+  The C++14 version looks like this (make functions for smart pointers were only
+  introduced in C++14):
+  #+BEGIN_SRC C++
+    unique_ptr<Address> create_address_smart(string postcode){
+        auto a = make_unique<Address>(); //only since C++14!
+        a->postcode = postcode; //init with pointer deref operator
+        return a;
+    }
+  #+END_SRC
+
+  Why is this better? Because /in general/, we must assume that ~create_address~
+  produces copies of the instantiated ~Address~ that we would have to mem-manage
+  manually. Returning objects using /smart pointers/ instead preserves safety
+  and you're not even at the remote risk of returning something with *RBV*.
+  ~unique_ptr~ makes sure that two variables can't share a pointer and replicate
+  the object.
+
+*** Intermision: Return Value Optimization
+  
+    Is ~create_address()~ really *RBV*? In other words, is /no copying
+    involved/? This question harks back to [[https://en.wikipedia.org/wiki/Return_value_optimization][Return Value Optimization (RVO)]]: the
+    compiler in use may eliminate both copies of ~Adress()~ on it's own - the
+    one copied into the function's return value, and the /temporary object/ in
+    ~main~ returned by the function - thus saving us the trouble to manage them.
+    We can check by overwriting the CCtor with one that ouputs a text:
+    #+BEGIN_SRC C++
+      Address::Address(const Address&) { cout << "Address copied!" << endl;}
+    #+END_SRC
+
+    Now let's do the check:
+
+    #+BEGIN_SRC C++
+     int main(){ auto my_address = create_address("D-79733"); return 0; }
+    #+END_SRC
+
+    The output is nothing (Netbeans gcc), so the compiler deleted both copies.
+    This means that on this machine, the compiler has taken care for us to
+    manage the *RBV* copies. Phew! Of course, with the /smart/ version, we don't
+    have to rely on this anymore.
+
+*** Back to the example
+
+    We can apply the same logic if we want to use the ~unique_ptr~ to eventually
+    store an object. For that, suppose we have a ~Person~ with an ~Adress~
+    member stored as pointer. In C++98, ~Person~ would have a Ctor initting and
+    Dtor deleting the address:
+  #+BEGIN_SRC C++
+    class Person2_Cpp98{
+      public: 
+        Address* address; //store Address as a pointer
+        Person2_Cpp98() {
+          Address a = Address{};
+          address = &a;
+        }
+        ~Person2_Cpp98(){
+         if (address) delete address; //if person dies, address dies
+        }
+    };
+  #+END_SRC
+
+    The C++14 version has no need of a Dtor anymore:
+    #+BEGIN_SRC C++
+      class Person2_Cpp14 {
+        public:
+          unique_ptr<Address> address;
+          Person2_Cpp14(){
+            address = make_unique<Address>();
+          }         
+      };
+    #+END_SRC
+
+** ~shared_ptr~ (Ex. 20)
+
+   But what if we want to have the ~Person~'s ~address~ live longer than it's
+   owner? The last line in the example below produces the compiler error ~use of
+   deleted function~, since by assigning to ~a~, ~address~ is no longer a unique
+   pointer.
+   #+BEGIN_SRC C++
+     unique_ptr<Address> a;
+      { //separate scope
+          Person2_Cpp14 p;
+          p.address->city = "Zurich";
+          a = p.address; //error!
+      }
+   #+END_SRC
+
+   If we declare ~a~ *AND* the ~Person~'s ~address~ as a ~shared_ptr~ on the
+   other hand, this works.
+       
+  
+* Variadic Templates
+
+  /Skipped. Not part of MATSE module C++ exam content in WS16/.
+  
+
+* RValue References
+
+  /Skipped. Not part of MATSE module C++ exam content in WS16/.

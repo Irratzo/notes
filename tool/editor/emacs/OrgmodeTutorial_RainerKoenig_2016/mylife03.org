@@ -1,0 +1,79 @@
+#+TODO: NEXT(n/!) TODO(t@/!) WAITING(w@/!) SOMEDAY(s/!) PROJ(p) | DONE(d@) CANCELLED(c)
+# Legend:
+# #+SEQ_TODO: STATE(k@/!)
+# k - hotkey for STATE
+# @ - log a timestamp and a note on item state change TO   STATE (entry)
+# ! - log a timestamp            on item state change FROM STATE (leave)
+#+TAGS: PHONE(o) COMPUTER(c) GARAGE(g) SHOPPING(s) FAMILY(f) URGENT(u)
+#+ARCHIVE: myarchive03.org::
+
+# mylife.org for Tutorial episode E03 onward
+# changes for each episode snippet:
+# E03S01 start:
+#   - Examples: removed subitems, added new ones
+
+* [[file:OrgmodeTutorial_RainerKoenig.org][Master File]]
+
+* GTD related things
+** NEXT Weekly Review                                       :REVIEW:COMPUTER:
+   SCHEDULED: <2018-11-18 Sun ++1w>
+
+   - Rescheduled from "[2018-11-16 Fri ++1w]" on [2018-11-09 Fri 02:06] \\
+     rescheduled weekly review for private stuff to sunday
+* Examples
+** NEXT Orgmode Tutorial Episode 03 [1/5]
+   - [X] Function: Automatic logging of status changes
+     + Logging ToDo keyword transitions
+     + Logging rescheduling and closing
+   - [ ] Concept: Splitting your org file into several files
+   - [ ] Function: The first capture template
+   - [ ] Function: The :PROPERTIES: drawer
+   - [ ] Function: Archiving to different files
+** WAITING Change keyword to NEXT now
+   :LOGBOOK:
+   - State "WAITING"    from "NEXT"       [2018-11-08 Thu 16:07] \\
+     sent out mail to customer, waiting for response
+   - State "NEXT"       from "TODO"       [2018-11-08 Thu 16:00]
+   :END:
+   - This is an example for E03S01
+** DONE This task is considered to be finished
+   CLOSED: [2018-11-08 Thu 16:15]
+   :LOGBOOK:
+   - State "DONE"       from "TODO"       [2018-11-08 Thu 16:15] \\
+     Problem solved.
+   :END:
+   - So please mark it done now
+
+** TODO Example job captured in E03S03
+   - Some notes on this job
+   :LOGBOOK:
+   - Added: [2018-11-09 Fri 22:00]
+   :END:
+* Books
+* Legal obligations
+** TODO Call the tax lawyer after documents were sent                 :PHONE:
+** NEXT Prepare tax declaration                             :COMPUTER:URGENT:
+   DEADLINE: <2018-11-16 Fri> SCHEDULED: <2018-11-05 Mon>
+   - Collect all documents for your tax lawyer
+* Maintenance
+** NEXT Wash the car                                                 :GARAGE:
+   SCHEDULED: <2018-11-03 Sat>
+   - Washing from outside and vacuum cleaning the inside
+* Family business                                                    :FAMILY:
+** PROJ Get a birthday gift for wife                               :SHOPPING:
+   DEADLINE: <2018-11-24 Sat> SCHEDULED: <2018-11-03 Sat>
+** NEXT Watch concert of your kid in school
+   SCHEDULED: <2018-11-07 Wed 16:00-17:00>
+   - Don't miss that, otherwise kid is disappointed
+** NEXT Call Uncle Tom after his surgery                              :PHONE:
+   - Need to know if everything went fine
+* House stuff
+** SOMEDAY Build a bike port in the garden                           :GARAGE:
+   Budget is $200 for the whole thing
+* Capture Headline for E03S03
+
+** TODO Another example job for E03S03
+   - blah, try out C-u my-org-capture-key
+   :LOGBOOK:
+   - Added: [2018-11-09 Fri 22:19]
+   :END:

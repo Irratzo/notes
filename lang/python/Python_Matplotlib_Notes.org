@@ -1,0 +1,94 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:nil # disable export latex section numbering for org headings
+#+OPTIONS: toc:nil # no table of contents (doesn't work if num:nil)
+
+#+TITLE: Python_Matplotlib_Notes
+#+DATE: <2019-01-14 Mon>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: de
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: 
+
+* Cheatsheets
+** jrjohansson scientific-python-lectures
+- links: [[https://github.com/jrjohansson/scientific-python-lectures][github]], [[file:repos/scientific-python-lectures/][local]],
+- chapters:
+  - [[https://nbviewer.jupyter.org/github/jrjohansson/scientific-python-lectures/blob/master/Lecture-4-Matplotlib.ipynb][matplotlib 2D and 3D plotting]]: good matplotlib cheatsheet
+* 3D Plotting
+** [[https://jakevdp.github.io/PythonDataScienceHandbook/04.12-three-dimensional-plotting.html][OReilly PythonDataScienceHandbook - 3DPlotting]]
+- nice examples, like how to get the ~X, Y~ data for a ~X, Y, Z~ plot[fn:1]:
+  #+BEGIN_SRC python
+  import matplotlib.pyplot as plt
+  from mpl_toolkits.mplot3d import axes3d
+  import numpy as np
+
+  def f(x, y):
+      return np.sin(np.sqrt(x ** 2 + y ** 2))
+
+  x = np.linspace(-6, 6, 30)
+  y = np.linspace(-6, 6, 30)
+
+  X, Y = np.meshgrid(x, y)
+  Z = f(X, Y)
+
+  fig = plt.figure()
+  ax = plt.axes(projection='3d')
+  ax.contour3D(X, Y, Z, 50, cmap='binary')
+  ax.set_xlabel('x')
+  ax.set_ylabel('y')
+  ax.set_zlabel('z');
+  plt.show()
+  #+END_SRC
+
+  #+RESULTS:
+  : None
+
+** [[https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html][matplotlib.org 3D tutorial with example codes]]
+* Footnotes
+
+[fn:1] In a properly setup org-mode Emacs, evaluate code with =C-c C-c=. A plot
+image should pop up.

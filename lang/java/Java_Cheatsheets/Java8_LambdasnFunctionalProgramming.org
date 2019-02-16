@@ -1,0 +1,298 @@
+[2016-09-25 So]
+* Diese orgmode-Datei formatiert anschauen
+  Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+
+
+* Java 8: \lambda's and Functional Programming
+   [[https://www.youtube.com/watch?v=zolbIZS4SRQ][yt > JavaOne > Learn Java 8: Lambdas and Functional Programming]]
+
+** ~\lambda's~ 
+*** ~@FunctionalInterface~'s
+
+    - Enthält nur eine =acstract= (implizit) Methode, sonst funzts nicht
+    - =abstract=, weil dennoch zusätzliche (explizite) ~static~ und ~default~ Methoden erlaubt sind
+    - =FI= wird dann durch ein \lambda implementiert.
+    - ein \lambda hat keinen ~type~, es wird inferenziert
+    - Variablen außerhalb des \lambda können innerhalb verwendet werden: werden per =Capturing= eingebunden,
+      gleicher Mechanismus wie bei =JavaScript=
+
+**** ~default~ - Methoden
+     Normalerweise wird die =abstract=-Methode aufgerufen mit Zusätzen
+
+**** =Closures=
+**** Built-in =FI=-Typen
+***** ~Supplier~: erhält ein arg, gibt ein arg aus
+     - ~Function~: Typ ~Supplier~, erlaubt mehr (z.B. ~BiFunction~)
+     - ~Predicate~: erhält arg, returned ~boolean~
+***** ~Consumer~: erhält ein arg, gibt ~void~
+*** Clean Coding: Favor =Method reference= over \lambda's
+**** Einfaches Beispiel
+    - Beispiel:
+      #+BEGIN_SRC java
+      Passenger passenger = new Passenger();
+      List<Train> trains = Collections.singletonList(new Train());
+      trains.forEach(t -> t.repair(); //NOT SO GOOD
+      trains.forEach(Train::repair);  //BETTER
+      #+END_SRC
+
+    - _Grund:_
+      Bei komplizierterem =Pipelining= mit Bedingungen ist es lesbarer, dies in eine eigene Methode zu verpacken.
+      Statt:
+      #+BEGIN_SRC java
+      trains.forEach(t -> {
+        if(t.isBlue()) {
+          t.repair();
+        }
+      });
+      #+END_SRC
+
+      besser:
+
+      #+BEGIN_SRC java
+      trains.forEach(Train::repairIfBlue);
+      #+END_SRC
+     
+**** Fortgeschrittene =Method reference= - Techniken
+
+     - ~static~ - Methoden können auch referenziert werden
+     - ~trains.forEach(this::repairIfBlue)~ geht auch
+     - Man kann das aufgerufene Objekt per =Method Reference= an Methode anderer Instanz senden:
+       #+BEGIN_SRC java
+       trains.forEach(passenger::inboard);
+       #+END_SRC
+     - Man kann den =Default Constructor= aufrufen (benötigt einen ~Supplier~ oder ~Function~):
+       #+BEGIN_SRC java
+       ...{ List<Train> trains = Collections.singletonList(Train.create(Train::new)); 
+            //List<Train> trains = Collections.singletonList(Train.create(Train::new)); 
+          }
+
+       public static class Train{
+         public static Train create(Supplier<Train> supplier) { return supplier.get();}
+         //public static Train create(Function<String,Train> supplier) { return supplier.get();}
+         //...
+       }
+       #+END_SRC
+
+    
+*** \lambda's & Capturing
+
+    leer
+   
+*** \lambda's & ~type~ TroubleShooting
+
+    - Der gewünschte =input=-Type implementiert mehrere Interfaces.
+    - Beispiel(i): compiled nicht, weil \lambda =input=-Type nicht kennt
+      #+BEGIN_SRC java
+      try{ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(path))) {
+        out.writeObject(() -> System.out.println("Test"));
+      }
+      #+END_SRC
+
+    - Beispiel(ii): compiled immer noch nicht, weil =input=-Type unvollständig
+      #+BEGIN_SRC java
+      try{ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(path))) {
+        out.writeObject((Runnable)() -> System.out.println("Test"));
+      }
+      #+END_SRC
+
+    - Beispiel(iii): _Lösung:_ beliebig viele =Interfaces= können mit ~&~ angegeben werden
+      #+BEGIN_SRC java
+      try{ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(path))) {
+        out.writeObject((Runnable & Serializable & Cloneable)() -> System.out.println("Test"));
+      }
+      #+END_SRC
+
+    - wieso gerade ~Serializable~ hier oft nützlich ist, zB in Tests, siehe Quelle ca. 45 min.
+
+*** \lambda's + =Reflection= - Conflict & Security
+
+    Siehe Quellle ca. 32 min
+
+    - mit an.inner.classes : ~SomeClass.class.getDeclaredMethods()~ gibt Methoden zurück
+    - mit repl. aic's > \lambda's: ~SomeClass.class.getDeclaredMethods()~ gibt Methoden zurück PLUS LEERE METHODEN
+
+    Dies kann bei Verwendung von =Reflection= und Ersetzen aics -> \lambda's den bisherigen Code brechen (andere Methodenzahl)!
+    Deshalb entsprechend anpassen.
+
+    (Die leeren Stellvertreter-Methoden für die \lambda's werden erst bei ihrer Verwendung mit Inhalt gefüllt.)
+
+    _Security_: Außerdem kann jemand per Reflection das \lambda per =Reflection= manipulieren und aufrufen (~invoke~).
+
+**** Beispiel
+
+    Beispiel: *mit aic's* in ~SomeClass::main~:
+    #+BEGIN_SRC java
+    Arrays.asList(SomeClass.class.getDeclaredMethods())
+       .forEach(new Consumer<Method>(){
+         @Override
+         public void accept(final Method method) {System.out.println(method.getName()); }
+       });
+    #+END_SRC
+
+    Output:
+    #+BEGIN_SRC 
+    main
+    #+END_SRC
+
+    Beispiel: *mit \lambda's* in ~SomeClass::main~:
+    #+BEGIN_SRC java
+    Arrays.asList(SomeClass.class.getDeclaredMethods())
+       .forEach(method -> System.out.println(method.getName());
+    #+END_SRC
+
+    Output:
+    #+BEGIN_SRC 
+    main
+    lambda$main$0
+    #+END_SRC
+   
+    
+** ~Stream~
+*** FP: ~Stream~
+    - alle /coolen/ FP Methoden sind unter ~Stream~ (~Collections~ hat ein paar, but that's it).
+
+*** ~Stream~ als Übergabeparameter verändert das Verhalten des Programms
+    - wenn man in seinen Interfaces ~Streams~ statt ~Collections~ übergibt:
+      =lazy loading=, Wert wird erst geholt (Pipeline rückwärts durch die
+      gelegten Stream-Funktionen), sobald die Stream =Terminator=-Methode
+      aufgerufen wird. Das verändert einiges, zB bei DB-Aufrufen. Beim
+      *Debuggen* ist das zB bisschen seltsam, weil der DB-Aufruf erst bei Aufruf
+      der Terminator-Methode stattfindet.
+    - Streams können /unendlich lang/ sein
+      (Bsp.: ~random.ints().limit(10).forEach(syso)~)
+
+    Beispiel:
+    #+BEGIN_SRC java
+    public List<String> getPeople(){
+      return Arrays.asList(people);
+    }
+    #+END_SRC
+
+    ...wird zu:
+    #+BEGIN_SRC java
+    public Stream<String> getPeople(){
+      return Arrays.stream(people);
+      //oder: Stream.of() //macht dasselbe
+    }
+    #+END_SRC
+
+    Das ändert den Methoden-Aufruf von...
+    #+BEGIN_SRC java
+    @Test
+    public void people(){
+      List<String> result = new ArrayList();
+      getPeople().forEach(name -> {
+        if(name.contains("i")) {
+          result.add(name);
+        }
+      });
+
+      assertThat(result).hasSize(3);
+    }
+    #+END_SRC
+
+    zu...
+    #+BEGIN_SRC java
+    @Test
+    public void people(){
+      List<String> result = getPeople()
+        .filter(name -> name.contains("i"))
+        .collect(Collectors.toList());
+
+      assertThat(result).hasSize(3);
+    }
+    #+END_SRC
+
+
+**** ~Stream~ Debugging
+
+     Leider brauche man viel ~syso~ :(. Im obigen Beispiel z.B. mit ~peek~:
+
+     #+BEGIN_SRC java
+    @Test
+    public void people(){
+      List<String> result = getPeople()
+        .filter(name -> name.contains("i"))
+        .peek(System.out::println())        //Debugging
+        .collect(Collectors.toList());
+
+      assertThat(result).hasSize(3);
+    }
+    #+END_SRC
+**** ~Stream~: weitere simple Beispiele
+
+     Beispiel:
+     #+BEGIN_SRC java
+     @Test
+     public void sumOfAllLengthOfFirstnamesContainingAnI(){
+       int sum = list.stream().
+         .filter(name -> name.containts("i"))
+         .mapToInt(String::length)           //Mapping zu Primitives-Streams 
+         .sum();                             //Primitives-Stream - Methode (Terminator)
+    
+       assertEquals(15,sum);
+     }
+     #+END_SRC
+
+     Beispiel:
+     #+BEGIN_SRC java
+     @Test
+     public void getListOfLengths(){
+       List<Integer> actual = list.stream().
+         .map(String::length);               //transform sth into sth else
+         .collect(Collectors.toList());      //Terminator: erst HIER wird list geöffnet
+    
+       assertThat(actual).containsSequence(5, 5, 7, 5);
+     }
+     #+END_SRC
+
+     - wenn Du sortiert willst, musst Du ~list.forEachOrdered(...)~ verwenden.
+    
+    
+**** ~Parallel Stream~: simple Beispiele
+
+     Einfach ~list.parallelStream()~ benutzen (alle diese werden im ~commonPool~
+     in der JVM ausgeführt). Im /Real Life/ komplizierter, weil bei DB-Aufruf zB
+     =Hibernate= in keinem anderen ~Thread~ als im aktuellen existiert!
+
+     Tuning: ~ForkJoinPool.commonPool~ einstellen oder eigenen aufsetzen.
+
+     Andere Möglichkeit: ~CompletableFuture<T>~, ermöglich =Reactive Programming=
+     in Java. Sehr mächtig und kompliziert. Bsp siehe Quelle ca. 75 min.
+
+*** FP: ~Stream~ + ~Optional~
+
+    WICHTIG: *NIEMALS* ~.get()~ bei ~Optional~ verwenden! BAD!
+
+    ~Optional~ Beispiel 1: =Imperative Programming= Element finden
+    #+BEGIN_SRC java
+    int i = list.indexOf("Henri");
+    if (i >= 0){
+      String henri = list.get(i);
+      sout(henri);
+    }
+    #+END_SRC
+
+    Beispiel 1 mit ~Stream~ + ~Optional~ (obligatorisch!)
+    #+BEGIN_SRC java
+    list.stream()
+      .filter("Henri"::equals)
+      .findFirst();             //returns Optional<String>
+      .ifPresent(System.out::println);
+    #+END_SRC
+
+    Beispiel 2:
+    #+BEGIN_SRC java
+    UserDao dao = new UserDao();
+    User user = dao.find("Henri");
+    
+    String name = Optional.ofNullable(user)  //do nothing if null
+      .map(User::getName)
+      .orElse("404: not found");
+
+    sout(name);
+    #+END_SRC
+    
+    
+** \lambda's + =JavaScript= (Nashorn)
+   Siehe Quelle, ca. 85 min.

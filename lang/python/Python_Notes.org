@@ -1,0 +1,157 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:nil # disable export latex section numbering for org headings
+#+OPTIONS: toc:nil # no table of contents (doesn't work if num:nil)
+
+#+TITLE: Python_Notes
+#+DATE: <2019-01-14 Mon>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: de
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: 
+
+
+
+* Snippets
+
+** <2019-01-21 Mon> multiple inheritance, abc AbstractBaseClass
+*** attribute init order
+#+BEGIN_SRC python :results output
+from abc import ABC, abstractmethod
+from enum import Enum
+class T(Enum):
+    B = 1
+    C = 2
+class A(ABC):
+    def __init__(self):
+        if not hasattr(self, 'a'):
+            self.a = set()
+        print(f"init A.a: {self.a}")
+    def f(self):
+        check = ['d','dd']
+        print(f"f: 'd','dd' in a: {any(c in self.a for c in check)}\n")
+        print(self.a)
+class B(A):
+    def __init__(self):
+        A.__init__(self)
+        self.a.update('b')
+        print(f"init B.a: {self.a}")
+class D(A):
+    def __init__(self):
+        A.__init__(self)
+        self.a.update('d')
+        print(f"init D.a: {self.a}")
+class BD(B,D):
+    def __init__(self):
+        D.__init__(self)
+        B.__init__(self)
+        print(f"init BD.a: {self.a}")
+        
+
+        
+b = B()
+b.f()
+
+d = D()
+d.f()
+
+bd = BD()
+bd.f()
+
+print(bd.a)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+init A.a: set()
+init B.a: {'b'}
+f: 'd','dd' in a: False
+
+{'b'}
+init A.a: set()
+init D.a: {'d'}
+f: 'd','dd' in a: True
+
+{'d'}
+init A.a: set()
+init D.a: {'d'}
+init A.a: {'d'}
+init B.a: {'d', 'b'}
+init BD.a: {'d', 'b'}
+f: 'd','dd' in a: True
+
+{'d', 'b'}
+{'d', 'b'}
+#+end_example
+*** multiple inheritance: method inheritance order
+A derived class uses the matching overwritten method of the first derived class.
+#+BEGIN_SRC python :results output
+from abc import ABC, abstractmethod
+
+class A(ABC):
+    @abstractmethod
+    def f(self):
+        print("A")
+class B(A):
+    def f(self):
+        print("B")
+class C(A):
+    def f(self):
+        print("C")
+class D(B,C):
+    pass
+class E(C,B):
+    pass
+
+d = D()
+d.f()
+e = E()
+e.f()
+#+END_SRC
+
+#+RESULTS:
+: B
+: C

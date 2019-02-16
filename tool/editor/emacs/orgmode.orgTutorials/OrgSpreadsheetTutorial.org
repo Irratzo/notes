@@ -1,0 +1,197 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+TITLE: OrgSpreadsheetTutorial
+#+DATE: <2018-11-16 Fri>
+#+AUTHOR: Johannes Wasmer
+#+EMAIL: johannes@joe-9470m
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE:
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+
+
+* [[file:orgmode.orgTutorials.org][Master File]]
+* References
+** Note on org-mode leader keys 
+- (Emacs) ~C-u C-c~ calls a command menu (Spacemacs helm) full of otherwise not
+  easily unobtainable commands, like ~org-ctrl-c-star~ to fill a column with a
+  column formula.
+- (Spacemacs) ~M-RET~ calls org-mode command menu (helm). It has some overlap
+  with ~C-u C-c~, but is different.
+** [[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][Main reference]]
+** [[http://www.flutterbys.com.au/stats/tut/tut16.1.html][flutterbys.com.au Tutorial 16.1 - Emacs orgmode tables]] 
+*** Example references
+| Example    | Description                                            |
+|------------+--------------------------------------------------------|
+| ~@3$2~	   | Row 3, column 2. Same as C3                            |
+| ~@3~	     | Row 2, current column.                                 |
+| ~$2~	     | Current row, column 2. Same as C&                      |
+| ~@-2$-3~	 | Two rows up and three columns left of the current cell |
+| ~@>$<<~    | The last row, second last column                       |
+| ~@+II$2~	 | The first row after the second hline, second column    |
+*** Org Table Math Functions
+| Function	        | Description                               |
+|-------------------+-------------------------------------------|
+| ~exp(c)~	        | exponential                               |
+| ~log(c)~	        | natural logarithm                         |
+| ~log10(c)~	      | log base 10                               |
+| ~sqrt(c)~         | square-root                               |
+| ~vmin(v)~         | minimum of vector (non blanks)            |
+| ~vmax(v)~  			 | maximum of vector (non blanks)            |
+| ~vmean(v)~	      | mean of vector (non blanks)               |
+| ~vmedian(v)~      | median of vector (non blanks)             |
+| ~vsdev(v)~	      | standard deviation of vector (non blanks) |
+| ~vvar(v)~         | variance of vector (non blanks)           |
+| ~vcov(v1, v2)~	  | covariance of two vector (non blanks)     |
+| ~vcor(v1, v2)~	  | correlation of two vector (non blanks)    |
+*** Org Table Field / Column Formulas
+| Formula           | Description                               |
+|-------------------+-------------------------------------------|
+| ~vsum(v)~         | sum of vector                             |
+| ~vprod(v)~        | product of vector                         |
+| ~vcount(v)~       | length of vector (non blanks)             |
+| ~vlen(v)~				 | length of vector (non blanks)             |
+| ~vmin(v)~         | minimum of vector (non blanks)            |
+| ~vmax(v)~			   | maximum of vector (non blanks)            |
+| ~vmean(v)~	      | mean of vector (non blanks)               |
+| ~vmedian(v)~      | median of vector (non blanks)             |
+| ~vsdev(v)~	      | standard deviation of vector (non blanks) |
+| ~vvar(v)~         | variance of vector (non blanks)           |
+| ~vcov(v1, v2)~    | covariance of two vector (non blanks)     |
+| ~vcor(v1, v2)~    | correlation of two vector (non blanks)    |
+*** Formatting
+    A formula can be appended by a semi-colon and one or more optional mode
+    strings that is passed on to the calculation engine (calc) to alter the
+    format of the result. The mode strings are described in the following table:
+
+| Mode option | 	Example | 	Description                                                      |
+|-------------+-----------+--------------------------------------------------------------------|
+| ~p~	       | ~;p10~	  | set calculation precision to 10 decimal places                     |
+| ~n,s,e,f~	 | ~;s3~	   | normal, scientific, engineering or fixed formatting.               |
+|             |           | Example indicates scientific formatting with 3-1=2 decimal places. |
+| ~D,R~	     | ~;D~	    | degrees or radians                                                 |
+| ~F,S~	     | ~;F~	    | fraction (ratio) and symbolic (standard) format.                   |
+| ~N~	       | ~;N~	    | interpret all fields as numbers, making non-numerics 0 values      |
+| ~E~	       | ~;E~	    | keep empty cells in the range                                      |
+| ~L~	       | ~;L~      | terat the values as literal                                        |
+
+* Preliminary Remarks
+The org mode emphasis for verbatim/code, =foor= and ~bar~ are used
+here interchangeably.
+
+* Getting acquainted with references
+- Table/Data:
+| Ètudiant | Maths  | Physique | Moyenne   |
+|----------+--------+----------+-----------|
+| Bertrand |     13 |       09 | [Formule] |
+| Matthieu |     15 |       14 |           |
+| Justin   |     17 |       13 |           |
+
+- *Task: compute mean for each student and mean for each subject.*
+-                                                 emacs               spacemacs
+- ~org-table-field-info~ in table field           =C-c ?=
+- returns for example for field 'Bertrand' above:
+  - =line @2, col $1, ref @2$1 or A2=
+- ~org-table-toggle-coordinate-overlays~          =C-c }=             =M-RET t t o=
+- *Note: org updates references automatically when rows or columns are being
+  moved.*
+
+* Your first formula (field formula)
+- In first field 'Formula'/Moyenne, type ~:=vmean($2..$3)~ or ~:=vmean(B&..C&)~.
+  ~&~ means 'in this row'. Accept with =C-c C-c= or by simply hitting =TAB=.
+
+| Ètudiant | Maths | Physique | Moyenne |
+|----------+-------+----------+---------|
+| Bertrand |    13 |       09 |      11 |
+| Matthieu |    15 |       14 |         |
+| Justin   |    17 |       13 |         |
+#+TBLFM: @2$4=vmean($2..$3)
+
+- The newly appeared bottom line ~#+TBLFM~ contains all the formulas for the
+  table above, and you should be careful while editing it manually.
+
+* Column formulas and field formulas
+- How to compute the formulas for /all fields in the column/ named 'Moyenne'
+  (Mean/Average).
+- Need a column formula for that.
+- ~:=~ defines a field formula, ~=~ defines a column formula.
+- Replace with ~=vmean($2..$3)~. Note: only difference is the missing ~:~.
+- In ~#+TBFLM~, formula location changed from ~@2$4~ to ~$4~
+- Update table (to fill the column) with :
+-                                                 emacs               spacemacs
+  - when in table (~org-ctrl-c-star~):            =C-u C-c *=         =M-RET *=
+    - (calls org-table-recalculate or org-toggle-heading)
+  - when on ~#+TBFLM~:                            =C-c C-c=
+
+| Ètudiant | Maths | Physique | Moyenne |
+|----------+-------+----------+---------|
+| Bertrand |    13 |       09 |      11 |
+| Matthieu |    15 |       14 |    14.5 |
+| Justin   |    17 |       13 |      15 |
+#+TBLFM: $4=vmean($2..$3)
+
+- Now add per-student averages
+
+| Ètudiant | Maths | Physique | Moyenne |
+|----------+-------+----------+---------|
+| Bertrand |    13 |       09 |      11 |
+| Matthieu |    15 |       14 |    14.5 |
+| Justin   |    17 |       13 |      15 |
+|----------+-------+----------+---------|
+| Moyennes |    15 |       12 |         |
+#+TBLFM: $3=vmean(@2$3..@4$3)::$4=vmean($2..$3)::@5$2=vmean(@2$2..@4$2)
+
+* Interactively edit formulas
+- edit formulas in current field in the mini-buffer instead of in the buffer
+  directly.
+-                                                 emacs               spacemacs
+- edit org table column formula in mini-buffer    =C-c ==             =M-RET t e=
+- edit org table field formula in mini-buffer     =C-u C-c ==         =M-RET t e= ???
+- org table editor for formulas                   =C-c '=             =M-RET '=
+  - calls ~org-table-edit-fields~ -> ~org-edit-special~ ->
+    ~org-table-edit-formulas~
+  - supports =C-n=, =C-c C-c= and the like
+  - highlights reference/selection at point
+  - change reference at point                     =S-up/left/right/dow=
+- Example:
+  - in the previous table, the average for 'Physique' is a number not a formula
+    by accident. Correct that: =C-c '=, copy-paste the formula for 'Maths', and
+    update the references using shift selection.
+
+| Ètudiant | Maths | Physique | Moyenne |
+|----------+-------+----------+---------|
+| Bertrand |    13 |       12 |    12.5 |
+| Matthieu |    15 |       13 |    14.5 |
+| Justin   |    17 |       13 |      15 |
+|----------+-------+----------+---------|
+| Moyennes |    15 |       12 |         |
+#+TBLFM: $3=vmean(@2$3..@4$3)::$4=vmean($2..$3)::@5$2=vmean(@2$2..@4$2)::@5$3=vmean(@2$3..@4$3)
+
+
+* Calc and Elisp formulas
+- See main reference for an example on how to include Elisp functions as
+  formulas. The example returns a certain decimal in pi for a given average of a
+  student.
+
+* Debugging formulas
+- ~org-table-toggle-formula-debugger~             =C-c {=
+  - start debugger with formula at point          =C-u C-c *=
+- side notes:
+  - the tutorial says =C-c C-c= starts debugger as well, but not in my emacs
+  - if =C-u C-c *= is hit with the debugger turned off, then the rounding
+    accuracy display seems to be set higher?
+
+#  LocalWords:  Ètudiant Moyenne Formule Matthieu Moyennes

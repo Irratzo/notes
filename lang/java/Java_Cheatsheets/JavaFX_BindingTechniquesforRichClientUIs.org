@@ -1,0 +1,366 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+<2016-10-01 Sa>
+* Diese orgmode-Datei formatiert anschauen
+  Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+
+* JavaFX Binding Techniques for Rich Client UIs
+  Quelle: [[https://www.youtube.com/watch?v=lnvAKjZaRpE][yt > JavaOne > TUT2097 JavaFX Binding Techniques for Rich Client UIs]]
+
+
+** BloodPressureMonitor Application
+   
+   Was die Demo-Applikation zeigt:
+   - =Observable Properties=
+     - =Property Change Support=
+     - =Listener=, =Binding=
+   - =Observable Lists=
+     - ~BackingList~, ~SortedList~, ~FilteredList~ (mit ~Predicate~)
+     - ~Extractor~: *nützlich zum Rausfinden ob sich in Listenelementen was geändert hat*
+   - =Listeners=
+     - dies sind =Functional Interfaces= -> Lambdas statt aic's!
+     - ~ChangeListener~ : Zugriff auf *alten UND neuen* Wert
+       Beispiel 1:
+       Reaktion auf User selektiert Zeile in ~TableView~:
+       #+BEGIN_SRC java
+       bpTable.getSelectionModel().selectedIndexProperty().addListener(
+         (observable, oldval, newval) -> {  //Zugriff auf alten UND neuen Wert!
+           Sysout("row is selected = "
+             + bpTable.getSelectionModel().getSelectedIndex()
+             + " old row = "
+             + oldval);
+           //deactivate drop shadow on prev. selected point in lineChart viz of table data
+           if (oldval.intValue() >= 0 &&
+               oldval.intValue() < sortedData.size()) {
+             sortedData.get(oldval.intValue()).getNode().setEffect(null);
+         }
+       });       
+       #+END_SRC
+     - ~InvalidationListener~: ist neuer Wert invalide?
+       - da =LazyEvaluation= statt =Eager= bei CL auch gut für Anwendung auf ein großes Datenobjekt
+         (LE: feuert erst wenn Änderung benutzt werden soll)
+       Beispiel 1: UpdateButton in einem Eingabeformular aktivieren falls Formularwerte geändert und deleteButton aktiv:
+       #+BEGIN_SRC java
+       InvalidationListener li = observable -> {
+         if (!deleteButton.isDisabled()) {
+           updateButton.setDisabled(false);
+         }
+       };
+       textField1.textProperty().addListener(li);
+       ...
+       #+END_SRC
+       Beispiel 2: ~Predicate~ einer ~FilteredList~ ändern (re-invoke), wenn
+       User Startdatum ändert: muss in gültigem Bereich sein
+       #+BEGIN_SRC java
+       startDate.valueProperty().addListener( observable -> {
+         filteredList.setPredicate( data -> isInRange( data.getDate()))
+       });
+       #+END_SRC
+     - ~ListChangeListener~:
+
+
+** JavaFX Properties with Model Data
+
+   - =Read-write= Properties: Wert kann /extern/ geändert werden
+     #+BEGIN_SRC java
+     pr final DoubleProperty x = ...;         //final: JavaFX Beans - Konvention
+     pu final double         getData(){ ... } //final: JavaFX Beans - Konvention
+     pu final void           setData(){ ... } //final: JavaFX Beans - Konvention
+     pu       DoubleProperty xProperty(){...} //Dev-User can overwrite
+     #+END_SRC
+   - =Read-only= Properties: Wert kann /intern/ geändert werden
+     #+BEGIN_SRC java
+     pr final DoubleProperty x = ...;          //final: JavaFX Beans - Konvention
+     pu final double         getData(){ ... }  //final: JavaFX Beans - Konvention
+     pr       void           setData(){ ... }  //only internal change allowed
+     pu       ReadOnlyDoubleProperty xProperty(){...} //Dev-User can overwrite
+     #+END_SRC
+   - =Immutable= Properties:
+     #+BEGIN_SRC java
+     pr final DoubleProperty x = ...;          //final: JavaFX Beans - Konvention
+     pu final double         getData(){ ... }  //final: JavaFX Beans - Konvention
+     #+END_SRC
+     
+*** Tipp für List-Controls & ~CellValueFactory~
+
+    ~Static String~ im Property-Konstruktor übergeben erleichtert Füllen einer ~ListView~, ~TableView~, etc.
+
+    #+BEGIN_SRC java
+    public static final String SOME_TITLE = "bla";
+    private final IntegerProperty x;
+    public A(){
+      x = new SimpleIntegerProperty(this, SOME_TITLE);
+    }
+    #+END_SRC
+
+** JavaFX Listeners and Binding
+
+   
+
+** JavaFX Observable Lists
+
+** JavaFX Binding with Streams
+
+   - Message: always prefer the two Binding APIs (=Fluent=, =Factory=) instead of writing Custom Bindings!
+   - beide APIs können gemixt werden
+
+*** =Unidirectional Binding=
+
+    - ~target.bind(source)~:
+      - Wert von target hängt nun ab von Wert von source
+      - source Prop kann als source für mehrere target Props dienen
+      - Wert von target kann nun nicht mit einem Setter geändert werden (=Runtime Error=)!
+      - ~a.unbind(b)~ existiert hierfür
+
+    Beispiel: << < > >> - Buttons an einem Graphen, > disabled wenn >> geklickt
+    usw., Datenquelle sortedBackingList
+    #+BEGIN_SRC java
+    lastbu.disabledProperty().bind(Bindings.createBooleanBinding(() ->
+      sortedBackingList.isEmpty() ||
+        (!filteredList.isEmpty() &&
+          filteredList.getSourceIndex(filteredList.size() - 1) =
+            sortedBackingList.size() - 1),
+              filteredList, sortedBackingList)); //ChangeListener: observable, oldval, newval
+    nextBu.disabledProperty().bind(lastbu.disabledProperty());
+    prevBu.disabledProperty().bind(lastbu.disabledProperty());
+    #+END_SRC
+
+*** =Bidirectional Binding=
+
+    - Usus: control ist target, data ist source: (weil symmetrisch bis auf initial value)
+      ~control.someProperty().bindBidirectional(bean.someProperty());~
+
+*** =Fluent Binding API=
+
+    - Method chaining via Builder Pattern
+
+    - Class ~BooleanExpression~: für true/false - Verhalten
+      | and       | or           | not               |
+      | isEqualTo | isNotEqualTo | asString          |
+      | asObject  | getValue     | booleanExpression |
+      
+    - Interface ~NumberExpression~: für zB Listenlänge, etc.
+      | add               | subtract             | multiply    |
+      | divide            | negate               | asString    |
+      | isEqualTo         | isNotEqualTo         | greaterThan |
+      | lessThanOrEqualTo | greaterThanOrEqualTo |             |
+
+    - Class ~StringExpression~:
+      | concat              | isNull                 | isNotNull            |
+      | isEmpty             | isNotEmpty             | length               |
+      | isEqualToIgnoreCase | isNotEqualToIgnoreCase | lessThan             |
+      | lessThanOrEqualTo   | greaterThan            | greaterThanOrEqualTo |
+      | getValueSafe        | stringExpression       |
+
+    - Class ~ObjectExpression~:
+      | isNull            | isNotNull    | getValue |
+      | isEqualTo         | isNotEqualTo | asString |
+      | objectTexpression |              |          |
+
+    Beispiel1:
+    AddButton in Formular en/disablen falls Felder nicht/leer plus Zusatzbedingung
+    #+BEGIN_SRC java
+    addbu.disabledProperty().bind(
+      field1.textProperty().isEmpty().or(
+        fiel2.textProperty().isEmpty()).or(
+          fiel3.textProperty().isEmpty()).or(
+            okToAdd.not()));
+    #+END_SRC
+
+
+*** =Factory method Binding=
+
+    - sind alles =static methods=
+    - mindestens ein Argument muss ein ~Observable~ sein
+    - kombinierbar mit Fluent Bindings
+
+    - Interfaces ~Binding<T>~, ~NumberBinding~
+    - Abstract Classes:
+    | IntegerBinding   | FloatBinding   | DoubleBinding |
+    | BooleanBinding   | LongBinding    | StringBinding |
+    | ObjectBinding<T> | ListBinding<E> | SetBinding<E> |
+    | MapBinding<K,V>  |                |               |
+
+    - Methoden:
+      - Arithmetic, Numeric:
+      | add | subtract | multiply | divide |
+      | max | min      | negate   |
+
+    - Relational, Logical:, ~when~ ist if-else-ternär, sehr nützlich
+      | equal           | notEqual           | lessThan    | lessThanOrEqual    |
+      | equalIgnoreCase | notEqualIgnoreCase | greaterThan | greaterThanOrEqual |
+      | and             | or                 | not         | when               |
+
+    - Strings: /sehr nützlich/
+      | concat | convert | format | length |
+
+    - Bindings:
+      | createBooleanBinding       | createFloatBinding       |
+      | createDoubleBinding        | createIntegerBinding     |
+      | createLongBinding          | createStringBinding      |
+      | createObjectBinding        | bindContent              |
+      | unbindContent              | bindBidirectional        |
+      | unBindBidirectional        | bindContentBidirectional |
+      | unbindContentBidirectional |
+
+    - ObservableLists:
+      | isEmpty | isNotEmpty |
+      | size    | valueAt
+
+    - ObservableValues:
+      | isNull | isNotNull |
+
+      
+    Beispiel1:
+    Titel eines Charts aktuell halten
+    #+BEGIN_SRC java
+    chart.titleProperty().bind(Bindings.concat(
+      "bla ", Bindings.size(data.get()).asString());
+    #+END_SRC
+    
+    Beispiel2:
+    StringBinding erhält ein StringArg, das Binding wird um 7 Tage verschoben (DateTime), oder so
+    #+BEGIN_SRC java
+    toLabel.textProperty().bind(Bindings.create(() ->
+        String.format(" To : %s",
+      startDate.getValue.plusDays(daysWindow.get())
+          startDate.getValueProperty())));
+    #+END_SRC
+    
+
+*** Custom Binding
+
+    #+BEGIN_SRC java
+    XYBinding bindi = new XYBinding() {
+      { super.bind(sources); } //soviele sources/dependencies wie gewünscht
+      @Override
+      protected bindingType computeValue(){ ... }
+    };
+    #+END_SRC
+
+    - XYBinding ist eine der Abstract Classes aus =Factory method Binding=
+    - wenn EINE der sources ändert, wird computeValue invoked
+
+    Beispiel:
+    auf Änderungen in mehreren Listen reagieren:
+    #+BEGIN_SRC java
+    button.disabledProperty().bind( new BooleanBinding() {
+      { super.bind(filteredList, sortedBackingList); }
+      @Override
+      protected boolean computeValue(){
+        return (sortedBackingList.isEmpty() ||
+          (!filteredList.isEmpty() && inRange(filteredList.get(0).getDate()))
+        )
+      }
+     });
+    #+END_SRC
+
+    Dasselbe mit Factory Method:
+    #+BEGIN_SRC java
+    button.disabledProperty().bind( Bindings.createBooleanBinding(() ->
+      sortedBackingList.isEmpty() ||
+          (!filteredList.isEmpty() && inRange(filteredList.get(0).getDate()))
+      )
+    );
+    #+END_SRC
+
+** ObservableLists
+
+*** Typen
+
+   - Interface ~ObservableList<E>~: 
+   - Class     ~SortedList<E>~:   read-only, wraps OL, sorts   with E Comparator
+       - add macht man auf der gewrappten OL, nicht auf der SL (gibt =Runtime Error=)
+       - sort läuft dann intern automatisch ab
+   - Class     ~FilteredList<E>~: read-only, wraps OL, filters with E Predicate
+       - inkludiert FL genauso automatisch abh von gewrappter OL
+       - nützlich vor allem zum konditionalen Ändern des Filters
+
+   Beispiel:
+   #+BEGIN_SRC java
+   pr final ObservableList<MyData> backingList = FXcollections.observableArrayList();
+   pr final SortedList<MyData> sortedBackingList = new SortedList<>(
+      backingList, (data1, data2) ->
+        data1.getSomeVal().compareTo(data2.getSomeVal())); //Comparator-Lambda
+
+   pr final FilteredList<MyData> filteredList = new FilteredList<>(
+      sortedBackingList, p -> false); //initial leeres Predicate, Änderung siehe oben InvalidationListener Bsp.2
+
+   pr final ObservableList<MyData<String, Number>> xyList =
+      FXCollections.observableArrayList();  //Bsp. für xy (String, Number) - Liste für LineChart verwenden
+
+   ...
+   {
+     aTableView.setItems(filteredList); //diese Tabelle bleibt nun immer sortiert und gefiltert
+   #+END_SRC
+
+*** ~ListChangeListener<E>~ Interface
+
+    #+BEGIN_SRC java
+    @FunctionalInterface
+    public interface ListChangeListener<E> {
+      void onChanged(ListChangeListener.
+        Change<? extends E> change) }
+    #+END_SRC
+
+    - Nested Class ~Change<E>~ static methods:
+      | wasAdded()      | kam was hinzu                                        |
+      | wasRemoved()    | ging was weg                                         |
+      | wasUpdated()    | element wurde geändert, ABER benötigt Extractor s.u. |
+      | wasPermutated() | Ordering geändert                                    |
+    - Typischerweise macht mans so:
+      - wenn der =Callback= zurückkommt, mit while-loop iteriert man durch Change-Objekt ~next()~-Methode
+      - durch die obigen Methoden einzeln durchgehen
+      - gibt eine ~true~ zurück, weiß man, wie die Liste sich geändert hat
+
+    Beispiel:
+    #+BEGIN_SRC java
+    filteredList.addListener(
+      (ListChangeListener.Change<? extends MyData> change) -> {
+        while (change.next()) {
+          if (change.wasRemoved()) {
+            change.getRemoved().forEach(data ->
+            removeMyDataFromChart(change.getFrom()));
+          }
+          if (change.wasAdded()) {
+            change.getAddedSubList().forEach(data ->
+              addMyDataToChart(data));
+          }
+        }
+    });
+    #+END_SRC
+    
+*** JavaFX Extractors!
+
+    - Man hat ne Liste, man möchte mitbekommen wenn ne Property in nem ListenElement geupdatet wurde
+    - obiges ~ListChangeListener~ ~wasUpdated()~ benötigt einen ~Extractor~ zum Funktionieren
+    - Aufruf per Lambda:
+      #+BEGIN_SRC java
+      FXCollections.observableArrayList(data ->
+        new Observable[] {data.dateProperty() });
+      #+END_SRC
+    - man kann hier beliebige Properties eintragen, die beobachtet werden sollen, je mehr je teurer
+    - Notiz hier zur BeispielAnwendung.: mit filteredList haben die keinen
+      Extractor verwendet, weil das Ändern des Date dort auch die Sortierung
+      (und damit die Filterung) ändert. Danach weiß man dann aber nicht mehr,
+      WELCHES Element sich jetzt intern (Date) geändert hat. Deshalb machen die
+      statt Ändern des Date IN der Liste ein Remove + ein Add. Mit Extractor
+      würde reordert und refiltered nur aufgrund des Date-Change. Zusätzlich,
+      wenn das neue Datum das Filter-Predicate nicht erfüllt, ist das geänderte
+      Element gar nicht mehr in der Liste, aus wasUpdated() würde dann also
+      wasRemoved().
+
+    - Gutes Anwendungsbeispiel für Extractor:
+      Control-Liste hat Custom Rendering. Control-Element wechselt Farbe aufgrund interner Änderung des Elements.
+
+** Bindings & Java8 =Streams=
+
+   
+      
+
+** Trail of Listeners and Bindings
+
+** JavaFX and Swing Integration
+
+

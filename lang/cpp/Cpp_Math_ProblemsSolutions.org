@@ -1,0 +1,140 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:nil # disable export latex section numbering for org headings
+#+OPTIONS: toc:nil # no table of contents (doesn't work if num:nil)
+
+#+TITLE: Cpp_Math_ProblemsSolutions
+#+DATE: <2019-01-11 Fri>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: de
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+* numpy linspace in C++
+
+[[https://stackoverflow.com/a/27030598][Reference]]
+
+#+BEGIN_SRC C++ :results output
+#include <iostream>
+#include <vector>
+
+template<typename T, typename U>
+std::vector<U> linspace(T start, T stop, int num)
+{
+    std::vector<U> points;
+
+    U start_d = static_cast<U>(start);
+    U stop_d = static_cast<U>(stop);
+    U num_d = static_cast<U>(num);
+
+    if (num_d == 0) { return points; }
+    if (num_d == 1)
+    {
+        points.push_back(start_d);
+        return points;
+    }
+
+    U in_between = (stop_d - start_d) / (num_d - 1);
+
+    for(int i=0; i < num_d-1; i++)
+    {
+        points.push_back(start_d + in_between * i);
+    }
+    points.push_back(stop_d); // I want to ensure that start and end
+    // are exactly the same as the input
+    return points;
+}
+
+void print_vector(std::vector<double> vec)
+{
+  std::cout << "size: " << vec.size() << std::endl;
+  for (double d : vec)
+    std::cout << d << " ";
+  std::cout << std::endl;
+}
+
+int main()
+{
+  std::vector<double> vec_1 = linspace<int,double>(1, 10, 3);
+  print_vector(vec_1);
+
+  std::vector<double> vec_2 = linspace<double,double>(6.0, 23.4, 5);
+  print_vector(vec_2);
+
+  std::vector<double> vec_3 = linspace<double,double>(0.0, 2.0, 1);
+  print_vector(vec_3);
+
+  std::vector<double> vec_4 = linspace<double,double>(0.0, 2.0, 0);
+  print_vector(vec_4);
+
+
+  return 0;
+}
+#+END_SRC
+
+#+RESULTS:
+: size: 3
+: 1 5.5 10 
+: size: 5
+: 6 10.35 14.7 19.05 23.4 
+: size: 1
+: 0 
+: size: 0
+
+Check against ~np.linspace~:
+#+BEGIN_SRC python :results output
+import numpy as np
+print(np.linspace(1, 10, 3))
+print(np.linspace(6, 23.4, 5))
+print(np.linspace(0.0, 2.0, 1))
+print(np.linspace(0.0, 2.0, 0))
+#+END_SRC
+
+#+RESULTS:
+: [ 1.   5.5 10. ]
+: [ 6.   10.35 14.7  19.05 23.4 ]
+: [0.]
+: []

@@ -1,0 +1,92 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+<2017-01-29 So>-?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* GDB Tutorial
+  #+BEGIN_QUOTE
+  This should be #+TITLE: GDB Tutorial
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Quellen:
+  - https://beej.us/guide/bggdb/ (v.a. cmdline-GUI ~gdb -tui~)
+  - http://web.eecs.umich.edu/~sugih/pointers/gdbQS.html
+
+  1. Compile with flag ~-g~:
+     #+BEGIN_SRC shell
+     g++ -g -ansi -pedantic -Wall -Wextra -Wconversion -std=C++11 foo.cpp -lm -o foo.out
+     #+END_SRC
+
+  2. Start with TUI (Textual User Interface, shows current code excerpt):
+     #+BEGIN_SRC shell
+     gdb -tui foo.out
+     #+END_SRC
+
+* GDB QuickRef
+
+  All keys can be aliased (abbreviated) as much as still unambiguous.
+
+*** Before Run
+  |--------------+----------+------------------+--------------------------|
+  | FullKey      | MinAlias | Examples         | Meaning                  |
+  |--------------+----------+------------------+--------------------------|
+  | break L      | b L      | break main       | set b at Location main() |
+  |              |          | break 5          | set b at Location line   |
+  |              |          | Break hello.c:5  |                          |
+  | run          | r        | r                |                          |
+  |              |          | run arg1 arg2    |                          |
+  |              |          |                  |                          |
+  |--------------+----------+------------------+--------------------------|
+
+*** During Run
+  |------------------+----------+------------------+-------------------------|
+  | FullKey          | MinAlias | Examples         | Meaning                 |
+  |------------------+----------+------------------+-------------------------|
+  | info  X          | i X      | i b              | list all bs             |
+  |                  |          | info breakpoints | by b number J           |
+  |                  |          | info display     | l.a. displayed vars     |
+  |                  |          |                  | by var num K, see below |
+  | clear J          | c J      | clear b J        | J != line of b!         |
+  | delete J         | del J    |                  | id. to clear            |
+  | enable J         | en J     |                  |                         |
+  | disable J        | disa J   |                  |                         |
+  |------------------+----------+------------------+-------------------------|
+  | next             | n        | n                | nextline in func        |
+  | continue         | c        | c                | run to next b           |
+  | step             | s        | s                | step /into/ func        |
+  | finish           | fi       | fi               | step out of func        |
+  | advance L        | ad L     | ad hello.c:5     | adv to Location L       |
+  |------------------+----------+------------------+-------------------------|
+  | display X        | disp X   | disp X           | disp var every stop     |
+  |                  |          |                  | Left of var: var num K  |
+  | undisplay K      | undi K   | undi K           | undi. var with num K    |
+  | print X          | /none/   | print X          | disp var once           |
+  | printf "f" X     | /none/   | printf "%d\n" i  | disp var once formatted |
+  |------------------+----------+------------------+-------------------------|
+  | backtrace        | bt       | bt               | Show current func call  |
+  |                  |          |                  | stack, cfunc on top,    |
+  |                  |          |                  | callers beneath         |
+  |------------------+----------+------------------+-------------------------|
+  | set variable EXP |          | set var i = 40   | change var at Runtime   |
+  |                  |          |                  | useful together with    |
+  |                  |          |                  | jump to repeat section  |
+  |------------------+----------+------------------+-------------------------|
+  | watch EXP        | wa EXP   | watch i          | Hardware w point:       |
+  |                  |          | wa *(p+5)        | notify change of        |
+  |                  |          | wa array-elm.    | expression, can be var  |
+  |------------------+----------+------------------+-------------------------|
+  | ... much more,   | like     | coredumps, pro   | attachement, etc ...    |
+  |------------------+----------+------------------+-------------------------|
+
+*** Help
+  |--------------+----------+------------------+--------------------------|
+  | FullKey      | MinAlias | Examples         | Meaning                  |
+  |--------------+----------+------------------+--------------------------|
+  | help [Z]     | h [Z]    | h stack          | Help [to group/command]  |
+  |--------------+----------+------------------+--------------------------|

@@ -1,0 +1,217 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+OPTIONS: ^{}
+#+TITLE: MPI_Notes
+#+DATE: <2018-08-15 Wed>
+#+AUTHOR: Johannes Wasmer
+#+EMAIL: johannes@joe-9470m
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE:
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+
+* Using cppStlContainers with MPI
+** References & General Idea
+  - [[https://www.sharcnet.ca/help/images/f/fa/MPI_Datatypes_with_Opaque_Types_seminar_2014.pdf][Preney, SharcNet -- Using MPI Datatypes with Opaque C++ Types]]
+  - General idea:
+    - make sure type has cppStandardLayout
+    - sendRecv length
+    - sendRecv data
+** Always first: Check if type has =cppStandardLayout=
+   - MPI (and others) need type to have cppStandardLayout
+   - cppStandardLayout is a bit like Java POJO and defined in standard
+   - cppStandardLayout means e.g. no ~virtual~ stuff, only one attribute
+     accessModifier, no overcomplex inheritance, ...
+   - *check if your type is cppStandardLayout*:
+     #+BEGIN_SRC C++
+     //-std=c++11
+     #include <type_traits>
+     struct A{ int i; double d[3]; };
+     struct B{ public: int i; private: double d[3]; };
+     std::is_standard_layout<A>::value; // 1
+     std::is_standard_layout<B>::value; // 0
+     #+END_SRC
+** sendRecv ~std::string~
+*** Send   
+#+BEGIN_SRC C++
+#include <type_traits>
+
+void send(std::string const & str, int dest, int tag, MPI_Comm com){
+  unsigned len = str.size ();
+  MPI_Send(&len, 1, MPI_UNSIGNED, dest, tag, com);
+  if (len)
+    MPI_Send( str.data (), len, MPI_CHAR, dest, tag, com);
+}
+#+END_SRC
+*** Recv
+#+BEGIN_SRC C++
+void recv(std::string& str, int src, int tag, MPI_Comm com){
+  unsigned len;
+  MPI_Status stat;
+  MPI_Recv(&len, 1, MPI_UNSIGNED, src, tag, com, &stat);
+  if (len){
+    std::vetor<char> tmp(len);
+    MPI_Recv(tmp.data(), len, MPI_CHAR, src, tag, com, &stat);
+    str.assign(tmp.begin(), tmp.end());
+  }
+  else str.clear();
+}
+#+END_SRC
+
+** sendRecv ~std::vector<T>~
+*** Send
+#+BEGIN_SRC C++
+#include <type_traits>
+
+template <class T>
+int send(std::vector<T> const& vec, int dest, int tag, MPI_Datatype type, MPI_Comm com){
+  if (!std::is_standard_layout<T>::value) return MPI_ERR_TYPE;
+  unsigned len = vec.size ();
+  MPI_Send(&len, 1, MPI_UNSIGNED, dest, tag, comm);
+  if (len)
+    MPI_Send( vec.data (), len, type, dest, tag, com);
+  return MPI_SUCCESS;
+}
+#+END_SRC
+*** Recv
+#+BEGIN_SRC C++
+template <class T>
+void recv(std::vector<T>& vec, int src, int tag, MPI_Comm com){
+  unsigned len;
+  MPI_Status stat;
+  MPI_Recv(&len, 1, MPI_UNSIGNED, src, tag, com, &stat);
+  if (len){
+    vec.resize(len);
+    MPI_Recv(vec.data(), len, MPI_CHAR, src, tag, com, &stat);
+  }
+  else vec.clear();
+}
+#+END_SRC
+
+** Register and sendRecv custom ~MPI_Datatype~
+*Note: The Register function is typeSpecific, the DeRegister and SendRecv
+ functions are typeAgnostic (the latters are templateFcts). For actual code, the
+ Register function should be overloaded so that it works with the others.*
+*** Register DeRegister (example)
+#+BEGIN_SRC C++
+ #include <cstddef> // For offsetof macro 
+ MPI_Datatype register_mpi_type(example const&) {
+   constexpr std::size_t num_members = 3;
+   int lengths[num_members] = {
+     1, 1, 3
+   };
+   MPI_Aint offsets[num_members] = {
+     offsetof(example, x),
+     offsetof(example, y),
+     offsetof(example, vec)
+   };
+   MPI_Datatype types[num_members] = {
+     MPI_INT, MPI_INT, MPI_DOUBLE
+   };
+   MPI_Datatype type;
+   MPI_Type_struct(num_members, lengths, offsets, types, &type);
+   MPI_Type_commit(&type);
+   return type;
+ }
+
+  void deregister_mpi_type(MPI_Datatype type) { MPI_Type_free(&type); }
+#+END_SRC
+*** Send
+#+BEGIN_SRC C++
+  #include <type_traits>
+  template <class T>
+  int send(T const& thing, int dest, int tag, MPI_Comm com){
+    if (!std::is_standard_layout<T>::value) return MPI_ERR_TYPE;
+    MPI_Datatype type = register_mpi_type(thing);
+    MPI_Send(&thing, 1, type, dest, tag, com);
+    deregister_mpi_type(type);
+    return MPI_SUCCESS;
+  }
+
+  template <class T>
+  void send_example(std::vector<T> const& vec, int dest, int tag, MPI_Comm com) {
+    unsigned len = vec.size();
+    MPI_Send(&len, 1, MPI_UNSIGNED, dest, tag, com);
+    if (len != 0) {
+      MPI_Datatype type = register_mpi_type(&vec[0]);
+      MPI_Send(vec.data(), len, type, dest, tag, com);
+      deregister_mpi_type(type);
+    }
+  }
+#+END_SRC
+
+*** Receive
+#+BEGIN_SRC C++
+  template <class T>
+  void recv(T const& thing, int src, int tag, MPI_Comm comm ) {
+    MPI_Status stat;
+    MPI_Datatype type = register_mpi_type(thing);
+    MPI_Recv(&thing, 1, type, src, tag, com, &stat);
+    deregister_mpi_type(type);
+  }
+
+  template <class T>
+  void recv( std::vector<T> const& vec, int src, int tag, MPI_Comm com ) {
+    unsigned len;
+    MPI_Status stat;
+    MPI_Recv(&len, 1, MPI_UNSIGNED, src, tag, com, &stat);
+    if (len != 0) { vec.resize(len);
+      MPI_Datatype type = register_mpi_type(&vec[0]);
+      MPI_Recv(vec.data(), len, type, src, tag, com, &stat);
+      deregister_mpi_type(type);
+    }
+    else vec.clear();
+  }
+#+END_SRC
+
+*** 
+
+** Switching cppStlContainers
+   - eg send ~std::vector~, recv ~std::list~ is now possible, see reference
+* Helpers
+
+** TODO Get ~MPI_Datatype~ for given cppPrimitiveType cppFundamentalType
+- For now the functions above delegate this to the user by demanding the correct
+  corresponding ~MPI_Datatype~ for the given type ~T~ without checking.
+- But it would be better if the functions inferred the correct ~MPI_Datatype~ by
+  themselves.
+- Ideal would be a KV-Map, but there is no wrapper for all primitive types like
+  ~Object~ in Java.
+- Or function overloading.
+- Or there could be a template/traits-based solution. but instead i will do a dirty
+  solution:
+  - define a struct that contains a type for each [[https://msdn.microsoft.com/en-us/library/dn473290(v=vs.85).aspx][MPI_Datatype]].
+  - init an instance of it.
+  - a function compares the var input to all attribute types with ~std::is_same~
+    from C++11 [[https://en.cppreference.com/w/cpp/header/type_traits][header <type_traits>]] and returns appropriate ~MPI_Datatype~
+
+#+BEGIN_SRC C++
+#include <type_traits>
+template <class T>
+void getMpiTypeForType(T t){
+  struct Types{
+    char t0;
+    short t1;
+    int t2;
+    unsigned t3;
+    long t4;
+    float t5;
+    double t6;
+  } types;
+  //TODO
+  
+}
+#+END_SRC

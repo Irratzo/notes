@@ -1,0 +1,14 @@
+* [[file:OrgmodeTutorial_RainerKoenig.org][Master File]]
+* 2018
+** 2018-11 November
+*** 2018-11-02 Friday [4/4]
+    - [X] Weekly review
+    - [X] Go grocery shopping
+    - [X] Read another chapter of "Predictably irrational"
+    - [X] Practice bass
+*** 2018-06-11 Saturday [80%]
+    - [X] Record screen cast for org-mode tutorial
+    - [X] Do the laundry
+    - [X] Vacuum the house
+    - [ ] Wash the car -> it was raining
+    - [X] Practice bass

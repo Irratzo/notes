@@ -1,0 +1,74 @@
+#+TODO: NEXT(n) TODO(t) WAITING(w) SOMEDAY(s) PROJ(p) | DONE(d) CANCELLED(c)
+#+TAGS: PHONE(o) COMPUTER(c) GARAGE(g) SHOPPING(s) FAMILY(f) URGENT(u)
+#+ARCHIVE: myarchive.org::
+
+* [[file:OrgmodeTutorial_RainerKoenig.org][Master File]]
+
+* GTD related things
+** NEXT Weekly Review                                       :REVIEW:COMPUTER:
+   SCHEDULED: <2018-11-16 Fri ++1w>
+
+* NEXT plus1w
+  SCHEDULED: <2018-11-02 Fri +1w>
+  :PROPERTIES:
+  :LAST_REPEAT: [2018-11-04 Sun 02:49]
+  :END:
+  - State "DONE"       from "NEXT"       [2018-11-04 Sun 02:49]
+* NEXT plusplus1w
+  SCHEDULED: <2018-11-09 Fri ++1w>
+  :PROPERTIES:
+  :LAST_REPEAT: [2018-11-04 Sun 02:49]
+  :END:
+  - State "DONE"       from "NEXT"       [2018-11-04 Sun 02:49]
+* NEXT dotplus1w
+  SCHEDULED: <2018-11-11 Sun .+1w>
+  :PROPERTIES:
+  :LAST_REPEAT: [2018-11-04 Sun 02:49]
+  :END:
+  - State "DONE"       from "NEXT"       [2018-11-04 Sun 02:49]
+* Examples
+** TODO Something that is still to be done
+** TODO This one remains
+* Consulting jobs
+** NEXT Time management training for ACME company [1/5]            :TRAINING:
+   - [X] Day 1: Brain dump, write everything down
+   - [ ] Day 2: Split larger tasks into smaller tasks
+   - [ ] Day 3: Weekly Review
+   - [ ] Day 4: Setting goals
+   - [ ] Day 5: Learning to delegate and to say "NO"
+   :PEOPLE:
+   - PHB: The boss type manager that knows nothing but everything better
+   - Dilbert: Smart engineer, bright mind
+   - Wally: Another engineer, but more procrastinator
+   - Dogbert: The evil director of Human Resources
+   - Asok: An intern that does most of the work
+   :END:   
+   :LOGBOOK:
+   - Note taken on [2018-11-06 Tue 03:30] \\
+     There's also Tina the technical writer who is very much interested in
+     participating in the course.
+   - Note taken on [2018-11-06 Tue 03:28] \\
+     Thank god the first day is over. Nice people, but the PHB obviously needs some
+     individual coaching. Dogbert doesn't seem to have a lot of interest.
+   :END:
+
+* Legal obligations
+** NEXT Prepare tax declaration                             :COMPUTER:URGENT:
+   DEADLINE: <2018-11-16 Fri> SCHEDULED: <2018-11-05 Mon>
+   - Collect all documents for your tax lawyer
+** TODO Call the tax lawyer after documents were sent                 :PHONE:
+* Maintenance
+** NEXT Wash the car                                                 :GARAGE:
+   SCHEDULED: <2018-11-03 Sat>
+   - Washing from outside and vacuum cleaning the inside
+* Family business                                                    :FAMILY:
+** NEXT Get a birthday gift for wife                               :SHOPPING:
+   DEADLINE: <2018-11-24 Sat> SCHEDULED: <2018-11-03 Sat>
+** NEXT Watch concert of your kid in school
+   SCHEDULED: <2018-11-07 Wed 16:00-17:00>
+   - Don't miss that, otherwise kid is disappointed
+** NEXT Call Uncle Tom after his surgery                              :PHONE:
+   - Need to know if everything went fine
+* House stuff
+** SOMEDAY Build a bike port in the garden                           :GARAGE:
+   Budget is $200 for the whole thing

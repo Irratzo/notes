@@ -1,0 +1,59 @@
+
+* TODO Drawer example for the sreencast
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-11-06 Tue 04:35
+  :ARCHIVE_FILE: ~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/mylife.org
+  :ARCHIVE_OLPATH: Examples
+  :ARCHIVE_CATEGORY: mylife
+  :ARCHIVE_TODO: TODO
+  :END:
+  - This task will show you how drawers work
+  :MY_DRAWER:
+  - This is usually hidden
+  - The drawer ends with a line that says :END:
+  :END:
+  :LOGBOOK:
+  - Note taken on [2018-11-06 Tue 04:30] \\
+    This task is done and should be moved out of the way now.
+  :END:
+
+
+* DONE Repair bicycle                                                :GARAGE:
+  CLOSED: [2018-11-06 Tue 04:41]
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-11-06 Tue 04:46
+  :ARCHIVE_FILE: ~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/mylife.org
+  :ARCHIVE_OLPATH: Maintenance
+  :ARCHIVE_CATEGORY: mylife
+  :ARCHIVE_TODO: DONE
+  :END:
+** DONE Delivery of spare part (chain)
+   CLOSED: [2018-11-04 Sun 23:22] SCHEDULED: <2018-11-06 Tue>
+   I have the chain ordered, needs to be delivered
+** DONE Mount chain
+   CLOSED: [2018-11-06 Tue 04:40] SCHEDULED: <2018-11-07 Wed>
+   :LOGBOOK:
+   - Note taken on [2018-11-06 Tue 04:40] \\
+     It worked, but just because Petros and Sasha helped.
+   :END:
+   You probably need to readjust the gear shifting
+
+* DONE Another one for the archive
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-11-06 Tue 04:52
+  :ARCHIVE_FILE: ~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/mylife.org
+  :ARCHIVE_OLPATH: Examples
+  :ARCHIVE_CATEGORY: mylife
+  :ARCHIVE_TODO: DONE
+  :END:
+  - This time we use the "archive subtree with prefix" command
+** Some level 3 stuff
+
+* DONE This one goes away
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2018-11-06 Tue 04:52
+  :ARCHIVE_FILE: ~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/mylife.org
+  :ARCHIVE_OLPATH: Examples
+  :ARCHIVE_CATEGORY: mylife
+  :ARCHIVE_TODO: DONE
+  :END:

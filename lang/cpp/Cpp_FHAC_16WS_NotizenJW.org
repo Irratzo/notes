@@ -1,0 +1,748 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+<2017-01-28 Sa> - ?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+
+* FH Aachen Modul C++ 16WS/17SS Notizen JW
+  #+BEGIN_QUOTE
+  This should be #+TITLE: FH Aachen Modul C++ 16WS/17SS Notizen JW
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Dies ist eine Art Notizbuch, entstanden während der Bearbeitung des
+  Übungsmaterials des Kurses C++ von J.Wasmer, für die Prüfungsvorbereitung im
+  SS17. Diese Datei enthält eher allgemeine Dokumentation zur Sprache, den
+  Übungen und Snippets, und weniger Lösungen für spezielle Probleme.
+
+* Abschnitt C - Basistypen, Init, Cast, IO, Scope
+
+** Fundamental Types - Primitive Typen
+   /Official name in C++ language: Fundamental Types/
+
+*** Primitive types available in C++98/C++11
+    *Integral types*:
+    | C++11                  | C++98 |
+    |------------------------+-------|
+    | bool                   | X     |
+    | char                   | X     |
+    | char16_t               | -     |
+    | char32_t               | -     |
+    | wchar_t                | X     |
+    | signed char            | X     |
+    | short int              | X     |
+    | int                    | X     |
+    | long int               | X     |
+    | long long int          | -     |
+    | unsigned char          | X     |
+    | unsigned short int     | X     |
+    | unsigned int           | X     |
+    | unsigned long int      | X     |
+    | unsigned long long int | -     |
+
+    *Floating point types*:
+    | float       |
+    | double      |
+    | long double |
+
+*** /Fixed-width/ Primitive types (C++11), using the example of ~int~
+
+   ~int32_t~, for example, is a /fixed-width/ type: it will be 32 bits long on
+    all machines. ~int~ on the other hand has /variable width/, depending on the
+    machine. /Variable width/ means that it only has a guaranteed minimum width.
+    This is a leftover from the days when memory was scarce. Fixed-width types
+    have been around in C since C99, and in C++ they have been introduced into
+    their specific type-header in C++11.
+
+    Now that /fixed-width/ integers have been added to C++, the best practice
+    for integers in C++ is as follows:
+      - ~int~ can be used when the integer size doesn’t matter and isn’t going
+        to be large.
+      - /Fixed-width/ integers should be used in all other cases, especially
+        when you need an integer with a guaranteed width.
+      - Only use /unsigned/ types if you have a compelling reason.
+    More on best practices and backgrounds [[http://www.learncpp.com/cpp-tutorial/24a-fixed-width-integers/][here]] and [[http://stackoverflow.com/questions/13413521/is-there-any-reason-not-to-use-fixed-width-integer-types-e-g-uint8-t][here]].
+   
+    For ~int~ e.g., the afore-mentioned header is ~cstdint~ ([[http://en.cppreference.com/w/cpp/types/integer][Reference]]).
+    The definitions are:
+    - ~intZ_t~ : signed integer type, width of *exactly* ~Z~ bits
+      (8,16,32,64)
+    - ~int_fastZ_t~: *fastest* signed int type, width *at least* ~Z~ bits
+    - ~int_leastZ_t~: *smallest* signed int type, width *at least* ~Z~ bits
+    - ~intmax_t~: maximum width int type
+   
+    The ~fast~ and ~least~ types are only for code optimization AFTER
+    implementation. Most coders never need to use them.
+
+    ~cstdint~ offers these fine-grained types also for ~uint~ (unsigned), as well
+    as =Macro constants= for these types, like ~INT8_MIN~ representing the
+    *minimum value of an object of type ~int8_t~*.
+
+    
+*** Primitive Types Sizes and Ranges
+
+    Typ -- Größen auf meinem Azubi-Laptop (Windows 7) (~unsigned~
+    / ~signed~ - Groessen waren hier für alle gleich), Beispielcode:
+
+    #+BEGIN_SRC C++
+      signed long long sll = -8;
+      printf("ld=%Lf, sizeof(long double)=%zu\n",ld,sizeof(long double));
+      //or, with header <limits>:
+      auto maxLongLongIntDigits = numeric_limits<long long int>::digits;
+    #+END_SRC
+
+    *Nicht vergessen!:*
+    - Type sizes can differ between machines!
+
+    | type                          | My size (bytes) | (1)  |
+    |-------------------------------+-----------------+------|
+    | ~bool~                        |               1 | same |
+    | ~unsigned / signed char~      |               1 | same |
+    | ~unsigned / signed short~     |               1 | 2    |
+    | ~unsigned / signed short int~ |               2 | ?    |
+    | ~unsigned / signed int~       |               4 | 2    |
+    | ~unsigned / signed long~      |               8 | 4    |
+    | ~unsigned / signed long long~ |               8 | ?    |
+    |-------------------------------+-----------------+------|
+    | ~uint8_t~ / ~int8_t~          |               1 |      |
+    | ~uint16_t~ / ~int16_t~        |               2 |      |
+    | ~uint32_t~ / ~int32_t~        |               4 |      |
+    | ~uint64_t~ / ~int64_t~        |               8 |      |
+    |-------------------------------+-----------------+------|
+    | ~float~                       |               4 | same |
+    | ~double~                      |               8 | same |
+    | ~long double~                 |              16 | 10   |
+    |-------------------------------+-----------------+------|
+    | ~char~                        |               1 |      |
+    | ~signed char~                 |               1 |      |
+    | ~wchar_t~                     |               2 |      |
+    | ~char16_t~                    |               2 |      |
+    | ~char32_t~                    |               4 |      |
+    | ~char*~ (nicht-primitiv!)     |               8 |      |
+    | ~string~ (nicht-primitiv!)    |               8 |      |
+    |                               |                 |      |
+    (1): [[http://www.byte-notes.com/data-types-c][Differing Opinion / Machine?]] (but in the minority, compared to other sites)
+
+    | Name				  | 		Type							  | 	Range																							      |
+    |---------------+-------------------------+---------------------------------------------------------------|
+    | ~int8_t~	    | 1 byte signed				   | 		-128 to 127																							 |
+    | ~uint8_t~		 | 		1 byte unsigned		 | 0 to 255																									    |
+    | ~int16_t~		 | 		2 byte signed			 | 	-32'768 to 32'767																				   |
+    | ~uint16_t~	  | 		2 byte unsigned		 | 	0 to 65'535																							   |
+    | ~int32_t~		 | 		4 byte signed			 | 	-2'147'483'648 to 2'147'483'647													   |
+    | ~uint32_t~	  | 		4 byte unsigned		 | 	0 to 4'294'967'295																			    |
+    | ~int64_t~		 | 		8 byte signed			 | 	-9'223'372'036'854'775'808 to 9'223'372'036'854'775'807     |
+    | ~uint64_t~	  | 		8 byte unsigned		 | 	0 to 18'446'744'073'709'551'615													   |
+  
+    | type     | Mantissa bits | sig.dec.digits | minExp | maxExp | min10Exp | max10Exp |
+    | ~float~  |            24 |              6 |   -125 |    128 |      -37 |       38 |
+    | ~double~ |            53 |             15 |  -1021 |   1024 |     -307 |      308 |
+ 
+
+*** Spezielles zu Chars und Strings (=C05_primitive_data_types_V4.cpp=, =C12_string_example.cpp=)
+
+    Takeaway-Messages C05 onward:
+    1. ~string~ in ~printf~ immer so: ~printf( %s , s.c_str() )~. Das wandelt den
+       C++- in einen C-String (~char*~). Andernfalls zeigt Output den String als
+       undefinierten ~char~ an: ~▒~, oder ~(~, oder usw..
+    2. ~sizeof(x)~, wobei ~x~ ein ~char~-Array ist (~char[]~), gibt *nicht* die
+       Datentyp-Größe zurück (wäre der Fall wenn ~x~ vom Typ ~string~ oder
+       ~char*~ wäre), sondern die *Anzahl* chars im Array, äquivalent zu
+       ~x.size()~ und ~x.length()~ beim C++-Strings.
+    
+    Takeaway-Messages C10 to C12:
+    1. NOTjava: C++-String ist *mutable* (zB via ~[]~-Operator).
+    2. NOTjava: ~==~ prüft bei ~string~ auf Gleichheit, nicht Identität
+    3. NOTjava: ~string s2=s1~ dupliziert den String (andere Speicherad.)
+    4. NOTjava: ~string::substr~ zweiter Param ist =len= statt =endIndex=.
+    5. for each / range-based for-loop funzt auch auf ~string~ (mit ~auto~)
+    6. ~string::insert~, ~string::erase~ gezeigt, jeweils (=pos=, ~string~ /
+       =len= )
+
+
+
+** Initialisierung, Casting / Conversion
+*** ~auto~ Specifier, Uniform Initializiation with ~initialize_list<T>~
+
+   The whole business of ~auto~ is that the compiler infers things for you.
+
+   [[http://en.cppreference.com/w/cpp/language/auto][Cppreference: auto: Syntax & Examples]]
+   | ~auto~ /variable initializer/ 	                 | (1) | 	(since C++11) |
+   | ~auto~ /function -> return type/                 | (2) | 	(since C++11) |
+   | ~auto~ /function/ 	                             | (3) | 	(since C++14) |
+   | ~decltype(auto)~ /variable initializer/          | (4) | 	(since C++14) |
+   | ~decltype(auto)~ /function/                      | (5) | 	(since C++14) |
+   | ~auto~ ~::~ 	                                   | (6) | 	(concepts TS) |
+   | cv(optional) ~auto~ /ref(optional) parameter/ 	 | (7) | 	(since C++14) |
+   | ~template~ < ~auto~ /Parameter/ >                | (8) | 	(since C++17) |
+
+  
+   Examples:
+   #+BEGIN_SRC C++
+    auto a = 0;        //inferred to be int
+    auto b = 123.f;    //inferred to be float
+    auto c = L"hello"; //inferred to be: const wchar_t * c (IntelliJ), const const char * (Netbeans)
+    auto d = {1,2,3};  //auto initializer_list for containers is also possible!
+    int n{2};          //uniform initilization
+    int m{};           //u.i., def-value (0)
+    string s{"foo"};   
+   #+END_SRC
+
+     More Uniform Initialization examples come later in section Classes & Objects.
+     
+*** Fundamental Type -- Initialization with /Literals/
+
+    Good source: http://www.learncpp.com/cpp-tutorial/28-literals/ 
+
+    Examples:
+    #+BEGIN_SRC C++
+      auto b = 123.f;    //inferred to be float
+      auto c = L"hello"; //inferred to be: const wchar_t * c (IntelliJ), const const char * (Netbeans)
+    #+END_SRC
+   
+    The ~L~ prefix above specifies ~c~ as ~const wchar_t *~ instead of ~const char *~:
+
+    | 'a'  | type: ~char~         |
+    | L'a' | type: ~wchar_t~      |
+    |      |                      |
+    | "a"  | type: ~char~         |
+    | L"a" | type: ~wchar_t~      |
+    | U"a" | type: ~char32_t~     |
+    |      |                      |
+    | 1    | type: ~int~          |
+    | 1U   | type: ~unsigned int~ |
+    |      |                      |
+    | 0.5  | type: ~double~       |
+    | 0.5f | type: ~float~        |
+    | 0.5L | type: ~long double~  |
+
+    So, Netbeans C++ documentation does not recognize this specification
+    statically! Background info on ~wchar_t~ (IntelliJ above) from [[https://en.wikipedia.org/wiki/Wide_character][Wikipedia]] : A
+    /wide character/ is a computer character datatype that generally has a size
+    /greater/ than the traditional 8-bit character. The increased datatype size
+    allows for the use of larger coded character sets. The wide characters are
+    defined using datatype ~wchar_t~. The implementation is compiler-specific
+    ~char16_t~ or ~char32_t~. ~wchar_t~ has *nothing* to do with Unicode, see
+    [[http://stackoverflow.com/questions/13087219/what-exactly-is-the-l-prefix-in-c][Stack Overflow discussion]].
+
+*** Simples =FundamentalTypeCasting= (=C06_casts.cpp=)
+    =implicitTypeConversion= =explicitTypeConversion= =FundamentalTypeConversion=
+
+    Takeaway-Messages (Klammern: bytes auf meinem Azubi-Laptop):
+    1. Bspe von "problemlosen" /impliziten Casts/:
+       - ~char~ (1) --> ~int~ (up to 4) <--> ~unsigned int~ (up to 4)
+    2. Diese /impliziten Casts/ werfen zB Warnungen mit ~-Wconversion~-Compiler-Flag:
+       - ~unsigned int~ (up to 4) --> ~char~ (1)
+       - ~double~ (8) --> ~float~ (4)
+    3. /Explizite Casts/ zwischen solchen "Problempaaren" ~x~, ~y~ werfen keine Warnungen:
+       - ~b = (y)a~ äqv. ~b = y(a)~ äqv. ~b = static_cast<y> (a)~
+    4. C++11: korrektes Casten von ~double~ --> ~int~:
+       - ~i = lround(d)~
+       - ~lround(double)~ nimmt *näheren* /floor/- oder /ceiling/-Wert statt immer
+         /floor/
+    5. Lokales (?) Ausschalten von Compiler-Warnungen möglich per
+       Compiler-Direktiv ~pragma~:
+       #+BEGIN_SRC C++
+       #pragma GCC diagnostic ignored "-Wconversion"
+       #+END_SRC
+  
+*** String-To-Fundamental-Type-Conversion (=C08_cin.cpp=, Duilin)
+
+    - stoi, stol, stod, stof konvertieren ~strings~ in resp. ~int~ usw.
+    - ~cin >> a >> b~ erwartet Trennung per Leerzeichen, z.B. ~1.5 2.5~
+    - strtol, strtod erlauben check ob geglückt, siehe [[file:Cpp_Websnippets_NotesJW.org][Websnippets Notes > suche
+      strtod]]
+
+*** ~static_cast~, ~dynamic_cast~, ~const_cast~, ~reinterpret_cast~
+      
+    Siehe [[file:Cpp_Websnippets_NotesJW.org][Websnippets Notes > suche const_cast]].
+    
+
+** Arrays, Vorgriff Collections
+
+*** Arrays (=C11_array_example.cpp=)
+    Takeaway-Messages:
+    - *Best Practice* Array-Deklaration: Größe zuerst als ~const size_t~
+      initialisieren.
+    - ~f(x[] y)~ ist PBR, also ist ~sizeof(y) == sizeof(x)~, während ~sizeof~
+      auf einen lokal initialisierten Array seine Gesamtbytelänge angibt.
+    - NOTjava: Array-Werte lassen sich außerhalb des Init-Bereis setzen und
+      lesen (~&x+z~).
+
+
+*** C++ Looping Compendium for arrays / STL Sequence Containers
+
+  This section presents a whole compendium of different approaches for looping
+  over a container, taken from [[http://stackoverflow.com/a/10758845][here]]. The examples also cover the new
+  C++11-feature /range-based for-loop/. The example sequence container is a
+  ~vector~, the use-case is printing the elements.
+
+  #+BEGIN_SRC C++
+     //containers
+      char arr[5]{'H','u','h','u','\0'};
+      vector<char> path{'l', 'o', 'o', 'p', 'i', 'n', 'i', 's', 'f', 'u', 'n', '!', '\n'};
+      typedef vector<char> Path2;
+      Path2 path2{'w', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e', '!', '\n'};
+      vector<int> v{1, 2, 3};
+
+      //C++98, array: classic, with siz_t length calculation
+      for (size_t i=0; i < sizeof(arr)/sizeof(char); ++i)
+          cout << arr[i];
+      cout << endl;
+      
+      //C++98 newbie: use a counter (better version, see below)
+      for (int i = 0; i < path.size(); ++i)
+          cout << path[i];
+
+      //C++98: use an iterator: best-practice for STL containers
+      for (vector<char>::iterator i = path.begin(); i != path.end(); ++i)
+          cout << *i; //disallow change: use const_iterator
+
+      //C++11: with auto, non-const iterator
+      for (auto i = path.begin(); i != path.end(); ++i) 
+          cout << *i;
+
+      //C++11: with auto, and typedef(defined): latter enables using const_iterator
+      for (Path2::const_iterator i = path2.begin(); i != path2.end(); ++i) 
+          cout << *i;
+
+      //C++98: improved counter version using container's member types.
+      //such types must be available, e.g. via a typedef, like here.
+      //The type for the vector here size_type (returned by size function)
+      for (Path2::size_type i = 0; i < path2.size(); ++i) 
+          cout << path[i];
+
+      //C++11: range-based for-loop / for each, pass-by-value (PBV)...
+      for (int c : arr) 
+          cout << c; //...works on arrays [], too
+      cout << endl;
+
+      //C++11: range-based for-loop / for each, pass-by-value (PBV)...
+      for (int a : v) 
+          a *= -1; //...is not changing v
+      cout << endl;
+
+      //C++11: range-based for-loop / for each, pass-by-reference (PBR)...
+      //advantage: element does not get copied -> needs less memory
+      for (int& a : v) 
+          a *= -1; //... enables changing v
+      cout << endl;
+
+      //C++11: RBFL / for each, PBR, const (change disallowed)
+      for (const auto& c : path) 
+          cout << c; //recommended style for tasks like cout!
+
+      //C++11: RBFL / for each: also works on in-place initializer_list
+      //but (at least in Netbeans gcc) only with 'const'
+      //    for (int& x: {...}){ //Netbeans error: binding 'const int' to
+      //                         //reference of type 'int&' discards qualifiers
+      for (const char& c :{'i', 'n', 'p', 'l', 'a', 'c', 'e', '\n'}) 
+          cout << c;
+
+      //C++98: using std::copy and the 'iterator adaptor' ostream_iterator
+      //(also works with only one ostream arg)
+      //GOOD: the only one-liner, but requires specific type
+      copy(v.begin(), v.end(), ostream_iterator<int>(cout, " "));
+      cout << endl;
+
+      //C++11: using C++98 std::for_each and C++11 Lambda
+      //for_each is 'overkill' for cout, but good for operations, and a one-liner!
+      for_each(path.begin(), path.end(), [] (const auto c) {
+          cout << c;
+      });
+
+      //C++98: using generic << overloading (implementation is also C++98)
+      cout << path;
+  #+END_SRC
+
+  The last example uses a generic approach with globally overloading the ~<<~
+  operator. The implementation is arbitrarily chosen to use the ~std::copy~
+  approach from above:
+  #+BEGIN_SRC C++
+    template <typename T> //already defined in header, but did only work like this
+    ostream& operator<<(ostream& out, const vector<T>& v) {
+        if (!v.empty()) {
+            out << '[';
+            copy(v.begin(), v.end(), ostream_iterator<T>(out, ", "));
+            out << "\b\b]";
+        }
+        return out;
+    }
+  #+END_SRC
+
+*** Range-based-for loop: ~first~, ~second~ for <K,V>-Containers (Ex. 16)
+
+   #+BEGIN_SRC C++
+   map<string,int> histogram;
+    
+    //C++11: range-based for-loop, auto, const, PBR
+    for (const auto& pair: histogram){
+        cout << pair.first << ',' << pair.second << endl;
+    }
+   #+END_SRC
+
+
+** IO, Scopes, Bits
+
+
+*** ~printf~-Referenz
+    
+**** printf Format specifiers / Modifiers / Fields
+
+     Prototype ([[http://www.cplusplus.com/reference/cstdio/printf/][Reference]]).:
+     #+BEGIN_SRC sh
+     %[flags][width][.precision][length]specifier
+     #+END_SRC
+
+    Das ganze Ding wird der *Format Specifier* genannt. Die optionalen Dinger
+    (die in square brackets) werden *Subspecifier* genannt. Weitere Namen
+    dieser:
+
+    | ~%~ | Flags    | Width Sp.   | .Precision   | Length  | Specifier character   |
+    |-----+----------+-------------+--------------+---------+-----------------------|
+    |     | Flags    | Field Width |              |         | Conversion Modifier   |
+    |     |          | Feldbreite  | Nachkommast. |         | Typ / Umwandl.zeichen |
+    |     | Flags f. | Width Field | Prec. Field  | L field | Type field            |
+    |-----+----------+-------------+--------------+---------+-----------------------|
+
+   
+
+**** Der oblig. Specifier character / Conversion Modifier / Umwandlungsszeichen: Typen
+     | Modifier       | Conversion                                          |
+     |----------------+-----------------------------------------------------|
+     | ~%d~ / ~%i~ 	 | ~int~                                               |
+     | ~%c~ 	        | einzelnes Zeichen                                   |
+     | ~%e~ / ~%E~ 	 | ~double~ im Format ~[-]d.ddd~ ~e±dd~ bzw. ~[-]d.ddd E±dd~ |
+     | ~%f~ 	        | ~double~ im Format ~[-]ddd.ddd~                     |
+     | ~%g~ / ~%G~    | ~%f~ oder ~%e~, was gerade kürzer ist               |
+     | ~%o~ 	        | ~int~ als Oktalzahl ausgeben                        |
+     | ~%p~ 	        | die Adresse eines Pointers                          |
+     | ~%s~ 	        | Zeichenkette ausgeben                               |
+     | ~%u~ 	        | ~unsigned int~                                      |
+     | ~%x~ / ~%X~ 	 | ~int~ als HEXadezimalzahl ausgeben                  |
+     | ~%%~ 	        | Prozentzeichen                                      |
+     |----------------+-----------------------------------------------------|
+     | ~%zu~          | for ~size_t~ (~z~ actually Length spec., see below) |
+     |----------------+-----------------------------------------------------|
+
+**** Die Optional Subspecifiers / Modifiers Flag, Width, .Precision, Length: Typen
+     
+     | Flag  | Bedeutung                                                |
+     |-------+----------------------------------------------------------|
+     | ~-~   | linksbündig (Default: rechtsbündig)                      |
+     | ~+~   | Voranstellung von +/- (Default: nur bei -)               |
+     | ~SPC~ | Leerzeichen FALLS Wert positiv                           |
+     | ~#~   | Abh. vom Modifier:                                       |
+     |       | - bei ~%x~ z.B. Voranstellung von ~0x~ wenn Wert nicht 0 |
+     |       | - bei ~%f~ z.B. Ausgabe immer mit Dezimaltrenner         |
+     | ~0~   | Auffüllen auf Feldbreite mit Nullen statt =SPC=          |
+     |-------+----------------------------------------------------------|
+
+     Width has a numeric value!
+     | width  | Description                                   |
+     |--------+-----------------------------------------------|
+     | number | min. width, SPC-padding                       |
+     | ~*~    | external integer value preceding the argument |
+     |--------+-----------------------------------------------|
+
+     | .precision | Description                                   |
+     |------------+-----------------------------------------------|
+     | ~.~        | equals ~.0~                                   |
+     | .number    | Integer specifiers (d,i,o,u,xX):              |
+     |            | - min. digits to print, zero-padding          |
+     |            | aA,eE,fF specifiers:                          |
+     |            | - digits after decimal point (def. 6)         |
+     |            | sS specifiers:                                |
+     |            | - max. chars to print                         |
+     | ~.*~       | external integer value preceding the argument |
+     |------------+-----------------------------------------------|
+
+     Length subspecifier: see detailed chart on [[http://www.cplusplus.com/reference/cstdio/printf/][Cplusplus]], [[http://en.cppreference.com/w/cpp/io/c/fprintf][CppRef]].
+     Table here only short desc. from [[https://en.wikipedia.org/wiki/Printf_format_string#Length_field][Wikipedia]].
+     | length | for ~int~               | for float nu. types  |
+     |--------+-------------------------+----------------------|
+     | ~hh~   | expect arg to be ~char~ | ?                    |
+     | ~h~    | expect ~short~          | ?                    |
+     | ~l~    | expect ~long~           | expect ~double~      |
+     | ~ll~   | expect ~long long~      | ?                    |
+     | ~L~    | ?                       | expect ~long double~ |
+     | ~z~    | expect ~size_t~         |                      |
+     |--------+-------------------------+----------------------|
+
+**** printf Modifier Examples from [[http://en.cppreference.com/w/cpp/io/c/fprintf][CppRef]]
+     [[file:websnippets/io/io_printf_modifiers_cpprefexample.cpp][Archive > Code File]]:
+     #+BEGIN_SRC C++
+     #include <cstdio>
+     #include <limits>
+     #include <cstdint>
+     #include <cinttypes>
+      
+     int main()
+     {
+         std::printf("Strings:\n");
+      
+         const char* s = "Hello";
+         std::printf("\t[%10s]\n\t[%-10s]\n\t[%*s]\n\t[%-10.*s]\n\t[%-*.*s]\n",
+             s, s, 10, s, 4, s, 10, 4, s);
+      
+         std::printf("Characters:\t%c %%\n", 65);
+      
+         std::printf("Integers\n");
+         std::printf("Decimal:\t%i %d %.6i %i %.0i %+i %u\n", 1, 2, 3, 0, 0, 4, -1);
+         std::printf("Hexadecimal:\t%x %x %X %#x\n", 5, 10, 10, 6);
+         std::printf("Octal:\t%o %#o %#o\n", 10, 10, 4);
+      
+         std::printf("Floating point\n");
+         std::printf("Rounding:\t%f %.0f %.32f\n", 1.5, 1.5, 1.5);
+         std::printf("Padding:\t%05.2f %.2f %5.2f\n", 1.5, 1.5, 1.5);
+         std::printf("Scientific:\t%E %e\n", 1.5, 1.5);
+         std::printf("Hexadecimal:\t%a %A\n", 1.5, 1.5);
+         std::printf("Special values:\t0/0=%g 1/0=%g\n", 0.0/0.0, 1.0/0.0);
+      
+         std::printf("Variable width control:\n");
+         std::printf("right-justified variable width: '%*c'\n", 5, 'x');
+         int r = std::printf("left-justified variable width : '%*c'\n", -5, 'x');
+         std::printf("(the last printf printed %d characters)\n", r);
+      
+         // fixed-width types
+         std::uint32_t val = std::numeric_limits<std::uint32_t>::max();
+         std::printf("Largest 32-bit value is %" PRIu32 " or %#" PRIx32 "\n", val, val);
+     }
+     #+END_SRC
+     
+     Output (mein Azubi-Laptop cygwin):
+     #+BEGIN_EXAMPLE
+     Strings:
+             [     Hello]
+             [Hello     ]
+             [     Hello]
+             [Hell      ]
+             [Hell      ]
+     Characters:     A %
+     Integers
+     Decimal:        1 2 000003 0  +4 4294967295
+     Hexadecimal:    5 a A 0x6
+     Octal:  12 012 04
+     Floating point
+     Rounding:       1.500000 2 1.50000000000000000000000000000000
+     Padding:        01.50 1.50  1.50
+     Scientific:     1.500000E+00 1.500000e+00
+     Hexadecimal:    0x1.8p+0 0X1.8P+0
+     Special values: 0/0=nan 1/0=inf
+     Variable width control:
+     right-justified variable width: '    x'
+     left-justified variable width : 'x    '
+     (the last printf printed 40 characters)
+     Largest 32-bit value is 4294967295 or 0xffffffff
+     #+END_EXAMPLE
+
+
+*** Scopes, Namespaces, Speicheradressen (=C09_scope.cpp=)
+    
+
+    Beispiel: 
+    #+BEGIN_SRC C++
+      int n = 1;  // globales n
+
+      int main()
+      {
+    
+          int n = 2, k = 3;  // lokal, verdeckt globales n
+    
+          if (true)
+          {
+              int n = 4, m = 5;   // lokal
+              *(&k-1)=6;  // uii?
+          }   // end of scope
+    
+          //more print cmds
+          return EXIT_SUCCESS;
+      }
+    #+END_SRC
+
+    #+BEGIN_EXAMPLE
+    Line  Function    |  Comment
+     
+    19  main        |  Ebene: main(), bisher nur global n=1 gesetzt:
+    20  main        |  n=1, &n=0x100403018
+     
+    22  main        |  nun in main n=2, k=3 gesetzt.
+    24  main        |  n=2, &n=0xffffcbec, ::n=1, &::n=0x100403018, k=3, &k=0xffffcbe8
+    27  main        |  *(&k-1)=1, &k-1=0xffffcbe4
+     
+     
+    31  main        |     Ebene: main() > if(true)-Block
+    33  main        |     nun im block n=4, m=5 gesetzt.
+    34  main        |     n=4, &n=0xffffcbe4, m=5, &m=0xffffcbe0, ::n=1, &::n=0x100403018
+    38  main        |     *(&k-1)=4, &k-1=0xffffcbe4
+     
+    40  main        |     nun *(&k-1)=6 gesetzt (myExperiment)
+    41  main        |     n=6, &n=0xffffcbe4
+    42  main        |     *(&k-2)=5, &k-2=0xffffcbe0
+     
+    45  main        |  Ebene: main()
+    48  main        |  *(&k-1)=6, &k-1=0xffffcbe4
+    50  main        |  n=2, &n=0xffffcbec, ::n=1, &::n=0x100403018, k=3, &k=0xffffcbe8
+    #+END_EXAMPLE
+
+**** Speicher-Analyse des Beispiels
+     Remember: ~int~ has size 4 bytes!
+     | Scope    | Speicheradresse | Var  | Bemerkung             |
+     |----------+-----------------+------+-----------------------|
+     | global   |     0x100402018 | n    |                       |
+     |----------+-----------------+------+-----------------------|
+     | main     |      0xffffcbec | n    |                       |
+     |          |      0xffffcbe8 | k    |                       |
+     |          |      0xffffcbe4 | &k-1 | * == n global         |
+     |----------+-----------------+------+-----------------------|
+     | if-block |      0xffffcbe4 | n    |                       |
+     |          |      0xffffcbe0 | m    |                       |
+     |          |      0xffffcbe4 | &k-1 | & UND * == n if-block |
+     |          |      0xffffcbe0 | &k-2 | & UND * == m if-block |
+     |----------+-----------------+------+-----------------------|
+     | main     |      0xffffcbe4 | &k-1 | & UND * == n if-block |
+     |----------+-----------------+------+-----------------------|
+
+ Also, Speicher (Heap?) wird in ~main()~ /rückwärts/ belegt, und
+ /Address-Hopping/ ab ~k~ funzt immer gleich, da ~k~ nur einmal deklariert wurde.
+ Die /globale Variable/ wird ganz woanders abgelegt als die ~main()~-Variablen.
+
+     |    Adresse |   Wert | Variablen           |
+     |------------+--------+---------------------|
+     | 0xffffcbe0 |      5 | m if-block, *(&k-2) |
+     | 0xffffcbe4 | 4 -> 6 | n if-block, *(&k-1) |
+     | 0xffffcbe8 |      3 | k main              |
+     | 0xffffcbec |      2 | n main  (hex c=12)  |
+
+      
+
+
+
+
+*** Bit-Operatoren (=C07_operations.cpp=)
+
+     Gute Quelle: http://www.learncpp.com/cpp-tutorial/38-bitwise-operators/
+    
+     The following table displays bit operator results using example arguments
+     for a examplatory 4-Bit-Number-Type:
+     - 0101 and 0011 for the first three rows,
+     - 0101 for the One-Complement operator, and 1011 2 for the shift operators.
+
+     Reminder: negative numbers are stored as *two's complement*:
+     #+BEGIN_EXAMPLE
+     1-complement = bitwise invert all bits
+     two's complement = 1-complement plus 1.
+     #+END_EXAMPLE
+     Example with ~int x=2~:
+     - ~0000 0010~ -> ~1111 1101~ -> ~1111 1110~.
+     Backconversion identical:
+     - ~1111 1110~ -> ~0000 0001~ -> ~0000 0010~.
+     | Op   | Description      | In bin    | In dec | Out bin | Out dec |
+     |------+------------------+-----------+--------+---------+---------|
+     | ~&~  | AND              | 0101 0011 | 5 3    |    0001 |       1 |
+     | ~¦~  | OR               | 0101 0011 | 5 3    |    0111 |       7 |
+     | ~`~  | XOR              | 0101 0011 | 5 3    |    0110 |       6 |
+     | ~~~  | (One-Complement) | 0101      | 5      |    1010 |      -6 |
+     | ~<<~ | Left-Shift       | 0111 2    | 7      |    1100 |      -4 |
+     | ~>>~ | Right-Shift      | 0111 2    | 7      |    0001 |       1 |
+     (Note: ~¦~ only used cause org-Table interprets ~|~ as col-separator.)
+
+
+
+* Abschnitt D - Funktionen
+
+
+
+
+* Abschnitt I - Threads
+** ThreadSynchronization via Condition Variables
+   [[file:///C:/Users/johannesw/Desktop/Studium/Kurse/Cpp/Gonicup_CppNotizen_17FS/reference/en/cpp/thread/condition_variable.html][cppref offline gonicuprepo source]]
+   =ThreadCondVar= The condition_variable class is a synchronization primitive
+   that can be used to block a thread, or multiple threads at the same time,
+   until another thread both modifies a =sharedVar= (the condition), and
+   notifies the ~condition_variable~.
+
+   The thread that intends to modify the variable has to
+   1. acquire a ~std::mutex~ (typically via ~std::lock_guard~)
+   2. perform the modification while the lock is held
+   3. execute ~notify_one~ or ~notify_all~ on the ~std::condition_variable~ (the
+      lock does not need to be held for notification)
+
+   Any thread that intends to wait on std::condition_variable has to
+   1. acquire a ~std::unique_lock<std::mutex>~, on _the same mutex_ as used to
+      protect the =sharedVar=
+   2. execute ~wait~, ~wait_for~, or ~wait_until~. The wait operations
+      atomically release the mutex and suspend the execution of the thread.
+   3. When the ~condition_variable~ is notified, a timeout expires, or a
+      spurious wakeup occurs, the thread is awakened, and the mutex is
+      atomically reacquired. The thread should then check the condition
+      (=sharedVar=) and resume waiting if the wake up was spurious.
+
+
+   
+
+   
+
+   
+
+   
+** Aufgaben - Lessons Learned
+*** Bzgl Übergabe von ModifiableParams von =WorkFct=: PassByWhat?!
+    Siehe auch in Snippets > I > Aufgaben > Ioreth und Snipptes I07, I08.
+
+    Übergebene Parameter bisher:
+    - das ~mutex~, und ggf. ~condition_variable~
+    - Ergebnis-Variable zB ~int sum~ oder ~vector<int> vec~
+
+    Man hat mehrere Übergabeform-Möglichkeiten. Im Folgenden wird stellv. eine
+    Variable ~T &a~ verwendet, dies gilt aber für alle aus den obigen beiden
+    Gruppen (mutex und ResultVar) gleich. Pro Anwendung sollte man dann auch für
+    alle diese Var die gleiche Mögl nehmen.    
+    | No | Param (Signature) | Caller (Outside) | Body (Inside)            |
+    |----+-------------------+------------------+--------------------------|
+    |  3 | ~[&](){/*...*/}~  | ~a~              | ~a~                      |
+    |----+-------------------+------------------+--------------------------|
+    |  1 | ~T &a~            | ~std:ref(a)~     | ~a~                      |
+    |----+-------------------+------------------+--------------------------|
+    |  2 | ~T *a~            | ~&a~             | ~(*sum)~ if eg ~int~     |
+    |    |                   |                  | ~v->push~ if eg ~vector~ |
+    |----+-------------------+------------------+--------------------------|
+
+    
+    
+    
+* Verschiedenes
+
+  Sammelbecken für Dinge, die nicht direkt mit dem Lehrstoff in Verbindung
+  stehen, aber trotzdem irgendwie nützlich sind.
+
+** Nifty header trick
+   
+      If you use *gcc*, most of the time you need only one include line for the
+   STL: ~<bits/stdc++.h>~. For other compilers (e.g. VisualStudio), you still
+   have to include everything manually.
+
+   #+BEGIN_SRC C++
+     #if defined(_WIN32) || (defined(__APPLE__) && defined(__MACH__))
+       #include <cstdio>
+       #include <iostream>
+       #include <string>
+       #include <vector>
+       #include <map>
+       #include <algorithm>
+       #include <functional> //for Lambdas, Lambdas_Mine
+       #include <memory>
+       #include <type_traits>
+       #include <initializer_list> //for AutoDeclType, AutoDeclType_Mine
+     #else
+       #include <bits/stdc++.h>
+     #endif
+   #+END_SRC
+
+   Source: [[https://www.youtube.com/watch?v=iWvcoIKSaoc][yt > Jetbrains - A Tour of Modern C++]], Upload <2015-07-06>

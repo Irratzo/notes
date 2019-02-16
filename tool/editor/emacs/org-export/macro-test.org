@@ -1,0 +1,5 @@
+
+
+#+MACRO: name replacement text $1, $2 are arguments
+
+{{{name(arg1, arg2)}}}

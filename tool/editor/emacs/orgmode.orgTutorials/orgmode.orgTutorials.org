@@ -1,0 +1,31 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+TITLE: orgmode.orgTutorials
+#+DATE: <2018-11-16 Fri>
+#+AUTHOR: Johannes Wasmer
+#+EMAIL: johannes@joe-9470m
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE:
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+THIS IS THE MASTER FILE FOR NOTES ON ORGMODE.ORG TUTORIALS
+
+
+* MAIN REFERENCE / OVERVIEW: [[https://orgmode.org/worg/org-tutorials/][org.mode org-tutorials]]
+* TODO Rainer König 'Get Organized with org mode' [[file:~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/OrgmodeTutorial_RainerKoenig.org][Master File]]
+- started ca. <2018-11-02 Fri>, postponed <2018-11-10 Sat>
+* DONE Org as a spreadsheet system [[file:OrgSpreadsheetTutorial.org][file]] [[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][URL]]
+   CLOSED: [2018-11-17 Sat 01:05]

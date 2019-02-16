@@ -1,0 +1,40 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+
+<2017-02-12 So> - ?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* Exercism Notizen
+  #+BEGIN_QUOTE
+  This should be #+TITLE: Exercism Notizen
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Dies ist eine Art Notizbuch zur hiesigen Installation der
+  Programmiersprachen-Lernplattform [[http://exercism.io/][Exercism]].
+
+* Exercism Installation & Konfiguration (Windows)
+
+  Dieser [[http://exercism.io/cli/windows][Anleitung (Windows)]] gefolgt (in cmd, nur erste Zeile mit Admin-Rechten):
+  #+BEGIN_SRC 
+  choco install exercism-io-cli
+  exercism configure --key=3edc081e1fb8495c9a100a9a06ac0466
+  exercism fetch cpp
+  #+END_SRC
+
+  Damit ist nun die installierte Version Exercism ~version 2.3.0~ (auch in cmd
+  ohne Administratorrechte).
+  
+* C++ Problems
+
+  Howto: http://exercism.io/languages/cpp/about
+  Location: C:\Users\johannesw\exercism\cpp
+  Submit:
+  #+BEGIN_SRC
+  exercism submit C:\Users\johannesw\exercism\cpp\PATH_TO_FILE
+  #+END_SRC

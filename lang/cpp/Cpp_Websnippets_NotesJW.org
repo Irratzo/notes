@@ -1,0 +1,2449 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+<2017-01-28 Sa> - ?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+#+OPTIONS: toc:2
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+* Archive > Reference > C++ > websnippets Notes JW
+  #+BEGIN_QUOTE
+  This should be #+TITLE: Archive > Reference > C++ > websnippets Notes JW
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Dies ist eine Art Notizbuch, entstanden während der Bearbeitung des
+  Übungsmaterials des Kurses C++ von J.Wasmer, für die Prüfungsvorbereitung im
+  SS17. Diese Datei enthält eher allgemeine Dokumentation zur Sprache, und
+  bezieht sich dabei auf gesammelte [[file:websnippets][websnippets]] zum Thema, mit Links.
+
+* Sources, Definitions, Abbreviations:
+  
+** Sources & adapted Defs, Abbrevs
+  - If a Heading mentions a particular source, then the complete content is
+    coming from that source exclusively.
+    
+  - Sources list; Identifier = Source Reference
+  - Primary Source (ie source if not specified in headings):
+    - [ALEX] = [[http://www.learncpp.com/][LearnCpp.com]]. Adapted Defs & Abbrevs:
+      - BestPractice, _Rules_, /Tips/, *Conclusions*
+  - Minor sources (specified in headings):
+    - [StackOverflow], eg [[https://stackoverflow.com/q/4421706/8116031][OpOverloading FAQ]]
+    - [RRZN] = RRZN Handbücher zu C und C++
+    - [GoniCup] = Notes / Snippets on [[https://github.com/Bergiu/CPP][GitHubRepo]] of [[https://matse.it/u/gonicup/summary][MATSE.it Forum user GoniCup]]
+      (mainly WichtigeNotizen.md)
+    - [cplusplus.com] Tutorial
+    - Yt Bucky's C++ Tutorial
+    - Yt Bo Quian's C++ Tutorials
+
+    Tip: to download whole websites for offline use, use HTTrack. E.g. for
+     LearnCpp.com, set Limits > Maximum Mirror Depth to 2, leave anything else as
+     is.
+
+** Definitions & Abbreviations
+   - *Pattern*: Schablone, Vorlage, e.g.:
+     - codeSnippet/patternForReadingFile, patternForOverloadingComparisonOp, ...
+   - if not defined here, defined in resp. section
+   - =CT=, =RT=: CompileTime, RunTime
+   - =Fundamental= = =Primitive= = =Built-In= Type
+   
+
+* Variable Scope and More Types
+** Enum, Enum Classes
+*** *patternForConvertingEnumToString* *patternForAdaptingEnumToCout*
+    *patternForPrintingEnumAsString*. Example: overloads ~operator<<~ using a
+    ~std::map<MyEnum,string>~:
+    #+BEGIN_SRC C++
+      enum SEX {
+          FEMALE,
+          MALE,
+          UNSPECIFIED
+      };
+
+      std::ostream& operator<<(std::ostream& out, const SEX value) {
+          static std::map<SEX, std::string> strings;
+          if (strings.size() == 0) {
+      #define INSERT_ELEMENT(p) strings[p] = #p
+              INSERT_ELEMENT(FEMALE);
+              INSERT_ELEMENT(MALE);
+              INSERT_ELEMENT(SEX::UNSPECIFIED);
+      #undef INSERT_ELEMENT
+          }
+
+          return out << strings[value];
+      }    
+    #+END_SRC
+** =typedef= and aliases
+
+*** =typedef= Example: Defining a ~pair~
+    #+BEGIN_SRC C++
+      /*Input file content: one line: a 2*/
+      /*then call on linux shell with: myprog < dat.in > dat.out*/
+      typedef pair<string,int> eingabe;
+      cin >> ein1.first;
+      cin >> ein1.second;
+
+      //  copy(ein1, ostream_iterator<eingabe>(cout, " "));
+      //funktioniert wahrscheinlich nicht, weil pair kein STL-Container
+
+      cout << ein1.first << " " << ein1.second << endl;      
+    #+END_SRC
+*** =typedef= Example: defs in [[file:AltesCppZeug/JWalteCppCodingProjekte/lernplaner2017Netbeans/lerntageplaner.cpp][JW LernTagePlaner 2012]]:
+    #+BEGIN_SRC C++
+      typedef pair<string,unsigned int> onegroupdef;
+      typedef vector<onegroupdef> groupdef;
+      typedef vector <string> motherrowdef;
+      typedef pair<unsigned int, int> balancepairdef;
+      typedef vector<balancepairdef> balancedef;
+    #+END_SRC
+   
+
+* Arrays, Strings, Pointers, References
+  This is a summary of the most important bits of the [[http://www.learncpp.com/][LearnCpp.com]] chapter 6.
+  *Note: Best practices are towards the end, not the beginning*.
+  
+** Static vs Dynamic
+*** General Info 
+    - Concerns Stack and Heap
+    - Good Explanation: [[https://www.youtube.com/watch?v=_8-ht2AKyH4][Yt > Codeschool > Pointers and Dynamic Memory]]
+    
+    The application's memory consists of:
+    |-------------------------------------------+----------------|
+    | Heap                                      | order of GB+   |
+    |-------------------------------------------+----------------|
+    | Stack: Function calls and local variables | typically 1 MB |
+    |-------------------------------------------+----------------|
+    | Static / Global variables                 | smaller        |
+    |-------------------------------------------+----------------|
+    | Code (Text): Instructions                 | smaller        |
+    |-------------------------------------------+----------------|
+    - _Concerning Stack:_
+      - Size of stack is calc.ed at =CT= based on functions, local vars, global
+        vars, static vars
+      - every function gets a slice of the Stack = Stack-Frame
+      - at =RT=, program ptr jumps btw frames acc. to Code Instructions
+      - Stack is allocated at start, Stackframes are allocated during =RT=
+        - This means that e.g. a bad recursion is coded -> /Stack Overflow/
+      - Static arrays / containers (~std::array~) live here. This is why
+        their size *has to be calculable by compiler at =CT=*.
+     - _Concerning Heap:_
+       - Dynamic arrays / containers live here.
+*** DynamicMem C: ~malloc(..)~, ~free(..)~
+*** DynamicMem C++: ~new~, ~delete~
+    For DynamicMem alloc of arrays with ~new[]~, see -> "FixedArrays vs DynMemArrays" below
+**** Best-Practice Summary DynMem C++
+     - Avoid having multiple ptrs point to same mem, else be clear who /owns/
+       the mem for proper deletion
+     - Set deleted ptrs additionally to ~nullptr~ unless they are going out of
+       scope immediately afterward: ~delete p; p = nullptr;~
+     - *patternForDynamicMemoryAllocationCheck* using ~std::nothrow~:
+       #+BEGIN_SRC C++
+       int *value = new (std::nothrow) int; // ask for an integer's worth of memory
+       if (!value) {} // handle case where new returned null
+       #+END_SRC
+     - If wanted, use nullptr to conditionally allocated memory. nullptr don't
+       have to be deleted:
+       #+BEGIN_SRC C++
+       if (!p) p = new int; //conditional
+       delete p; //no conditional needed
+       #+END_SRC
+**** Examples
+    #+BEGIN_SRC C++
+    new int; //dyn.alloc. integer, i.e. lies on heap, not on stack
+
+    /*example of danglingPtr*/
+    int *p = new int; int *p2 = p; //point to same memLocation
+    delete p; //leave scope; p2 is dangling
+
+    /*example of memoryLeak memLeak memory leak 1*/
+    void foo(){ int* p = new int; } //mem cannot be reassigned
+
+    /*example of memoryLeak 2*/
+    int v=5; int *p = new int; p = &v; //old mem address lost
+
+    /*example of memoryLeak 3*/
+    int *p = new int; p = new int; //old address lost 
+    #+END_SRC
+** FixedArrays vs DynMemArrays
+   - FixedArrays: also called: static (C-style), fixed-size, fixed-length
+     arrays. *Live on Stack*.
+   - DynMemArrays: dynamically allocated arrays using ~new[]~ and ~delete[]~.
+     Size can be defined at =RT= instead of =CT=. *Live on Heap*.
+*** Declaration (1D, 2D arrays) 
+    Length must be compile-time constant.
+    | Type   | Comment | Using / Purpose         | Example                        |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | OK      | Literal constant        | ~int arr[5];~                  |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | OK      | Symbolic constant       | ~const int len=5;~             |
+    |        |         |                         | ~int arr[len];~                |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | OK      | enum                    | ~enum AEl{ MAX_LEN=5 };~       |
+    |        |         |                         | ~int arr[MAX_LEN];~            |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | OK, bad | Macro symbolic constant | ~#define LEN 5~                |
+    |        |         |                         | ~int arr[LEN];~                |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | ERR     | non-const var           | ~//int len e.g. from cin~      |
+    |        |         |                         | ~int arr[len];~                |
+    |--------+---------+-------------------------+--------------------------------|
+    | Static | ERR     | runtime const var       | ~int x = 5;~                   |
+    |        |         |                         | ~const int len = x;~           |
+    |        |         |                         | ~int arr[len];~                |
+    |--------+---------+-------------------------+--------------------------------|
+    |--------+---------+-------------------------+--------------------------------|
+    | DynMem | OK      | non-const var           | ~//int len e.g. from cin~      |
+    |        |         |                         | ~int *arr = new int[len];~     |
+    |        |         |                         | ~delete[] arr; arr = nullptr;~ |
+    |--------+---------+-------------------------+--------------------------------|
+    | DynMem | OK      | init dynarr els to 0    | ~int *arr = new int[len]();~   |
+    |--------+---------+-------------------------+--------------------------------|
+
+    2DArray twodimensional - Declaration Examples:
+    | Type   | Example                      | Comment                         |
+    |--------+------------------------------+---------------------------------|
+    | Static | ~int arr[10][5];~            |                                 |
+    |--------+------------------------------+---------------------------------|
+    |--------+------------------------------+---------------------------------|
+    | DynMem | ~int **arr = new int*[2];~   | ~2 int ptrs~                    |
+    |--------+------------------------------+---------------------------------|
+    | DynMem | ~auto arr = new int[10][5];~ | *only if ~5~ is =CT= constant!* |
+    |--------+------------------------------+---------------------------------|
+    | DynMem | ~int **arr = new int*[10];~  | otherwise. 10 rows, 5 columns   |
+    |        | ~for (int c=0;c<10;++c){~    |                                 |
+    |        | ~arr[c] = new int[5];}~      |                                 |
+    |        | ----                         | Requires LoopDeallocation:      |                                |
+    |        | ~for(int c=0;c<10;c++){~     |                                 |
+    |        | ~delete[] arr[c];}~          |                                 |
+    |        | ~delete[] arr;~              |                                 |
+    |--------+------------------------------+---------------------------------|
+
+    Further 2D DynMem examples:
+    *patternForFlattenedDynMem2DArray*
+    #+BEGIN_SRC C++
+    /*Pattern for flattened 2D DynMemArray: simpler to handle!*/
+    int *arr = new int[50]; //10x5 flattened array
+
+    int index(int row, int col, int numberOfColumnsInArray)
+    { return (row * numberOfColumnsInArray) + col; }
+    
+    arr[index(9,5)] = 42;
+    #+END_SRC
+
+    *patternForNonRectangularDynMem2DArray*
+    #+BEGIN_SRC C++
+    /*nonrectangular triangular 2d DynMemArray*/
+    int **arr = new int*[10]; for (int c=0;c<10;++c){arr[c]= new int[c+1];
+    #+END_SRC
+
+    
+
+*** Best-Practice 2D Array Declaration & Initialization [[https://stackoverflow.com/q/12841170/8116031][StackOverflow]]
+    #+BEGIN_SRC C++
+    /*static, decl&init, no resizing needed, C++11 ========*/
+    std::array<std::array<int,3>,2> a {{
+      {{1,2,3}},
+      {{4,5,6}}
+    }};
+
+    const int ROW = 2;
+    const int COL = 3;
+
+    /* static/dynMem, declaration, no resizing needed =====*/
+    /* no STL container, better use version below*/
+    int array1[ROW][COL];
+    for(int i=0; i<ROW; i++)
+        for(int j=0; j<COL; j++)
+            array1[i][j] = i*COL+j+1;
+
+
+    /* BEST METHOD ========================================*/
+    /* dynMem, declaration, resizing optional =============*/
+    /* same, without resizing: use array instead of vector*/
+    typedef vector<vector<int> > ARRAY; 
+    ARRAY array2;
+    vector<int> rowvector;
+    for(int i=0; i<ROW; i++)
+    {
+        rowvector.clear();
+        for(int j=0; j<COL; j++)
+            rowvector.push_back(i*COL+j+1);
+        array2.push_back(rowvector);
+    }
+    return 0;
+    #+END_SRC
+*** Initialization (1D, 2D arrays)
+    Use initializer list
+    | Type   | Purpose | Examples                        | Comment                |
+    |--------+---------+---------------------------------+------------------------|
+    | Static |      1D | ~int ar[3] = {4,5};~            | 4,5,0                  |
+    |        |         | ~int ar[3] = {};~               | 0,0,0                  |
+    |--------+---------+---------------------------------+------------------------|
+    |--------+---------+---------------------------------+------------------------|
+    | Static |      2D | ~int ar[2][3] =~                | 1,2,3                  |
+    |        |         | ~{{1,2,3},{4,5,6}};~            | 4,5,6                  |
+    |--------+---------+---------------------------------+------------------------|
+    | Static |      2D | ~int ar[][3] =~                 | 1,0,0                  |
+    |        |         | ~{{1},{4,5}};~                  | 4,5,0                  |
+    |--------+---------+---------------------------------+------------------------|
+    | Static |      2D | ~int ar[2][3] = {0};~           | 0,0,0                  |
+    |        |         |                                 | 0,0,0                  |
+    |--------+---------+---------------------------------+------------------------|
+    |--------+---------+---------------------------------+------------------------|
+    | DynMem |      1D | ~int *ar = new int[3]{4,5};~    | //C++11, except ~char~ |
+    |        |         | ~char *ar = new char[2]{"ab"};~ | // ~char~ : only C++14 |
+    |--------+---------+---------------------------------+------------------------|
+    
+
+    On Multidim-Arrays Init:
+    - 2D arr init with init list: ~rows~ can be omitted, i.e. ~[][cols]~.
+    - 
+**** Misc. Tips
+    - Simple K,V-structure with C-style array: declare an ~enum~. Use it's
+      values to access array elements. Last enum value = no.enum values. Use
+      that at array init for length.
+      - Caution: when using ~enum class E~, cast:
+        ~arr[static_cast<int>(E::VALUE)]~
+
+** Pointers
+*** BestPractice Summary Pointers
+    - When declaring a pointer variable, put the asterisk next to the variable
+      name.
+      - Example: ~int *p(2);~
+    - When declaring a function, put the asterisk of a pointer return value next
+      to the type.
+      - Example: ~int* foo();~
+    - When using ptr FunctionParam, prefer =ptr2constvalue= if arg not
+      changed by func
+    
+*** Basic Pointer examples
+    Empty line means: new code block!
+    #+BEGIN_SRC C++
+    int v=5;
+    int a[3];
+    int *p1 = &v; //address of v
+    int *p2 = a; //note: a derefs automatically to &a[0]
+    cout << typeid(&v); //int * = pi = ptr int
+    cout << sizeof(p1); //regardless of type:
+                       //32-bit arch: 4-byte, 64-bit: 8byte
+    
+    /*nullptr*/
+    int *p = 0; //C / C++98
+    int *p = nullptr; //C++11
+    #+END_SRC
+*** Uses of pointers
+    1. Arrays are implemented using pointers. Pointers can be used to iterate
+       through an array (as an alternative to array indices) (covered in lesson
+       6.8).
+    2. *They are the only way you can dynamically allocate memory in C++* (covered
+       in lesson 6.9). This is by far the most common use case for pointers.
+    3. They can be used to pass a large amount of data to a function in a way
+       that doesn’t involve copying the data, which is inefficient (covered in
+       lesson 7.4)
+    4. They can be used to pass a function as a parameter to another function
+       (covered in lesson 7.8).
+    5. They can be used to achieve polymorphism when dealing with inheritance
+       (covered in lesson 12.1).
+    6. They can be used to have one struct/class point at another struct/class,
+       to form a chain. This is useful in some more advanced data structures,
+       such as linked lists and trees.
+
+*** constPtr2, ptr2Const 
+    Hint: read type from right to left
+    #+BEGIN_SRC C++
+    int u = 1; const int v = 2;
+    int *p = &u;
+    /*ptr2ConstVal: value read-only; p can be redirected*/
+    const int *p = &u;  //OK. value does not have to be const itself
+    p = &v;  //OK: p can be redirected
+    /*constPtr2Val: value read-write; p cannot be redirected */
+    int * const p = &u; //OK. u can be changed via *p
+    int * const p = &v; //NOT OK
+    /*constPtr2ConstVal*/
+    const int * const p = &v; //value read-only, no p redirect
+    #+END_SRC
+*** voidPtr
+    - can point to any type, knows nothing /of/ the type
+    - always explicitCast before dereferencing!
+    #+BEGIN_SRC C++
+      void *pv; int a=5; pv=&a;
+      int *pi = static_cast<int*>(pv); //now deref: << *pi ...
+    #+END_SRC
+    
+*** Pointer Pitfalls
+    Dereferencing invalid pointer:
+    #+BEGIN_SRC C++
+    int *p;
+    donothingwithp(p); //compiler thinks p now valid
+    cout << *p; //garbage
+    #+END_SRC
+    
+** Arrays and Pointers
+*** BestPractice Summary Arrays and Pointers
+    - Passing fixedArray as FunctionParam: array *decays* to pointer!
+      - Example:
+        #+BEGIN_SRC C++
+          void foo(int arr[]) {/*arr has now type int*.*/} //same for (int* arr)
+        #+END_SRC
+      - _Rule:_ write ~foo (int* arr)~ to clearly mark this decay from arr to ptr!
+      - Consequences of Decay:
+        - called passByAddress / =PBA=: original ~arr~ accessible inside ~foo~,
+          just like with =PBR=. Butt array information lost (~sizeof~)!
+        - need additional arg to pass original ~arr~ length for traversal inside ~foo~!
+    - FixedArrays can be traversed by pointer of same type through ptrArithmetic:
+      ~arr[4] == *(arr + 4)~
+     
+*** Arrays often *decay* to Pointers
+    - Array and Pointer to Array have not the same type:
+      #+BEGIN_SRC C++
+      int arr[5]; //typeid: int[5]
+      int *p = arr; //typeid: int*
+      sizeof(arr); //sizeof(int)*arrlen
+      sizeof(p); //size of a pointer: 4 or 8 bytes
+      #+END_SRC
+    - Array to Pointer has lost all array information (~sizeof~).
+
+*** Ptr2Ptr = 2D DynMemArrays
+    #+BEGIN_SRC C++
+    int a=5; int *p=&a; int **pp=&p; // << **pp: 5
+    #+END_SRC
+    
+    
+** C++ References (JW-speak: SymLinks)
+*** LVal, RVal
+    - =LVal= are objects that have a defined memory address (such as
+      variables), and persist beyond a single expression
+    - =RVal= are temporary values that do not have a defined memory address, and
+      only have expression scope. R-values include both the results of
+      expressions (e.g. 2 + 3) and literals (e.g. 2, "Hello World!").
+*** Refs properties
+    - Refs init:
+      - =Ref2NonConstVal=: only by assignment to =nonConstLVal=. No init with
+        =constLVal= or =RVal=!
+      - =Ref2ConstVal=: all three are okay.
+    - Thus also, no null ref.
+    - Refs cannot be reassigned!
+    - Refs are much safer than ptrs, but more restricted
+    - Examples:
+      #+BEGIN_SRC C++
+      int u=5; const int v=6;
+      int &r = u; /*ok*/ int &r2 = v; int &r3 = 7; //not ok
+      Xyz &link = abc.def.uvw.xyz; //shortcut to struct member
+
+      /*Ref2ConstVal: read-only*/
+      int x = 5; const int y=6;
+      const int &r1 = x; const int &r2 = y; const int &r3 = 7; //all ok
+      /*also often confusingly called ConstRef*/   
+      #+END_SRC
+
+      
+    
+* Functions
+  - if a function is declared first without body, that is called =ForwardDeclaration=
+  - the function with the body is called =FctDefinition= or declaration
+
+** BestPractice Summary FunctionParams / FunctionArgs (IN)
+   See [ALEX], chapter 7.
+   
+   - General:
+     - "pass by" means "set param type as". Three types: passByVal,
+       passByRef, passByAddress  
+   - =PBV= (does not change external var):
+     - yes:
+       - Primitive / Fundamental Types, Enumerators, no change by function
+     - no:
+       - Arrays, Structs, Classes (last one: cause uses =copyInit=, see below)
+   - =PBR=:
+     - yes:
+       - Structs, Classes. If /read-only/, use =Ref2ConstVal=
+       - /read-and-write/ argument
+     - no:
+       - Primitive / Fundamental Types
+       - built-in Arrays
+   - =PBA=:
+     - yes:
+       - built-in Arrays, /Argument decays to ptr inside function!/.
+       - ptr, and ~nullptr~ is valid argument locally. That means, check ~if(p)~
+         before dereferencing
+       - If /read-only/, use =ptr2ConstVal=
+       - If needed to change ptr itself rather than the underlying object, then
+         =passPtrByRef=, see below
+     - no:
+       - if =PBV= or =PBR= yes
+     
+*** =PBR=
+   - /Function modifies arg/: pass by =Ref2NonConstVal=, e.g. ~foo(int &ref){}~
+   - /Function does not modify arg/, and /argument is not ptr, not fundamental
+     datatype/: pass by =Ref2ConstVal=. Can handle args:
+      - =nonConstLVal=, =constLVal=, =literal=, =expression= (e.g. ~(2+3)~).
+   - =PBR= when argument is an array, correct syntax is: ~int (&arr)[2][3]~
+   - CAUTION: when using =Ref2ConstVal= on class object, all called memberFcts
+     of that class must be const as well (see -> =constMemberFct= below)!
+
+*** Pass a pointer by reference using ~&*~
+    Example from LinkedList project (search document):
+    #+BEGIN_SRC C++
+    LinkedList<T> *next;
+    //...
+    void addRec(LinkedList *&node, T value);
+    //...
+    addRec(node->next, value);
+    #+END_SRC
+    When to =passPtrByRef=:
+    - you have a need to modify the pointer rather than the object that the
+      pointer is pointing to.
+    - when ~delete~ -ing a =dynMem= ptr ([[https://stackoverflow.com/a/20188970/8116031][Source]] explains why 'Moronic')
+      #+BEGIN_SRC C++
+        template<typename T>    
+        void moronic_delete(T*& p)
+        {
+            delete p;
+            p = nullptr;
+        }      
+      #+END_SRC
+    - (is similar to a pointer of a pointer, except one less level of
+      indirection for pass-by-reference semantics)
+    
+    
+** BestPractice Summary ReturnArg (OUT)
+   - General:
+     - the abbreviations mean retByVal, retByRef, retByAddress
+     - When using =RBR= / =RBA=, make sure not returning var that goes out of
+       scope after function ends!
+   - =RBV=:
+     - yes:
+       - return vars declared inside function / =CBV= FunctionArgs
+     - no:
+       - large Struct / Class, built-in Array, ptr (Class: cause uses
+         =copyInit=, see below)
+   - =RBR=:
+     - yes:
+       - =PBR= arg, elmt of passed-in array
+       - large Struct / Class not destroyed in function, eg passed-in
+     - no:
+       - =RBV=, =RBA=
+   - =RBA=:
+     - yes:
+       - =PBA=, DynMem. *Note*: The dynMem (eg array) can be inited /inside/ the
+         function cause DynMem does not go out of scope. example:
+         #+BEGIN_SRC C++
+         int* foo(int len){ return new int[len];}
+         #+END_SRC
+       
+     
+
+** InlineFunctions
+   - means that at =CT=, at the fct call points in the code, there will be no
+     jump to the fct's stackframe, but the fct is directly inserted at the site
+     and called there.
+   - means: *use only for very small fcts*. Else overhead and code length growth
+     eat the benefit.
+** Function Overloading
+   - =RetType= does *not* count to =OverloadedFct= uniqueness!
+
+** DefaultParams
+   - if mixed, only rightmost parameters can have =DefaultParams=
+   - =DefaultParams= can only appear in =ForwardDeclaration= XOR =FctDefinition= (use former)
+   - in =OverloadedFct=, =DefaultParams= do *not* count towards uniqueness
+
+   Example UseCases:
+   #+BEGIN_SRC C++
+   void openLogFile(std::string filename="default.log");
+   int rollDie(int sides=6);
+   void printStringInColor(std::string str, Color color=COLOR_BLACK); // Color is an enum
+   #+END_SRC
+
+   
+
+** Function Pointers
+   fctPtrs
+
+   Syntax for ~int foo(), int goo()~:
+   #+BEGIN_SRC C++
+   /*decl. syntax since C++11, (#include <functional>):*/
+   function<int()> pf;
+   const function<int()> pf;
+   function<bool(int, int)> pf2;
+
+   /*still valid decl syntax when using older C++*/
+   int (*pf)();       //init nonConstFctPtr
+   int (*const pf)(); //init constFctPtr
+   bool (*pf2)(int,int);
+
+
+   int (*pf)() = foo; //point to foo
+   pf = goo;          //now point to goo
+
+   pf(5); //call goo(5), on most modern compilers
+   //defaultParams dont work with fctPtrs!
+   #+END_SRC
+*** UseCase: Callback Functions
+    Example usecase: SelectionSort function should offer choice of
+    ascending/descending order.
+    #+BEGIN_SRC C++
+    #include <functional> //using C++11 syntax
+    bool compare_asc(int a, int b); //use as default
+    bool compare_desc(int a, int b);
+    void sortBySelection(int *arr, int size, function<bool(int,int)> compareFct = compare_asc);
+    sortBySelection(array,10,compare_asc);
+    #+END_SRC
+
+
+
+
+* BestPractice Summary Classes I,II,III
+   - Instance Initialization:
+     - prefer =uniformInit= (C++11) / =directInit= over =copyInit= (assignment,
+       may call =CCtor=)
+   - Constructors / Member Initialization:
+     - Use =MemberInitLists= to initialize your class member variables instead
+       of assignment.
+     - For =MemberInitLists=, favor =uniformInit= over =directInit= if using C++11
+     - Favor use of non-static member initialization (C++11) to give default
+       values for your member variables
+     - Consider declaring ~explicit~ Ctors to disallow =implicitCtorConversion=
+   - If class inside allocates =dynMem= (eg for members), use =RAII= (ie
+     allocate in Ctor, free dynMe in Dtor, see -> Destructors)
+   - =MemberFcts=:
+     - =DefaultParams= for memFcts: define in header, not cpp
+     - =StaticMemberVar=: must be inited outside class. Init in cpp, not in
+       header file
+     - Fct doesnt modify state of class object: define as =constMemberFct=, or
+       define parameters with =PBR= with =Ref2ConstVal=. If arg is Class object,
+       all called arg's methods must be const as well!
+   - Polymorphism & Inheritance, ~virtual~:
+     - all explicit =Dtor='s in an inheritance scheme /should/ be ~virtual~
+       (_must_ if =derivedClass= =subclass= allocates =dynMem=!). Otherwise
+       =derivedClass= Dtors never get called when ~delete~ a =baseClass= ptr
+       holding a =derivedClass= object.
+     - all =memFcts= in a =baseClass= that might be changed by =subclass= (es),
+       should be ~virtual~
+     - When =derivedFct= of =virtualFct= in =superClass= does not need all of
+       =virtualFct='s parameters, omit paramNames in =derivedFct= signature:
+       #+BEGIN_SRC C++
+       virtual f(char *str, int val, X& obj){...} //superClass
+       int f(char *str, int, X&) {...} //derivedClass: val, obj not needed
+       #+END_SRC
+       
+     
+* Classes I
+
+       
+** Constructor Ctor
+*** Instance Initialization
+    - As for =Fundamental= types, there are three ways of initialization in
+      descending recommended favor of use: =uniformInit= (C++11), =directInit=,
+      and /disencouraged use/: =copyInit= (assignment using equals sign).
+    - =uniformInit= (also called braceInit):
+      - called so because unlike other types, designed to support all dataTypes
+        (e.g. also arrays), and to check init args.
+      - Example:
+        #+BEGIN_SRC C++
+        int x {5};
+        Fraction f{}; //DefCtor
+        Fraction f{5, 3};
+        #+END_SRC
+    - =directInit=:
+      - Example:
+        #+BEGIN_SRC C++
+        int x(5);
+        Fraction f();
+        Fraction f(5, 3);
+        #+END_SRC
+    - =copyInit= (assignment), / use disencouraged for Classes/ cause not so
+      efficient, cause may invoke CCtor?
+      - Example:
+        #+BEGIN_SRC C++
+          int x = 5;
+          Fraction f = Fraction(6); //calls Fraction(6,1), then CCtor on that via assignment
+          Fraction f(Fraction(6));  //functionally the same as above:
+                                    //create anonymous F, then call CCtor on that
+          /*for both, the compiler may avoid calling CCtor by 'eliding', but not guaranteed*/
+          Fraction f = 7; //copyInit Fraction: compiler tries to convert 7 to
+                          //Fraction, calls Fraction(7,1)
+        #+END_SRC
+      - 'eliding' may not be employed when object =copyInit= by e.g. =PBV= /
+        =RBV=. That's why we use =PBR= / =RBR=.
+          
+
+*** Constructors & Member Initialization
+    See BestPractice above -> =MemberInitLists=. Here just examples.
+    Example 1: members Fundamental type
+    #+BEGIN_SRC C++
+    class A{
+    private:
+      int a,b;
+    public:
+      /*defCtor with memberInitList, using uniformInit with defValues (curly braces)*/
+      A() : a{1}, b{2} {}
+      /*paramCtor with memberInitList, using directInit (round braces)*/
+      A(int u, int v : a(u), b(v) {}
+    };
+    #+END_SRC
+    Example 2: members arrays and objects
+    #+BEGIN_SRC C++
+    class A{
+    private:
+      const int arr[5];
+      B b; //has Ctor B(int x), called below
+    public:
+      A(int a) : arr{1,2,3,4,5}, b{5} {/*A Ctor body*/}
+    };
+    #+END_SRC
+    Example 3: Non-static member initialization with DefVals (since C++11):
+    #+BEGIN_SRC C++
+    class C{
+    private:
+      double c{.3}, d{.4}; //uniformInit XOR copyInit, NOT directInit
+    public:
+      C(){} //note: if defCtor wouldnt be defined, defValues would never be used,
+            //cause memberInitList takes precedence!
+      C(double x, double y) : c{x}, y{x} {}
+    };
+    #+END_SRC
+
+*** DelegatingCtor / CtorChaining (C++11)
+    Use if several Ctors use same init code. Call =DelegatingCtor= in =MemberInitList=.
+    #+BEGIN_SRC C++
+    class D{
+    public:
+     D(){ /*do standard stuff*/ }
+     D(int u): D(){ /*do special stuff*/ } //use defCtor as DelegatingCtor
+    }
+    #+END_SRC
+    
+
+** Destructors Dtor & RAII
+   - Need to be defined IFF class has =DynMem= members.
+   - =RAII= = "Allocation is Acquisition" programming paradigm. Here means that
+     class resources (like e.g. =DynMem= array, =file= or Database) should be
+     initialized in Ctor, and freed in Dtor.
+   - Example:
+   #+BEGIN_SRC C++
+   class R{
+   private:
+     int *arr; int len;
+   public:
+     R(int leng){ assert(len>0); len = leng; arr = new int[len]; }
+     ~R(){ delete[] arr; }
+     void setVal(int i, int val){ arr[i]=val; }
+   };
+   int main(){
+     R r(10); /*set values, do stuff*/
+   }// ~R() is called here
+   #+END_SRC
+
+   
+** constClassObject, constMemberFct
+   - When class object is inited as const, e.g. ~const A a{42}~, then:
+     - it can ONLY call =constMemberFct=, not even nonconst Getters!
+   - =constMemberFct= def rules:
+     - ~const~ keyword comes /right before/ functionBody!
+     - ~const~ must be used on =ForwardDeclaration= AND =FctDefinition=
+     - =constMemberFct= cant call nonconst fcts, except Ctor!
+     - Example:
+       #+BEGIN_SRC C++
+       class C{
+       public:
+         int x;
+         int get() const;
+       }
+       int C::get() const { return x; }
+       #+END_SRC
+
+** StaticMemberVar, StaticMemberFct
+   =StaticMemberVar=:
+   - StaticMemberVar /must/ be initialized outside class. Accessible even if
+     ~private~. ONLY in cases ~const int~ and ~const enum~ can init happen in
+     declaration inside class.
+   - _VERY IMPORTANT_: if class is in =headerFile=, then private static member
+     *MUST* be initialized in the classe's =cppFile=! Otherwise errors that
+     don't give anything away as how to fix it.
+     #+BEGIN_SRC C++
+     class S{
+     static int s; //non-const int: must be inited outside
+     }
+     int S::s = 1; //init; if headerFile used, MUST be in cppFile!
+     int main(){ /*S::s not available cause private!*/ }
+     #+END_SRC
+
+     UseCase: IDs for class objects for debugging
+     #+BEGIN_SRC C++
+     class S{
+     private:
+       static int id_gen; int id;
+     public:
+       S(){ id = id_gen++; }
+       int getID() const { return id; }
+     }
+     int main(){ S a; S b; S c; /*has id==3*/ return 0;}
+     #+END_SRC
+   =StaticMemberFct=:
+   - can only use =StaticMemberVar=
+   - _VERY IMPORTANT_: when using =headerFile= for static class,
+     =staticMemberFct= _MUST NOT_ stand in the static classe's =cppFile=, but
+     _MUST STAND_ in the cppFile from where it is called (e.g. main.cpp).
+     Otherwise "undefined reference" or weirder compiler errors that don't help in any way.
+   - _TO RECAP_: when using =headerFile= for static class:
+     - =StaticMemberVar= _CAN ONLY_ be initialized in the classe's =cppFile=.
+       Nothing else can stand in the classe's =cppFile=!
+     - =staticMemberFct= _CAN ONLY_ be initialized from where they are called.
+       Usually, this is NOT the static classe's =cppFile=!
+     - In addition, even then it won't compile e.g. in Netbeans, only in cygwin.
+     - In summary: static classes *F#CKING SUCK* in C++! Don't use them!
+       
+     
+   
+** FriendFcts / FriendClasses
+   - external function/class can access private members of a class
+   - important for =OpOverloading=
+   There are three types of friends:
+   1. normal =externalFct= =nonMemberFct= that is declared _as friend by classes A,[B,...]_
+   2. =memberFct= of A that is declared _as friends by classes B,[C,...]_
+   3. ~class~ A that is declared _as friend by ~class~ 'es B,[C,...]_
+   
+   Syntax for the first (=nonMemberFct= as ~friend~ of classes):
+   #+BEGIN_SRC C++
+   class A{ private: int u; public:
+     friend void boo(A &a); };
+   void boo(A &a){ cout << a.u; }
+   #+END_SRC
+   Note:
+   - ~A~ has =ForwardDeclaration= of ~boo~ appended by ~friend~
+   - ~boo~ has no ref to ~A~, so needs an ~A~ instance as parameter
+
+   Syntax for the second case (=memberFct= as ~friend~ in other classes):
+   #+BEGIN_SRC C++
+   class A{ private: int u; public: friend void B::boo(A &a); };
+   class B{ private: int v; public: boo(A &a); };
+   void B::boo(A &a){ cout << a.u; }
+   #+END_SRC
+   Note: There is a big problem how to arrange the lines in order to satisfy the
+     dependencies.
+   - Prefer separate header/cpp files for each class:
+     - if file only needs to know other class, use class =ForwardDeclaration=:
+       in example above: ~B.h~ would have: ~class A;~
+     - if file needs to know other's class members, include other header: in
+       example above: ~A.h~ would include ~B.h~, ~B.cpp~ would include ~A.cpp~
+     - working example: [[file:websnippets/classes/LearnCpp_FriendsQuiz/main.cpp][websnippets > classes > friendsQuiz]]
+   - if all in one file: use class =ForwardDeclaration= and more than one friend
+     fct =ForwardDeclaration= if needed. With example above:
+     #+BEGIN_SRC C++
+     class A;
+     class B{... void boo(A &a);};
+     class A{... friend void boo(A & a);};
+     void B::boo(A &a){...}
+     #+END_SRC
+
+** CopyConstructor CCtor
+   #+BEGIN_SRC C++
+     class F{ //Fraction
+       int n,d; //numerator, denominator
+     public:
+       /*Ctor*/
+       F(int num=0, int denom=1) : n(num), d(denom) {}
+       /*CCtor*/
+       F(const F &f) : n(f.n), d(f.d) {}
+       /*this one eqv to the DefaultCCtor*/
+     };
+
+     int main(){
+       F f(5,3); //Ctor
+       F fcopy(f); //CCtor
+     }
+   #+END_SRC
+   - =CCtor= uses =MemberWiseInit=: each member inited from src object's member
+   - see also below > OpOverloading > =assignmentOp=
+
+
+       
+
+** ConvertingCtors, and prevention mechanisms
+   - Example for =implicitCtorConversion=: in both cases, compiler will convert ~6~ to
+     ~Fraction(6)~ since unambiguous:
+     #+BEGIN_SRC C++
+     //Ctor: Fraction(int num, int denom=1)~
+     //function: Fraction negate(Fraction f)
+
+     cout << negative(6);
+     Fraction f = 6;
+     #+END_SRC
+   - if a =Ctor= should *NOT* be used for =implicitCtorConversion=, put
+     ~explicit~ keyword in front of it.
+   - if specific Ctor call should be disallowed, use ~delete~ keyword (C++11):
+     #+BEGIN_SRC C++
+     //want to avoid Ctor call with char: A('c')
+     //in class public block write:
+     A(char) = delete; //such a call is now an error
+     #+END_SRC
+   
+
+     
+
+* Classes II - Relationships
+** Terminology, *Pattern* / Code Examples
+   - *Examples* / *Pattern*: [[file:websnippets/classes/LearnCpp_Composition_Game/main.cpp][websnippets > class > LearnCppComposition]]
+   - Terminology: "Composition" encompasses =ObjectComposition= and
+     =Aggregation=. Here, =Composition= is understood to mean
+     =ObjectComposition=.
+** =Composition=
+   - =unidirectional=: part is ignorant of it's owner
+   - part only belongs to one owner at a time
+   - owner manages part's existence
+   - example: ~Person p~, ~Kidney k~
+   - implementation: add parts using =memberVars= or ptrs (if dealloc by owner)
+** =Aggregation=
+   - =unidirectional=: part is ignorant of it's user/s
+   - part can belong to multiple users at a time
+   - user/s do not manage part's existence
+   - example: ~Person p~, ~Address a~ (multiple persons can live there)
+   - implementation: =memberVars= are ptrs referencing objects created outside
+     the the user class
+
+
+
+   
+
+
+* Classes III - Inheritance, Polymorphism, Casting,
+ 
+
+** Accessing inherited members and =friends=
+*** Accessing Derived and Local Members
+   Basic Example:
+   #+BEGIN_SRC C++
+   class X{        int val; public: void str(); }
+   class Y : X { float val; public: void str(float f); }
+   Y y;
+   y.val { .618 };    /*of Y*/
+   y.Y::val{ .618  }; /*of Y*/
+   y.X::val{ 42 };    /*of X*/
+   y.str();           /*Error: missing parameter. So, calls X::str*/
+   #+END_SRC
+
+   Tip: When ~Derived::foo()~ should extend ~Base::foo()~ don't use ~virtual~, simply
+   call the latter inside the former.
+
+*** Accessing ~friend~ members of =baseClass= / =superClass= using ~static_cast~
+    Example: using ~operator<<~ overloading of =baseClass= in =subclass= /
+    =derivedClass=: overload ~Derived~ as well (declare ~friend ostream&
+    operator<<~) and inside, ~out << static_cast<Base> derived~. That calls the
+    =baseClass= overloaded method. Example: [[file:websnippets/inheritance/LearnCpp_AccessFriendofBase/main.cpp][websnippets > inherit > accessFriendOfBase]].
+    
+
+** [RRZN] Polymorphism: ~virtual~, =statType=, =dynType=
+   - _Definition_: A class is /polymorph/ if it has >=1 ~virtual~ method ~voodoo~
+   - (A class is =abstractBaseClass= if it has >=1 =pureVirtualFct= (see below))
+   - Which type of action (which version of ~voodoo~) is called is decided at =RT=
+   - The =dynType= of the ptr/Ref to the object decides which ~voodoo~ is
+     called, not the obj's =statType=! (~virtual~ means employing the
+     =LateBinding= technique, which is the whole voodoo here that makes
+     polymorphism possible).
+
+   The Difference between =statType= and =dynType=:
+   #+BEGIN_SRC C++
+      //inheritance: B subclass : A superclass
+      A* pa = new B(4); //OK: implicitCast: upCasting
+      B& rb = (B&) *pa; //OK: explicitCast: downCasting
+   #+END_SRC
+    - ~A~ is =dynType=, can change during =RT=
+    - ~B~ is =statType=, can't change during =RT=
+    - =upCasting= (to superclass) is implicit, =downCasting= is explicit (or
+      sometimes impossible)
+   
+   
+*** [GoniCup] Example for effect of ~virtual~ w.r.t. =dynType=
+   #+BEGIN_CENTER
+   This section has much text and little new knowledge. It basically
+   demonstrates a programmer's error when one uses ~virtual~ incorrectly. The
+   essence is that when a baseClass ~A~ method ~f~ is not ~virtual~, but the
+   subclasse's ~B~ method is, then using a baseClass ptr ~A*~ or ref ~A&~ on a
+   subclass instance ~b~ and calling ~f~ will result in calling ~A::f~. Which
+   most often, is probably not what the coder had intended.
+   #+END_CENTER
+
+   Example from [[file:websnippets/inheritance/GoniCup_InheritBsp/main.cpp][Bergiu (GoniCup) GitHub > CPP > WichtigeNotizen]] ([[file:~/Desktop/Studium/Kurse/Cpp/Gonicup_CppNotizen_17FS/wichtige_notizen.md][Offline Link]]):
+   #+BEGIN_SRC C++
+   class A{ 
+   int n;
+   public:
+     A(int num) : n(num) {}
+     void f(){}
+     virtual void g(){}
+     virtual void h(){}
+     virtual void i() final {}
+   };
+
+   class B : public A{ 
+   public:
+     B(int num) : A(num) {}
+     void f(){}
+     virtual void g(){}
+     void h(){}
+     /* virtual void i() final {} //not allowed, final in A */
+   };
+   #+END_SRC
+
+   ~virtual~ combinations. *Note*: in general, the 
+   |-----+-----+-----+---------------------------------------------------------------|
+   | Fct | ~A~ | ~B~ | ~A* pb~ / ~A& ref~ use fct in ~A~                             |
+   |-----+-----+-----+---------------------------------------------------------------|
+   | f   |     | X   | yes (this is wrong use of ~virtual~)                          |
+   | g   | X   | X   | no (this is unintended use of ~virtual~)                      |
+   | h   | X   |     | no (this is intended use of ~virtual~)                        |
+   | i   | X   | -   | - (~() final {}~)                                             |
+   |-----+-----+-----+---------------------------------------------------------------|
+
+   Results of calling methods on instances:
+   |-------------------+------+--------+--------+------------------------------|
+   | From obj          | with | called | prints | Remark                       |
+   |-------------------+------+--------+--------+------------------------------|
+   | ~A sa;~           | ~.~  | f      | A::f   |                              |
+   | ~A sa;~           | ~.~  | g      | A::g   |                              |
+   | ~A sa;~           | ~.~  | h      | A::h   |                              |   
+   | ~B sb;~           | ~.~  | f      | B::f   |                              |
+   | ~B sb:~           | ~.~  | g      | B::g   |                              |
+   | ~B sb:~           | ~.~  | h      | B::h   |                              |
+   |-------------------+------+--------+--------+------------------------------|
+   | ~A& rsa = sa;~    | ~.~  | f      | A::f   |                              |
+   | ~A& rsa = sa;~    | ~.~  | g      | A::g   |                              |
+   | ~A& rsa = sa;~    | ~.~  | h      | A::h   |                              |
+   | ~A& rsb = sb;~    | ~.~  | f      | *A::f* | Cause ~A::f~ *not* ~virtual~ |
+   | ~A& rsb = sb;~    | ~.~  | g      | B::g   |                              |
+   | ~A& rsb = sb;~    | ~.~  | h      | B::h   |                              |
+   |-------------------+------+--------+--------+------------------------------|
+   | ~A* da = new A()~ | ~->~ | f      | A::f   | (Note: dynMem init not im-   |
+   | ~A* da = new A()~ | ~->~ | g      | A::g   | portant, just that ptr)      |
+   | ~A* da = new A()~ | ~->~ | h      | A::h   |                              |
+   | ~A* db = new B()~ | ~->~ | f      | *A::f* | Cause ~A::f~ not ~virtual~   |
+   | ~A* db = new B()~ | ~->~ | g      | B::g   |                              |
+   | ~B* db = new B()~ | ~->~ | h      | B::h   |                              |
+   |-------------------+------+--------+--------+------------------------------|
+
+   
+
+** [RRZN] MultipleInheritance & =virtualBaseClass=
+*** =virtualBaseClass= to prevent =baseClass= duplication
+   Problem: Say we have the following inheritance scheme:
+   #+BEGIN_EXAMPLE
+   Human;
+   Coder : Human; Woman : Human;
+   CoderGirl : Coder, Woman;
+   #+END_EXAMPLE
+   Then ~CoderGirl~ will inherit ~Human~ members *twice*.
+
+   Solution in two steps:
+   1. inherit ~Human~ with ~virtual~, i.e. make ~Human~ a =virtualBaseClass=:
+   #+BEGIN_EXAMPLE
+   Coder: virtual Human; Woman : virtual Human;
+   #+END_EXAMPLE
+   2. Needed Adjustment to Constructors: in order to avoid multiple init of
+      =virtualBaseClass=, compiler will move it's init to earliest possible
+      point, the lowest inherited subclass, here ~CoderGirl~. So ~CoderGirl~
+      Ctor now has to invoke ~Human~ Ctor as well, *and before* it's immediate
+      superclasses Ctors. The Ctor args now captured by ~Human~ Ctor can be set
+      to 0 in those Ctors as they are ignored. Ctor Adaptation shown in three
+      steps:
+      #+BEGIN_SRC C++
+      CoderGirl(string name, LANGUAGE lang) : Coder(name, lang), Woman(name) { } //adapt to
+      CoderGirl(string name, LANGUAGE lang) : Human(name, FEMALE), Coder(name, lang), Woman(name) { } //adapt to
+      CoderGirl(string name, LANGUAGE lang) : Human(name, FEMALE), Coder(0, lang), Woman(0) { }
+      #+END_SRC
+      
+   Consequence of =virtualBaseClass=: internally, ~Human~ is now no longer one
+   of the component's that makes up subclasses, but accessed by them via special
+   ptr (this implements the uniqueness). But there are no such ptrs from ~Human~
+   to subclasses. So:
+   - no longer possible: =staticCast= (=explicitCast=, =downCasting=) with
+     ~(SubCl&) vbClobj~ or ~(SubCl*) vbClobj~. But still possible with
+     =dynamicCast=.
+     #+BEGIN_SRC C++
+     CoderGirl ella{"Ella", LANGUAGE::CPP};
+     Human *h = &ella; //implicitCast = upCasting:  OK
+     CoderGirl* cgirl = (CoderGirl *)h; //explicit- / downCasting: ERROR!
+     #+END_SRC
+   
+*** Strange Calling Order with =virtualBaseClass=
+    Example using the same <>-shaped inheritance scheme as above:
+    #+BEGIN_SRC C++
+    class A { virtual void f(); };
+    class B1: virtual public A { void f(); };
+    class B2: virtual public A {};
+    class C: public B1, public B2 {};
+
+    C c; B2* pb2 = &c;
+    pb2->f(); //calls B1.f(), even though it's in the 'other arm'!
+    #+END_SRC
+    For indepth, see subject =vtable= =virtualTable=.
+
+** =pureVirtualFct=, =abstractBaseClass=, =InterfaceClass=
+*** =pureVirtualFct= = =abstractFct=
+    - Ending =baseClass= =virtualFct= with ~= 0;~ makes it =pureVirtualFct=, and
+      the class automatically =abstractBaseClass=!
+    - All =derivedClass= es now forced to implement it.
+    - However, can still provide outside implementation as default implementation.
+    #+BEGIN_SRC C++
+    class Animal{
+    virtual string speak() = 0; //pureVirtualFct Syntax
+    };
+
+    Animal::speak(){ return "buzz;" } //default; most animals do
+
+    class Beetle{
+    virtual string speak(); //now uses default
+    }
+    #+END_SRC
+
+    
+    
+
+*** =InterfaceClass=: like Java!
+    - _Definition_: no attributes, /all/ methods =pureVirtualFct=!
+    
+
+** [cplusplus] =TypeCasting= =TypeInfo=
+*** Implicit =TypeCasting= =TypeConversion=
+    [[http://www.cplusplus.com/doc/tutorial/typecasting/][Source]], [[file:Cheatsheets/cplupluscom_TypeConversionsCasting.html][Source offline]]
+    Mainly for =typecasting= ptrs and prts2Classs, =ptrCasting= =ptrConversion=.
+  
+    The problem: generic explicit casting like ~int (longnum)~ (C++-style) and
+    ~(int) longnum~ (C-Style) can be correct in =CT= but error in =RT= cause in
+    =CT= any ptr2ptr casting is allowed this way, e.g.:
+    #+BEGIN_SRC C++
+    A a;
+    B *pb; //A and B not related
+    pb = (B*) &a;
+    a->methodofB(); //runtime error!
+    #+END_SRC
+
+*** =TypeCasting= methods ~static_cast~, ~dynamic_cast~, ~const_cast~, ~reinterpret_cast~
+    *patternForTypeCasting*
+
+    Syntax of all four types: ~xycast<newtype>(expression)~.
+**** ~static_cast~
+     - can mimic all =implicitCasts=
+     - ~enum~ <- ~int~, ~float~ types, enum
+     - classes and classPtrs: =upCasting= /and/ =downCasting=
+     - no checks performed. Esp. for =downCasting= coder must guarantee that ptr
+       really has =dynType= of =derivedClass=.
+     - Counterexample:
+       #+BEGIN_SRC C++
+         class Base {};
+         class Derived: public Base {};
+         Base * a = new Base;
+         Derived * b = static_cast<Derived*>(a); //illegal downcast; RT error if deref.ed
+       #+END_SRC
+**** ~dynamic_cast~
+     - /only/ with =ptr2Object= and =ref2Object=
+     - unlike static_cast, performs checking for =upCasting= (implicit),
+       =downCasting= (explicit)
+     - requires =RTTI= RunTimeTypeInformation
+     - if fails, return ~nulptr~ or for ref, error bad_cast
+     - If possible, avoid =downCasting= and use =virtualFct= 's instead.
+      - Otherwise:
+        #+BEGIN_SRC C++
+        Base *b = getBaseObject();
+        Derived *d = dynamic_cast<Derived*>(b);
+           if (d) // make sure d is non-null!
+               //do stuff
+        delete b;
+        #+END_SRC
+**** ~const_cast~     
+     - can set or remove ~const~-ness of ptr2Object
+     - if removed and then write attempt, error!
+     - Example: adapting const ptr to reading fct requiring non-const ptr:
+       #+BEGIN_SRC C++
+       void print(char *str){/*...*/};
+       int main(){ const char *c = "bla"; print( const_cast<char *c>(c) ); }
+       #+END_SRC
+**** ~reinterpret_cast~
+     
+*** ~typeid~: Getting =TypeInfo= *Pattern*
+    #+BEGIN_SRC C++
+    #include <typeinfo>
+    using namespace std;
+    int main(){ int a; int *b; if (typeid(a) != typeid(b) {
+        cout << typeid(a).name() << " different" << endl; }}
+    #+END_SRC
+     
+* [StackOverflow] Operator Overloading
+** BestPractice Summary =OpOverloading=
+  - Only use OpOverloading if intent is clear.
+  - Stick to operators semantics (e.g. addition for ~+~)
+  - Always provide all out of a set of related operations.
+    - Example: overload ~+~ AND ~+=~, not only one
+  - Note: =opPrecedence= will not change.
+    - Example: Overloading ~^~ for exp(x,y) will produce wrong result for expr.
+      ~4 + 2^3~ since ~+~ has precedence over ~^~.
+  - new ops cannot be created
+  Rest: copied from [[https://stackoverflow.com/q/4421706/8116031][SO_OpOverloading_FAQ]].
+ 
+** General Syntax
+   You cannot change the meaning of operators for built-in types in C++,
+   operators can only be overloaded for user-defined types (Footnote 1). That
+   is, at least one of the operands has to be of a user-defined type. As with
+   other overloaded functions, operators can be overloaded for a certain set of
+   parameters only once.
+
+   Not all operators can be overloaded in C++. Among the operators that cannot
+   be overloaded are: ~.~ ~::~ ~sizeof~ ~typeid~ ~.*~ and the only ternary operator in
+   C++, ~?:~
+    
+   Among the operators that can be overloaded in C++ are these:  
+   - =ArithmeticOp=:
+     - ~+~ ~-~ ~*~ ~/~ ~%~ and ~+=~ ~-=~ ~*=~ ~/=~ ~%=~ (all
+     binary infix);
+     - ~+~ ~-~ (unary prefix);
+     - ~++~ ~--~ (unary prefix and postfix)
+   - =BitShiftOp= / =BitManipOp=:
+     - ~&~ ~¦~ ~^~ ~<<~ ~>>~ and ~&=~ ~¦=~ ~^=~ ~<<=~ ~>>=~ (all binary infix);
+     - ~~~ (unary prefix)
+   - =BooleanOp= / =AlgebraicOp= / =ComparisonOp=:
+     - ~==~ ~!=~ ~<~ ~>~ ~<=~ ~>=~ ~¦¦~ ~&&~ (all binary infix);
+     - ~!~ (unary prefix)
+   - =DynMemOp= / =MemoryOp=:
+     - ~new~ ~new[]~ ~delete~ ~delete[]~
+   - =ImplicitConversionOp=
+   - Various:
+     - ~=~ ~[]~ ~->~ ~->*~ ~,~ (all binary infix);
+     - ~*~ ~&~ (all unary prefix)
+     - ~()~ (function call, n-ary infix), must always be =MemberFct=
+        
+   - =OpOverloading= happens in the form of /functions with special
+   names/
+   - As with other functions, =OpOverloading= can be implemented as:
+     - =MemberFct= /of left operand's type/, or as
+     - non-member functions (then, often using ~friend~).
+   - Whether you are free to choose or bound to use either one depends on
+     several criteria, see below.
+   - A =unaryOperator= ~@~ is invoked as ~operator@(x)~
+   - A =binaryInfixOperator= ~@~, applied to the objects x and y, is called as
+     ~operator@(x,y)~
+    
+   Footnotes:
+   1. The term “user-defined” might be slightly misleading. C++ makes the
+      distinction between built-in types and user-defined types. To the former
+      belong for example int, char, and double; to the latter belong all struct,
+      class, union, and enum types, including those from the standard library, even
+      though they are not, as such, defined by users.
+
+** OperatorOverloading: when =MemberFct=, =NonMemberFct=, =FriendFct=?
+   - _Always as =MemberFct=_:
+     - =unaryOperator=
+     - =binaryOperator= of *left operand*:
+       - ~=~ (assignment), ~[]~ (array subscription), ~->~ (member access)
+       - op treats both operands differently (usually changing left one) and needs
+         member access
+     - =nAryOperator= ~()~ (function call)
+   - _Always as =NonMemberFct=_ (the minority):
+     - =binaryOperator=:
+       - op treats both operands equally (mostly: no change)
+     - operators whose left operand cannot be modified by dev.
+       - Examples: input and output operators ~<<~ and ~>>~
+     - _=NonMemberFct= AND =FriendFct=_:
+       - ~friend~ of MyClass if an operand is user-defined AND op needs to
+         access private members
+       - also ~friend~ if MyClass is *right operand* and does not provide
+         conversion to other type
+       - Example: when two types, symmetric ~operator==~ needs *two* overloads:
+         #+BEGIN_SRC C++
+           /* First: asymmetric operator== overloading */
+           class Message {
+               std::string content;
+           public:
+               Message(const std::string& str);
+               bool operator==(const std::string& rhs) const;
+           };
+
+           /* This will work*/
+           Message message("Test");
+           std::string msg("Test");
+           if (message == msg) {
+               // do stuff...
+           }
+
+           /* This won't! */
+           if (msg == message){} //CT error
+
+           /* Adjustment: symmetric overloading for two types */
+           class Message {
+               std::string content;
+           public:
+               Message(const std::string& str);
+               bool operator==(const std::string& rhs) const;
+               friend bool operator==(const std::string& lhs, const Message& rhs);
+               /*the friend definition is allowed to be inside the class and to be inline*/
+           };
+         #+END_SRC
+       - Alternative: provide conversionOperator, example for ~Message~ above:
+         #+BEGIN_SRC C++
+         operator std::string() const //instead of friend operator== above
+         #+END_SRC
+
+   Exception Examples:
+   - =OpOverloading= ~+~ for ~enum~: =NonMemberFct=
+     
+   (Indepth technical note: However, if you make an exception, do not forget the
+   issue of const-ness for the operand that, for member functions, becomes the
+   implicit ~this~ argument. If the operator as a non-member function would take
+   its left-most argument as =Ref2ConstVal=, the same operator as =MemberFct=
+   needs to have a ~const~ at the end to make ~*this~ a const =Ref2ConstVal=.)
+
+** =OpOverloading= *Pattern* (Vorlagen, Schablonen)
+*** =AssignmentOp= ~operator=~ / =deepCopy=
+    *patternForOverloadAssignmentOp* *patternForDeepCopy* (see below)
+    #+BEGIN_SRC C++
+    X& X::operator=(X rhs)
+    {
+      swap(rhs); //C++11: <utility>, prior: <algorithm>
+      return *this;
+    }
+    #+END_SRC
+**** =shallowCopy= vs =deepCopy=
+     - Normal =CCtor= uses =MemberWiseInit=, i.e. assignment ~=~ of each
+       original object's member to copy object's member (see above > Classes >
+       CopyConstructor). This is a =shallowCopy=. It doesn't work with =dynMem=
+       members!
+     - ~operator=~ implementation above uses ~std::swap~. This makes a
+       =deepCopy=. The original object is not destroyed cause =PBV=.
+     - when overloading ~operator=~ for Class that has =dynMem= members, and not
+       using *pattern* with ~swap~ above, make sure:
+       - ~delete~ / ~delete[]~ destObj's =dynMem= members first (contra
+         =MemoryLeak=)
+       - then allocate new mem and for-loop elm-wise value copy from old to new
+       - or use STL containers...
+*** =BitShiftOp= ~operator<<~, ~operator>>~ but used for Stream =IO=
+    *patternForOverloadBitShiftOpForIOS
+    #+BEGIN_SRC C++
+    std::ostream& operator<<(std::ostream& os, const T& obj){
+      // write obj to stream, e.g. os << obj toString();
+      return os; }
+
+    std::istream& operator>>(std::istream& is, T& obj){
+      // read obj from stream
+      if( /* no valid object of T found in stream */ )
+        is.setstate(std::ios::failbit);
+      return is; }
+    #+END_SRC
+    - General: =NonMemberFct=. If ~private~ members of ~T~ needed: make
+      ~operator<<~ a ~friend~ =FriendFct=.
+*** =FctCallOp= / =ParenthesisOp= ~operator()~
+    - Always as =MemberFct= cause needs ~this~
+    - Used to create =FctObject= i.e. =Functors=
+    - can take zero to n arguments apart from ~this~
+
+    Example in [[file:websnippets/opOverloading/LearnCpp_opOverloading/Matrix.cpp][websnippets > opOverloading > LearnCpp]]:
+    #+BEGIN_SRC C++
+      double& Matrix::operator()(int row, int col) {
+          assert(col >= 0 && col < M_SIZE);
+          assert(row >= 0 && row < M_SIZE);
+          return data[row][col];
+      }
+    #+END_SRC
+    
+*** =ComparisonOp= ~operator==~ ~operator>~ ~operator<=~ etc.
+    - should be implemented as =NonMemberFct=
+    *patternForOverloadComparisonOp*
+    #+BEGIN_SRC C++
+      inline bool operator==(const X& lhs, const X& rhs){ /* do actual comparison */ }
+      inline bool operator!=(const X& lhs, const X& rhs){return !operator==(lhs,rhs);}
+      inline bool operator< (const X& lhs, const X& rhs){ /* do actual comparison */ }
+      inline bool operator> (const X& lhs, const X& rhs){return  operator< (rhs,lhs);}
+      inline bool operator<=(const X& lhs, const X& rhs){return !operator> (lhs,rhs);}
+      inline bool operator>=(const X& lhs, const X& rhs){return !operator< (lhs,rhs);}
+    #+END_SRC
+    - STL algorithms ~std::sort()~, containers ~std::map~ only require
+      ~operator<~, but user expects all
+    - Tip: do NOT overload ~¦¦~, ~&&~
+    - If useCase needs implentation as =MemberFct=:
+      - do not forget that the left-hand operand of the binary comparison
+        operators, which for member functions will be ~*this~, needs to be
+        ~const~, too. So a comparison operator implemented as a member function
+        would have to have this signature:
+        #+BEGIN_SRC C++
+        bool operator<(const X& rhs) const { /* do actual comparison with *this */ }
+        #+END_SRC
+
+
+*** =ArithmeticOp=, =BitShiftOp=
+    *patternForOverloadArithmeticUnaryOp* =unaryOperator=, ~operator++~
+    #+BEGIN_SRC C++
+      class A {
+        A& operator++()
+        {
+          // do actual increment
+          return *this;
+        }
+        A operator++(int)
+        {
+          A tmp(*this);
+          operator++();
+          return tmp;
+        }
+      };
+    #+END_SRC
+    *patternForOverloadArithmeticBinaryOp* =binaryOperator=, ~operator+=~,
+     ~operator*=~, ~operator/=~
+    #+BEGIN_SRC C++
+      class B {
+        B& operator+=(const B& rhs)
+        {
+          // actual addition of rhs to *this
+          return *this;
+        }
+      };
+      inline B operator+(B lhs, const B& rhs)
+      {
+        lhs += rhs;
+        return lhs;
+      }    
+    #+END_SRC
+    - =BitShiftOp= should be implemented same way, but don't do it
+    - Note: ~++i~ and ~a+=b~ more efficient than ~i++~ and ~a+b~
+    - ~operator+=~ is =RBR=, ~operator+~ is =RBC=
+    - ~operator+~ leftOperand is =PBC= like ~operator=~
+    - all this is obligatory
+
+*** =BracketOp= / =IndexOp= / =ArrayOp= ~[]~ (=binaryOperator=)
+    *patternForOverloadBracketOp* ~operator[]~
+    #+BEGIN_SRC C++
+      class X {
+              value_type& operator[](index_type idx);
+        const value_type& operator[](index_type idx) const;
+        // ...
+      };    
+    #+END_SRC
+    - if ~value_type~ is =Fundamental=, ~const~ fct should =RBC= not =RBR=
+    - changing data disallowed: provide both variants
+    - changing data allowed: drop ~const~ variant
+
+*** =PtrOperator= ~*~ ~->~
+    - ~operator*~ =unaryOperator=, ~operator->~ =binaryOperator= (dont confuse with
+      multiplication operator, that one is binary!)
+    *patternForOverloadPtrOp*
+    #+BEGIN_SRC C++
+      class my_ptr {
+              value_type& operator*();
+        const value_type& operator*() const;
+              value_type* operator->();
+        const value_type* operator->() const;
+      };    
+    #+END_SRC
+    
+*** =ConversionOperator= for UserDefinedCoverion
+    
+    
+   
+* Templates
+  Sources if not specified below:
+  - [[https://www.youtube.com/watch?v=W0aoAm6eYSk&t=383s][Youtube: Buckys C++ Tutorial 58-61 on Templates]]
+** Function Templates
+*** [[file:websnippets/templates/BuckysCppTutorial_Templates/main.cpp][Websnippet: Buckys C++ Tutorial 58-61 on Templates]]
+    Showcases:
+    - How to correctly write very simple function templates for one and two types
+    - Example: one =templateParam=:
+      #+BEGIN_SRC C++
+        template <typename bucky>
+        bucky addCrap(bucky a, bucky b) {
+            return a + b;
+        }
+        int() main{ int a=1,b=2; addCrap(1,2); }
+      #+END_SRC
+    - Example: two =templateParam=:
+      #+BEGIN_SRC C++
+        template <typename FIRST, typename SECOND>
+        FIRST addDifferentCrap(FIRST a, SECOND b) {
+            return a + b;
+        }      
+      #+END_SRC
+** Class Templates
+*** [[file:websnippets/templates/BuckysCppTutorial_Templates/main.cpp][Websnippet: Buckys C++ Tutorial 58-61 on Templates]]
+    Showcases:
+    - How to correctly write very simple class template with function decl 
+    Key lessons:
+    - ~template <class T>~ first line of *every* class-related declaration!
+    - =memberFcts= declarations *must* have ~<T>~:
+      - ~rettype MyClass<T>::foo(){/*...*/}~!
+    - Class instantiation must have ~<instanceType>~ to specify ~T~:
+      ~MyClass<int> obj;~!
+    Example:
+    #+BEGIN_SRC C++
+      template <typename T>
+      class Bucky {
+          T a, b;
+      public:
+          Bucky(T aa, T bb) : a(aa), b(bb) {}
+          T bigger();
+      };
+
+      template <typename T>
+      T Bucky<T>::bigger() { return (a > b ? a : b); }
+
+      int main(){ Bucky<int> bucky(4,90); }
+    #+END_SRC
+*** [GoniCup] Value as =templateParam= *Pattern*
+    Example: Value
+    #+BEGIN_SRC C++
+      template <typename T, int N>
+      class A {
+          public:
+              A(T x){cout << "A inited with " << x << "and int N=" << N << endl;}
+      };
+      int main(){ A<double,42> spec2(0.999); }
+    #+END_SRC
+
+*** [JW] ClassTemplate LinkedList
+    *patternForClassTemplateSingleLinkedList*
+    [[file:websnippets/arrays-ptrs-ref/LinkedListETHZ/LinkedListETHZ.h][Source Code]]
+**** /BestPractice/: Lessons Learned While Coding
+     1. =TemplateClass=: =memberFct= definitions INSIDE HEADER, NOT inside CPP.
+        Else compiler error: "undefined reference"
+     2. =memberFct= ~add~, ~addRec~:
+       - can't use =uniformInit= for setting ~value~, ~next~, need copyInit
+         instead
+       - since ~next~ is of type ~*LiLi~ i.e. ptr, need to pass as =PBA=.
+     3. =opOverloading=:
+        - ~operator+=~ is easy, ~operator+~ is hard
+        - =memberFcts= cause =unaryOperator=: ~operator=~, ~operator+=~
+     4. =LinkedList= / Recursion:
+        - public add, private addRec
+        - getLength verwenden für zB zusammenzählen (nichtrekursiv!)
+        
+     
+** Template Specializations
+*** [[file:websnippets/templates/BuckysCppTutorial_Templates/main.cpp][Websnippet: Buckys C++ Tutorial 58-61 on Templates]]
+    Showcases:
+    - How to correctly write very simple class with one specialization for ~char~
+    Key lesson:
+    - For spec., write class definition again, preceded by firstline ~template
+      <>~ (empty =diamonOperator= marks =templateSpec=), and in second line
+      specify type e.g. for ~char~ by ~class MyClass<char>{ ...~.
+    Example1: specialization for =templateParam= ~char~:
+    #+BEGIN_SRC C++
+      template <typename U>
+      class Spunky{
+          public:
+              Spunky (U x){ cout << x << " not char!" << endl; } };
+
+      /*specialization: */
+      template <> //MEANS: empty diamond operator = specialization
+      class Spunky<char>{ //specify that U=char here
+          public:
+              Spunky(char x){ cout << x << " is char!" << endl; } };
+
+      int main() { Spunky<char> s('c');
+    #+END_SRC
+     
+*** [GoniCup] =templateParam= restriction through Inheritance *Pattern*    
+    Example: Template *only* accepts =subClasses= of specified =baseClass= =superclass=:
+    #+BEGIN_SRC C++
+    template<typename T>
+    class A{}
+    template<> //<>: specialization!
+    class A<Beverage>
+    #+END_SRC
+
+* Exceptions
+** Most simple working =TryCatchBlock=
+   The =tryBlock= acts as observer for Exceptions. Only throws if one occurs.
+   #+BEGIN_SRC C++
+   try{
+     //statements that might throw an Exception
+     //throw -1; //if activated, would always throw!
+    } catch (int x) {
+      std::cerr << "Caught exception with value" << x << std::endl;
+    }
+   #+END_SRC
+   Better: *patternForExceptionHandler1*
+   #+BEGIN_SRC C++
+     try
+     {
+         // Statements that may throw exceptions you want to handle go here
+         //throw -1; // here's a trivial example
+     }
+     catch (int x)
+     {
+         // Any exceptions of type int thrown within the above try block get sent here
+         std::cerr << "We caught an int exception with value: " << x << std::endl;
+     }
+     catch (double) // no variable name since we don't use the exception itself in the catch block below
+     {
+         // Any exceptions of type double thrown within the above try block get sent here
+         std::cerr << "We caught an exception of type double" << std::endl;
+     }
+     catch (const std::string &str) // catch classes by const reference
+     {
+         // Any exceptions of type std::string thrown within the above try block get sent here
+         std::cerr << "We caught an exception of type std::string" << std::endl;
+     }   
+   #+END_SRC
+
+* MoveSemantics, SmartPtr
+** Summary, /BestPractice/
+   - A smart pointer class is a composition class that is designed to manage
+     dynamically allocated memory, and ensure that memory gets deleted when the
+     smart pointer object goes out of scope.
+     
+   - Copy semantics allow our classes to be copied. This is done primarily via
+     the copy constructor and copy assignment operator.
+     
+   - Move semantics mean a class will transfer ownership of the object rather
+     than making a copy. This is done primarily via the move constructor and
+     move assignment operator.
+     
+   - std::unique_ptr is the smart pointer class that you should probably be
+     using. It manages a single non-shareable resource. std::make_unique() (in
+     C++14) should be preferred to create new std::unique_ptr. std::unique_ptr
+     disables copy semantics.
+     
+   - std::shared_ptr is the smart pointer class used when you need multiple
+     objects accessing the same resource. The resource will not be destroyed
+     until the last std::shared_ptr managing it is destroyed. std::make_shared()
+     should be preferred to create new std::shared_ptr. With std::shared_ptr,
+     copy semantics should be used to create additional std::shared_ptr pointing
+     to the same object.
+** =RValRef=
+   - =LVal= (also called a locator value): a function or an object
+     - modifiable and non-modifiable = ~const~
+   - =RVal= : everything else: literals (e.g. 5), temporary values (e.g. x+1),
+     and anonymous objects (e.g. Fraction(5, 2))
+
+   New in C++11:
+   - =LValRef= = L-Value References, syntax ~&~:
+     - Forms and allowed inits:
+       - =LValRef=: only with modifiable =LVal=
+       - =LValRef2Const=: with =LVal= and =RVal=
+   - =RValRef=: R-Val Ref, syntax ~&&~:
+     - Forms, both only initable with =Rval=:
+       - =RValRef=: can modify =RVal= (same goes for =LValRef= above)
+       - =RValRef2Const=: cannot modify (like =LValRef2Const=)
+     - can extend lifespan of =RVal= beyond scope
+     - Syntax:
+       #+BEGIN_SRC C++
+         int x = 5;
+         int &lref = x; // l-value reference initialized with l-value x
+         int &&rref = 5; // r-value reference initialized with r-value 5       
+       #+END_SRC
+
+** [BoQuian] Shared_Pointer =SharedPtr=
+   [[file:websnippets/arrays-ptrs-ref/BoQuian_SmartPointers/main.cpp][Code: websnippets > arrs-ptrs > SmartPtrs]] just copy-pasted in here:
+   #+BEGIN_SRC C++
+     #include <cstdlib>
+     #include <iostream>
+     #include <string>
+     #include <memory> //smartPtrs
+
+     using namespace std;
+
+     class Dog{
+     protected:
+         string name;
+         public:
+             Dog(string name) : name{name} { cout << "A new Dawg has risen, he's " << name << endl;}
+             Dog(){ cout << "A new Nameless Dog, probably a wolf" << endl;}
+             ~Dog(){ cout << "Dog " << name << " HAS BEEN DESTROYED (by argument)!" << endl;}
+             virtual void bark(){ cout << "Woof, said " << name << endl;}
+     };
+
+     class Hound : public Dog{
+     public: Hound(string name) : Dog(name){}
+     void bark(){ cout << "I'm a Hound, no matter what you point at me!, said " << name << endl;}
+     };
+
+     void oldWay_dontCallThis(){ //dont do this anymore
+         Dog *p = new Dog("TheGood");
+         //...
+     //    delete p; //OH NO!
+         //...
+         p->bark(); //danglingPtr undefined behaviour
+     } //memory leak if not deleted
+
+     void newWay_callThis_Uhoh(){
+     //    shared_ptr<Dog> p(new Dog("TheBad"));
+         shared_ptr<Dog> p = make_shared<Dog>("The Ugly"); //yes! //p.use_count()=1
+         {
+             shared_ptr<Dog> p2 = make_shared<Dog>("Pepe"); //que? //count=2
+             p2->bark();
+         }//count=1
+     }//count=0
+
+     void rawPtrsShouldNotBeUsedAgain(){
+         Dog *d = new Dog();
+         shared_ptr<Dog> p(d); //count=1
+         shared_ptr<Dog> p2(d); //count=1! if one goes out of scope, the other is dangling!
+         /*assign obj to smartPtr AS SOON AS IT IS CREATED!*/
+     }
+
+     void commonPointerOperationsWithSmartPtrs(){
+         shared_ptr<Hound> p = make_shared<Hound>("Zuzu");
+         p->bark(); //arrow!
+         (*p).bark(); //dereference!
+         //SPECIAL castFcts for SmartPtrs!
+         shared_ptr<Dog> p2 = static_pointer_cast<Dog>(p);
+         shared_ptr<Dog> p3 = dynamic_pointer_cast<Dog>(p);
+     //    shared_ptr<Dog> p4 = const_pointer_cast<Dog>(p); //error!
+         p2->bark(); //still a Hound deep inside
+         p3->bark(); //still a Hound deep inside
+     }
+
+     void whenSmartPtrsGoOutOfScope(){
+         shared_ptr<Dog> p1 = make_shared<Dog>("The Ugly");
+         shared_ptr<Dog> p2 = make_shared<Dog>("Rantanplan");
+         shared_ptr<Dog> p3 = p2;
+         p1 = p2; //The Ugly is DESTROYED!
+         p2 = nullptr; //Responsibility moved to p3
+         p3.reset(); //Rantanplan is DESTROYED!
+     }
+
+     void usingACustomDeleterOnAnArrayOfDogs(){
+         /*in such a case the default deleter wont do. We create one with Lambda.*/
+     //    shared_ptr<Dog> p3(new Dog[3]); //ptr just points to the first dog
+         /*Deleting the ptr would just delete the first dog, memleak for dog2, dog3*/
+    
+         //custom deleter:
+         shared_ptr<Dog> p4(new Dog[3], [](Dog *p){delete[] p;});   
+     }
+     /*
+      ,* 
+      ,*/
+     int main(int argc, char** argv) {
+    
+     //    oldWay_dontCallThis();
+         newWay_callThis_Uhoh();
+         cout << endl;
+     //    rawPtrsShouldNotBeUsedAgain();
+         commonPointerOperationsWithSmartPtrs();
+         cout << endl;
+         whenSmartPtrsGoOutOfScope();
+         cout << endl;
+         usingACustomDeleterOnAnArrayOfDogs();
+
+         return 0;
+     }   
+   #+END_SRC
+   
+     
+* STL: Containers, Iterators, Algorithms
+** Overview / Intro
+*** [[https://www.youtube.com/watch?v=ltBdTiRgSaw][Youtube: Bo Qian's STL Overview]] Summary
+    - The STL consists of three sections / main sublibraries:
+      - A: Algorithms ( ~#include <algorithm>~
+      - B: Iterators
+      - C: Containers ( data structures)
+    - The approach is not OO. The design aim was that every algorithm works with
+      every container. That would require $A*C$ implementations. Instead,
+      iterators were introduced as common interface that all containers
+      implement. The algorithms only work on iterators. So, only $A+B$
+      implementations are needed. Thus, adding a new algorithm only requires to
+      implement it for a general iterator, not for every container. Each
+      container has a specific implementation with additional methods.
+    - STL is so heavily optimized that it is as fast as C (arrays e.g.) and
+      faster than any own implementation. It is standardized (always available
+      and error-free), and a model for library design and A&DS implementations.
+** Iterator Library / Interface
+   STL headers:
+   #+BEGIN_SRC C++
+   #include <vector>
+   #include <deque>
+   #include <list>
+   #include <set> //set,multiset
+   #include <map> //map,multimap
+   #include <unordered_set> //unordered_set, unordered_multiset
+   #include <unordered_map> //unordered_map, unordered_multimap
+   #include <iterator>
+   #include <algorithm>
+   #include <numeric>
+   #include <functional> //Functors
+   #+END_SRC
+** Containers
+*** Overview, *Pattern*
+   - Simple Overview and from [[https://www.youtube.com/watch?v=gxZJ5JNuWMY][BoQuian STL Intro 2]].
+   - *patternForSTLContainers* / Code Examples : [[file:websnippets/STL/BoQian_STLIntro/B02_SequenceContainers.cpp][websnippets > STL > BoQuianSTLIntro]]
+   |-----------------------+---------------------------------------------------|
+   | SequenceContainers    | ~vector~, ~deque~, ~list~, ~forwardList~, ~array~ |
+   |-----------------------+---------------------------------------------------|
+   | AssociativeContainers | ~set~, ~multiset~, ~map~, ~multimap~              |
+   |-----------------------+---------------------------------------------------|
+   | UnorderedContainers   | ~unordered_set~, ~unordered_multiset~,            |
+   |                       | ~unordered_map~, ~unordered_multimap~             |
+   |-----------------------+---------------------------------------------------|
+   Common Container interface methods:
+   #+BEGIN_SRC C++
+   c.empty();
+   c.size();
+   vector<int> v2(v); //CCtor
+   c.clear();
+   c2.swap(c); //all c elements *moved* from c to c2
+   #+END_SRC
+   
+*** SequenceContainers (Array and LinkedList)
+
+    | Operation      | ~vector~          | ~deque~   | ~list~   |
+    |----------------+-------------------+-----------+----------|
+    | ins/rem start  | O(n)              | O(1)      | O(1)     |
+    | ins/rem middle | O(n)              | O(n)      | O(1)     |
+    | ins/rem end    | O(1)              | O(1)      | O(1)     |
+    |----------------+-------------------+-----------+----------|
+    | search         | O(n)              | O(n)      | < O(n)*  |
+    |----------------+-------------------+-----------+----------|
+    | kill feature   | contiguous memory | cont.mem. | splicing |
+    |----------------+-------------------+-----------+----------|
+    Remarks:
+    - search ~list~ much slower than ~vector~ since ~list~ non-contiguous
+      memory: cont.mem. can be swapped into cache in chunks, while list lies
+      around all over the place, so cache must be constantly swapped.
+
+**** Array
+     
+**** Vector
+     - Dynamical array that grows in one direction
+     - Member access:
+       | ~v[2]~   | index op., /no range check/ |
+       | ~v.at(2) | throws range_error exc.     |
+     - Iterating:
+       #+BEGIN_SRC C++
+       for (int i; i<v.size(); i++){vec[i] }
+       /* faster and universal traversal style:*/
+       for (vector<T>::iterator it=v.begin(); it!=v.end(); ++it){ *it }
+       for (it : v) { it } //C++11 for-range
+       #+END_SRC
+     - Dynamically allocated, /Contiguous array in memory/:
+       #+BEGIN_SRC C++
+       T *p = &v[0]; p[2]=6;
+       #+END_SRC
+**** Deque
+     - like ~vector~
+     - additionally ~push_front(x)~
+**** List
+     - no random access via =IndexOp= / =ArrayOp= / =BracketOp= ~[]~:
+       #+BEGIN_SRC C++
+       list<int> l; l.push_back(1);
+       l[0]; //does not work!
+       #+END_SRC
+     - only Container that supports =Splicing= in O(1):
+       #+BEGIN_SRC C++
+       li1.splice(it, li2, ita, itb); // O(1)!
+       #+END_SRC
+
+       
+     
+*** AssociativeContainers (BinaryTree)
+*** UnorderedContainers (HashTable)
+    - 
+   
+   
+
+** Algorithms
+*** Sorting
+    #+BEGIN_SRC C++
+    array<int,5> arr{7,3,1,9,5};
+    sort(arr.begin(),arr.end()); //sort forwards
+    sort(arr.rbegin(),arr.rend()); //sort backwards
+    #+END_SRC
+
+**** Sorting with a =Predicate= / Sorting Vector of ~pair~
+    Example taken from [[http://bit.ly/OTF8p1][std::sort vector or pairs]]
+    #+BEGIN_SRC C++
+      #include <iostream>
+      #include <vector>
+      #include <string>
+      #include <algorithm>
+
+      typedef std::pair<bool, std::string> my_pair;
+
+      bool sort_pred(const my_pair& left, const my_pair& right)
+          {
+          return left.second < right.second;
+          }
+
+      int main()
+          {
+          std::vector<my_pair> data;
+
+          data.push_back(my_pair(false, "orange"));
+          data.push_back(my_pair(true, "apple"));
+          data.push_back(my_pair(true, "pear"));
+
+          std::sort(data.begin(), data.end(), sort_pred);
+          }    
+    #+END_SRC
+*** Swap
+    #+BEGIN_SRC C++
+    #include <algorithm> //C++98
+    #include <utility> //C++11
+    int a=2, b=3;
+    swap(a,b);
+    #+END_SRC
+
+* More on Strings
+** Troubleshooting
+   - If error for string ~s~: =std::string cannot be converted to const char*=, then use: ~s.c_str()~
+** *Patterns*
+*** *patternForString2NumberConversion* *patternForNumber2StringConversion*
+**** C++11     
+     std::to_string Converts basic numeric types to strings.
+      
+     The set of functions
+     stoi, stol, stoll convert to integral types, the functions
+     stof, stod, stold to floating-point values.
+      
+     These functions are declared in declared in <string>.     
+**** Before C++11: stringstream 
+     #+BEGIN_SRC C++
+       #include <sstream>
+       using namespace std;
+     
+       template <typename T>
+         string NumberToString ( T Number )
+         {
+            ostringstream ss;
+            ss << Number;
+            return ss.str();
+         }
+       //Usage: NumberToString ( Number );
+
+       template <typename T>
+         T StringToNumber ( const string &Text )
+         {
+            istringstream ss(Text);
+            T result;
+            return ss >> result ? result : 0;
+         }
+       //Usage: StringToNumber<Type> ( String );
+     #+END_SRC
+*** *patternForStringConcatNumbers*
+    #+BEGIN_SRC C++
+    double g = 1.618;
+    string s = "The golden ratio is " + std::to_string(g);
+    const char *c = s.c_str();
+    #+END_SRC
+*** *patternForStringContainsSubstring* Check
+    Check if string contains substring:
+    #+BEGIN_SRC C++
+    if (s.find(subs) != std::string::npos){
+      std::cout << "Found!" << std::endl;
+    }
+    #+END_SRC
+*** *patternForStringSplit
+    splitter only single character allowed
+    #+BEGIN_SRC C++
+      const vector<string> explode(const string& s, const char& c)
+      {
+        string buff{""};
+        vector<string> v;
+  
+        for(auto n:s)
+        {
+          if(n != c) buff+=n; else
+          if(n == c && buff != "") { v.push_back(buff); buff = ""; }
+        }
+        if(buff != "") v.push_back(buff);
+  
+        return v;
+      }
+
+      //Usage:
+      int main()
+      {
+        string str{"the quick brown fox jumps over the lazy dog"};
+        vector<string> v{explode(str, ' ')};
+        for(auto n:v) cout << n << endl;
+  
+        return 0;
+      }
+    #+END_SRC
+*** *patternForStringIsNumeric* Check
+    Source: [[https://stackoverflow.com/questions/4654636/how-to-determine-if-a-string-is-a-number-with-c][Stack Overflow]]
+
+**** Using STL ~strtol~, ~strtod~
+     Using STL functions ~strtol~ for integerTypes and hex, ~strtod~ for ~double~:
+     - for ~double~, change fct
+     - for HEX, third param ~0~ instead of ~10~
+     - if succeeds: ~p~ will be pointing to the ~NUL~ that terminates the string. So
+       ~p != 0~ and ~*p == 0~.
+     - ignores whitespace in front
+     #+BEGIN_SRC C++
+       char* p;
+       long converted = strtol(s.c_str(), &p, 10);
+       if (*p) {
+           // conversion failed because the input wasn't a number
+       }
+       else {
+           // use converted
+       }    
+     #+END_SRC
+     Form for checking yes/no:
+     #+BEGIN_SRC C++
+       bool isParam(string line)
+       {
+           char* p;
+           strtol(line.c_str(), &p, 10);
+           return *p == 0;
+       }    
+     #+END_SRC
+
+**** Iterating over string to find non-numerical chars
+
+* IO
+** C++ ~iostream~: ~cin~, ~cout~ etc.
+*** Tip: Handling user-input errors using ~cin.fail()~
+    - Source: [[file:c:/C:/Users/johannesw/Desktop/Archive/Reference/C++/LearnCpp.com/www.learncpp.com/cpp-tutorial/63-arrays-and-loops/index.html][LearnCpp 6.2 Quiz]]
+    - Example code:
+      #+BEGIN_SRC C++
+      int number = 0;
+      do {
+          std::cout << "Enter a number between 1 and 9: ";
+          std::cin >> number;
+    
+          // if the user entered an invalid character
+          if (std::cin.fail())
+              std::cin.clear(); // reset any error flags
+    
+          std::cin.ignore(32767, '\n'); // ignore any extra characters in the input buffer
+    
+      } while (number < 1 || number > 9);
+      #+END_SRC
+
+     
+** Examples *Pattern*: File IO
+*** Mixing ~std::cin~ und ~std::getline()~
+    
+
+    Das [[http://www.learncpp.com/cpp-tutorial/4-4b-an-introduction-to-stdstring/][LearnCPP String Intro]] (offline: Code siehe unten) zeigt schön:
+    - mit ~cin~ holste bis zum nächsten =SPC=
+    - mit ~getline(cin,line)~ holste bis zum nächsten ~\n~
+    - Caution: in the following case, middle-line obligatory:
+      #+BEGIN_SRC C++
+      cin >> number;
+      cin.ignore(32767,'\n'); //ignore max. 2^15 chars until \n removed
+      getline(cin, name);
+      #+END_SRC
+      Reason: cin extracted number, but leaves ~\n~ in input stream. Without
+      ignore, getline would read newline = empty string.
+    Code:
+    #+BEGIN_SRC C++
+      int main()
+      {
+        std::cout << "Pick 1 or 2: ";
+        int choice;
+        std::cin >> choice;
+ 
+        std::cin.ignore(32767, '\n'); // ignore up to 32767 characters until a \n is removed
+ 
+        std::cout << "Now enter your name: ";
+        std::string name;
+        std::getline(std::cin, name);
+ 
+        std::cout << "Hello, " << name << ", you picked " << choice << '\n';
+ 
+        return 0;
+      }    
+    #+END_SRC
+*** =InFileText= C-Style Example
+    *patternForReadingFileTextCStyle*
+   =C-Style= Reading in text file: ASCII 2D array (maze) into ~char[][]~, first
+   line maze dimensions columns=x lines=rows=y (e.g. "12 8"): example from [[file:AltesCppZeug/JWalteCppCodingProjekte/clab2017Netbeans/clab.cpp][JW
+   CLab Maze]]:
+   #+BEGIN_SRC C++
+     char labyrinth_original[80][80];
+
+     //laedt das labyrinth
+     int loadLabyrinth(char *filename) {
+         FILE *fp;
+         int y;
+    
+         //das file oeffnen
+         if (!(fp = fopen(filename, "r"))){
+             cout << "Labyrinth-Datei existiert nicht\n";
+             getchar();
+             return -1;
+         }
+        
+         //die groesse des labyrinths einlesen
+         fscanf(fp, "%d %d\n", &size_x, &size_y);
+            
+         //jeweils eine zeile als original einlesen
+         char dump[2];
+         for (y = 0; y< size_y; y++) {
+             fgets(labyrinth_original[y], size_x+1, fp);
+             //skip newlines
+             fgets(dump, 2, fp);
+         }
+
+         //file schliessen
+         fclose(fp);
+    
+         //in die labyrinth matrix kopieren
+         resetLabyrinth();
+         return 0;
+     }
+
+     int main(int argc, char** argv) {
+       if (argc < 2) { cout << argv[0] << " <filename> " << endl; }
+       loadLabyrinth(argv[1]);
+     //...
+     }
+   #+END_SRC
+** Examples *Pattern*: using ~<iomanip>~ =IOmanipulator=
+   Formatted output of a person's address: Example from [[file:websnippets/classes/LearnCpp_Composition_Game/Address.h][websnippets > class >
+   composition > Address Output]]:
+   #+BEGIN_SRC C++
+     std::ostream& operator<<(std::ostream& out, const Address &a) {
+         out << std::setw(10) << std::left << "Street:"
+                 << std::setw(25) << std::right << a.street << std::endl
+                 << std::setw(10) << std::left << "No.:"
+                 << std::setw(25) << std::right << a.no << std::endl
+                 << std::setw(10) << std::left << "Zipcode:"
+                 << std::setw(25) << std::right << a.zipcode << std::endl
+                 << std::setw(10) << std::left << "City:"
+                 << std::setw(25) << std::right << a.city << std::endl;
+        return out;
+     }
+   #+END_SRC
+
+* Other Tools
+** Pseudo Random Number Generators (PRNGs)
+*** Best-Practice C++11 style PRNG
+    - *patternForRandomNumberGenerator*
+**** PRNG ~double~, ~vector~
+     BestPractice, with seed:
+#+BEGIN_SRC C++
+/**
+ * Best-Practice C++11 PRNG (PseudoRandomNumberGenerator) for doubles,
+ * with seed (two runs produce different numbers).
+ * 
+ * Notes
+ * - Source: [1]
+ * - needs include random
+ * - returns numbers in interval [lo, hi). If you want [lo, hi], swap 
+ *   distribution init in code  with commented out version [2].
+ * - the used seed std::random_device may be implemented in terms of a 
+ *   pseudo-random number engine if a non-deterministic source (e.g. a hardware 
+ *   device) is not available to the implementation [3]. Meaning: the seed 
+ *   number is always the same. In that case, use the alternative seed commented
+ *   out [4].
+ * - The use of srand() and rand() (traditional C/C++ utilities for simple PRNG) 
+ *   is discouraged [1]. rand() is not thread-safe, may produce uniform distribution, 
+ *   mod-division may return non-uniform distribution.
+ * 
+ * References:
+ * - [1] Stephan T. Lavavej. rand() Considered Harmful. GoingNative 2013.
+ *       URL: https://channel9.msdn.com/Events/GoingNative/2013/rand-Considered-Harmful
+ *       Secondary sources:
+ *       - https://stackoverflow.com/a/19666713/8116031
+ *       - https://stackoverflow.com/a/4196775/8116031
+ * - [2] URL: https://stackoverflow.com/a/19666713/8116031
+ * - [3] URL: https://stackoverflow.com/a/18880689/8116031 
+ * - [4] URL: https://stackoverflow.com/a/32615585/8116031
+ * 
+ * 
+ * @param lo lower bound
+ * @param hi upper bound
+ * @param randoms std::vector, stores results
+ */
+void randDoubleMersenne(double lo, double hi, std::vector<double>& randoms) {
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    //alternative seed if your implementation is affected (see doc; include chrono):
+    //unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    //std::mt19937 generator(seed);
+
+    //distribution for numbers in [lo, hi):
+    std::uniform_real_distribution<double> distribution(lo, hi);
+    //distribution for numbers in [lo, hi]:
+    //  - needs include limits
+    //  - for double, only needed in exceptional cases (prob. of number==hi very 
+    //    low), slower
+    //std::uniform_real_distribution<double> dist(lo, std::nextafter(hi, std::numeric_limits<double>::max()));
+
+    for (double& number : randoms) {
+        number = distribution(generator);
+    }
+}
+#+END_SRC
+     BestPractice, without seed:
+#+BEGIN_SRC C++
+/**
+ * Best-Practice C++11 PRNG (PseudoRandomNumberGenerator) for doubles, 
+ * without seed (two runs produce same numbers).
+ * 
+ * Notes:
+ * - Source: [1]
+ * - needs include random
+ * - returns numbers in interval [lo, hi). If you want [lo, hi], swap 
+ *   distribution init in code  with commented out version [2].
+ * - The use of srand() and rand() (traditional C/C++ utilities for simple PRNG) 
+ *   is discouraged [3]: rand() is not thread-safe, may produce uniform distribution, 
+ *   mod-division may return non-uniform distribution.
+ * 
+ * References:
+ * - [1] URL: https://stackoverflow.com/a/32583991/8116031
+ * - [2] URL: https://stackoverflow.com/a/19666713/8116031
+ * - [3] Stephan T. Lavavej. rand() Considered Harmful. GoingNative 2013.
+ *       URL: https://channel9.msdn.com/Events/GoingNative/2013/rand-Considered-Harmful
+ *       Secondary sources:
+ *       - https://stackoverflow.com/a/19666713/8116031
+ *       - https://stackoverflow.com/a/4196775/8116031
+ * 
+ * @param lo lower bound
+ * @param hi upper bound
+ * @param randoms std::vector, stores results
+ */
+void randDoubleNoSeed(double lo, double hi, std::vector<double>& randoms) {
+    /* 
+     * The random number engines in the Standard Library are pseudo-random, 
+     * i.e. deterministic in how their internal state is initialized and 
+     * mutated. This means that each function call will get a fresh new 
+     * generator that will continue to give the same number over and over again.
+     * Making the generator a static function variable ensures that its state 
+     * can evolve over different function calls.
+     */
+    static std::default_random_engine generator;
+    //distribution for numbers in [lo, hi):
+    std::uniform_real_distribution<double> distribution(lo, hi);
+    //distribution for numbers in [lo, hi]:
+    //  - needs include limits
+    //  - for double, only needed in exceptional cases (prob. of number==hi very 
+    //    low), slower
+    //std::uniform_real_distribution<double> dist(lo, std::nextafter(hi, std::numeric_limits<double>::max()));
+    for (double& number : randoms) {
+        number = distribution(generator);
+    }
+}
+#+END_SRC
+
+**** PRNG ~int~, ~vector~
+     Note: adapting to ~int~ only requires using distribution
+     ~std::uniform_int_distribution<int>~ instead of
+     ~std::uniform_real_distribution<double>~.
+
+     BestPractice, with seed:
+#+BEGIN_SRC C++
+/**
+ * Best-Practice C++11 PRNG (PseudoRandomNumberGenerator) for integers,
+ * with seed (two runs produce different numbers).
+ * 
+ * Notes
+ * - Source: [1]
+ * - needs include random
+ * - the only difference to double version:
+ *   std::uniform_int_distribution<int> instead of 
+ *   std::uniform_real_distribution<double>.
+ * - returns numbers in interval [lo, hi).
+ * - the used seed std::random_device may be implemented in terms of a 
+ *   pseudo-random number engine if a non-deterministic source (e.g. a hardware 
+ *   device) is not available to the implementation [2]. Meaning: the seed 
+ *   number is always the same. In that case, use the alternative seed commented
+ *   out [3].
+ * - The use of srand() and rand() (traditional C/C++ utilities for simple PRNG) 
+ *   is discouraged [1]. rand() is not thread-safe, may produce uniform distribution, 
+ *   mod-division may return non-uniform distribution.
+ * 
+ * References:
+ * - [1] Stephan T. Lavavej. rand() Considered Harmful. GoingNative 2013.
+ *       URL: https://channel9.msdn.com/Events/GoingNative/2013/rand-Considered-Harmful
+ *       Secondary sources:
+ *       - https://stackoverflow.com/a/19666713/8116031
+ *       - https://stackoverflow.com/a/4196775/8116031
+ * - [2] URL: https://stackoverflow.com/a/18880689/8116031 
+ * - [3] URL: https://stackoverflow.com/a/32615585/8116031
+ * 
+ * 
+ * @param lo lower bound
+ * @param hi upper bound
+ * @param randoms std::vector, stores results
+ */
+void randIntegerMersenne(int lo, int hi, std::vector<int>& randoms) {
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    //alternative seed if your implementation is affected (see doc; include chrono):
+    //(untested; may have to be cast to int first, e.g. static_cast<int>)
+    //unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    //std::mt19937 generator(seed);
+
+    //distribution for numbers in [lo, hi):
+    std::uniform_int_distribution<int> distribution(lo, hi);
+
+    for (int& number : randoms) {
+        number = distribution(generator);
+    }
+}
+#+END_SRC
+
+**** DISCOURAGED PRNG ~double~, ~array~
+     BestPractice, with seed:
+#+BEGIN_SRC C++
+/**
+ * Best-Practice C++11 PRNG (PseudoRandomNumberGenerator) for doubles,
+ * with seed (two runs produce different numbers).
+ * 
+ * Notes
+ * - Source: [1]
+ * - needs include random
+ * - returns numbers in interval [lo, hi). If you want [lo, hi], swap 
+ *   distribution init in code  with commented out version [2].
+ * - the used seed std::random_device may be implemented in terms of a 
+ *   pseudo-random number engine if a non-deterministic source (e.g. a hardware 
+ *   device) is not available to the implementation [3]. Meaning: the seed 
+ *   number is always the same. In that case, use the alternative seed commented
+ *   out [4].
+ * - The use of srand() and rand() (traditional C/C++ utilities for simple PRNG) 
+ *   is discouraged [1]. rand() is not thread-safe, may produce uniform distribution, 
+ *   mod-division may return non-uniform distribution.
+ * 
+ * References:
+ * - [1] Stephan T. Lavavej. rand() Considered Harmful. GoingNative 2013.
+ *       URL: https://channel9.msdn.com/Events/GoingNative/2013/rand-Considered-Harmful
+ *       Secondary sources:
+ *       - https://stackoverflow.com/a/19666713/8116031
+ *       - https://stackoverflow.com/a/4196775/8116031
+ * - [2] URL: https://stackoverflow.com/a/19666713/8116031
+ * - [3] URL: https://stackoverflow.com/a/18880689/8116031 
+ * - [4] URL: https://stackoverflow.com/a/32615585/8116031
+ * 
+ * 
+ * @param lo lower bound
+ * @param hi upper bound
+ * @param randoms array, stores results
+ * @param n array size
+ */
+void randDoubleMersenne(double lo, double hi, double * randoms, int n) {
+    std::random_device seed;
+    std::mt19937 generator(seed());
+    //alternative seed if your implementation is affected (see doc; include chrono):
+    //unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    //std::mt19937 generator(seed);
+
+    //distribution for numbers in [lo, hi):
+    std::uniform_real_distribution<double> distribution(lo, hi);
+    //distribution for numbers in [lo, hi]:
+    //  - needs include limits
+    //  - for double, only needed in exceptional cases (prob. of number==hi very 
+    //    low), slower
+    //std::uniform_real_distribution<double> dist(lo, std::nextafter(hi, std::numeric_limits<double>::max()));
+
+    for (int i = 0; i < n; i++) {
+        randoms[i] = distribution(generator);
+    }
+}
+#+END_SRC
+
+     BestPractice, without seed:
+#+BEGIN_SRC C++
+/**
+ * Best-Practice C++11 PRNG (PseudoRandomNumberGenerator) for doubles, 
+ * without seed (two runs produce same numbers).
+ * 
+ * Notes:
+ * - Source: [1]
+ * - needs include random
+ * - returns numbers in interval [lo, hi). If you want [lo, hi], swap 
+ *   distribution init in code  with commented out version [2].
+ * - The use of srand() and rand() (traditional C/C++ utilities for simple PRNG) 
+ *   is discouraged [2]: rand() is not thread-safe, may produce uniform distribution, 
+ *   mod-division may return non-uniform distribution.
+ * 
+ * References:
+ * - [1] URL: https://stackoverflow.com/a/32583991/8116031
+ * - [2] URL: https://stackoverflow.com/a/19666713/8116031
+ * - [3] Stephan T. Lavavej. rand() Considered Harmful. GoingNative 2013.
+ *       URL: https://channel9.msdn.com/Events/GoingNative/2013/rand-Considered-Harmful
+ *       Secondary sources:
+ *       - https://stackoverflow.com/a/19666713/8116031
+ *       - https://stackoverflow.com/a/4196775/8116031
+ * 
+ * @param lo lower bound
+ * @param hi upper bound
+ * @param randoms array, stores results
+ * @param n array size
+ */
+void randDoubleNoSeed(double lo, double hi, double * randoms, int n) {
+    /* 
+     * The random number engines in the Standard Library are pseudo-random, 
+     * i.e. deterministic in how their internal state is initialized and 
+     * mutated. This means that each function call will get a fresh new 
+     * generator that will continue to give the same number over and over again.
+     * Making the generator a static function variable ensures that its state 
+     * can evolve over different function calls.
+     */
+    static std::default_random_engine generator;
+    //distribution for numbers in [lo, hi):
+    std::uniform_real_distribution<double> distribution(lo, hi);
+    //distribution for numbers in [lo, hi]:
+    //  - needs include limits
+    //  - for double, only needed in exceptional cases (prob. of number==hi very 
+    //    low), slower
+    //std::uniform_real_distribution<double> dist(lo, std::nextafter(hi, std::numeric_limits<double>::max()));
+    for (int i = 0; i < n; i++) {
+        randoms[i] = distribution(generator);
+    }
+}
+#+END_SRC
+
+*** DISCOURAGED PRNG ~int~ using ~rand()~
+    - Source: LearnCpp
+#+BEGIN_SRC C++
+#include <cstdlib> // randTime(), randRange: rand() and srand()
+#include <ctime> // for randTime(): time() 
+
+/**
+ * RNG: set initial seed value to system clock.
+ * 
+ * @return seed
+ */
+int randTime() {
+    srand(static_cast<unsigned int> (time(0)));
+}
+
+/**
+ * RNG with range inclusive.
+ * Assumes srand() has been called (see randTime()).
+ *
+ * Notes:
+ * Notes:
+ * - include cstdlib
+ * - to include max (often done): remove +1.0 from RAND_MAX
+ * - rand() is not thread-safe, may produce uniform distribution, mod-division may
+ *   return non-uniform distribution. Prefer C++11/TR1 RNG method. 
+ * 
+ * @param min
+ * @param max
+ * @return 
+ */
+int randRange(int min, int max) {
+    //static used for efficiency, so we only calculate this value once:
+    static const double fraction = 1.0 / (static_cast<double> (RAND_MAX) + 1.0);
+    //evenly distribute the random number across our range
+
+}
+#+END_SRC
+
+*** DISCOURAGED PRNG ~double~ using ~rand()~
+    - Source: [[https://stackoverflow.com/questions/2704521/generate-random-double-numbers-in-c][StackOverflow]] 
+#+BEGIN_SRC C++
+    /**
+    * Remember to call srand() with a proper seed each time your program starts.
+    *
+    * Notes:
+    * - include cstdlib
+    * - to exclude max (often done): add +1 to RAND_MAX
+    * - If you add 1 to RAND_MAX, do so carefully, since it might be equal to INT_MAX
+    * - rand() is not thread-safe, may produce uniform distribution, mod-division may
+    *   return non-uniform distribution. Prefer C++11/TR1 solution.
+    */
+    double fRand(double fMin, double fMax)
+      {
+          double f = (double)rand() / RAND_MAX;
+          return fMin + f * (fMax - fMin);
+      }
+#+END_SRC
+    
+     
+     
+
+    

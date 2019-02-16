@@ -1,0 +1,641 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+<2017-07-05 Mi> - ?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+#+BEGIN_QUOTE
+HTML / Orgmode - Version: Damit die Links auf die cpp-Files funktionieren, muss
+dieses File innerhalb des Snippets-Ordners auf oberster Ebene liegen. Die
+zusätzlichen Pakete 1) CPP_Snippets_F0X_AddOn.zip und 2) U10 müssen ebenfalls
+hier entpackt und die Ordner wie folgt benannt werden 1) F_pointers2_17SS,
+und 2) H_templates2_17SS.
+#+END_QUOTE
+
+* FH Aachen Modul C++ 16WS/17SS Snippets - Table of Contents
+  #+BEGIN_QUOTE
+  This should be #+TITLE: FH Aachen Modul C++ 16WS/17SS Notizen JW
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  This document serves as a QuickRef, enabling the user to search for code
+  examples within the course snippets pertaining to a subject of interest rather
+  quicker than trudge from cpp file to cpp file one by one.
+
+  The contents of each section are just the copied-out file headers of each cpp
+  file, optionally with additional comments.
+
+
+* A - Compiler, Make & more
+** [[file:A_compiler_make_and_more/example1.c][example1.c]]
+   
+   Ein einfaches C-Programm.
+    
+   - Uebersetzen im Terminal-Fenster (LXTerminal)
+     #+BEGIN_SRC shell
+     gcc example1.c -o example1.out
+     #+END_SRC
+   - ergibt "example1.out", ausfuehrbar mit
+     #+BEGIN_SRC shell
+     ./example1.out
+     #+END_SRC
+** [[file:A_compiler_make_and_more/example2.cpp][example2.cpp]]
+   
+   Ein einfaches C++-Programm.                 
+                                               
+   Uebersetzen im Terminal-Fenster (LXTerminal)
+   #+BEGIN_SRC shell
+   g++ example2.cpp -o example2.out          
+   #+END_SRC
+   ergibt "example2.out", ausfuehrbar mit
+   #+BEGIN_SRC shell
+   ./example2.out                            
+   #+END_SRC
+
+
+* B - Hello World(s)
+
+
+** [[file:B_hello_world/B01_hello_world.c][B01 Hello World in C]]
+   Das bekannteste C-Programm.                                 
+                                                               
+   Stichworte:                                                 
+       - #include, Header- oder Include-File, stdio.h, stdlib.h
+       - Makro EXIT_SUCCESS                                    
+       - Funktionsaufruf, main, printf                         
+       - C-String "text", '\n'                                 
+       - return                                                
+       - C-Kommentare, std=c99                                 
+
+** [[file:B_hello_world/B02_hello_world.cpp][B02 Hello World in C++]]
+
+   Das bekannteste C++-Programm.              
+                                              
+   Stichworte:                                
+       - #include, iostream, cstdlib          
+       - std::cout, std::endl, C-String "text"
+       - using namespace
+
+** [[file:B_hello_world/B03_hello_world_snippet.cpp][B03]] Hello World C++ showing off Course Snippet Tools
+
+   Ein typisches Kurs-C++-Snippet.          
+                                            
+   Stichworte:                              
+       - #include "../tools.h", tools_log() 
+   
+* C - Primitive Types (Basistypen), Init, Cast, IO, Scope
+** [[file:C_primitive_data_types/C01_cout_vs_printf.cpp][C01]] - cout vs printf
+
+   Erste primitive Datentypen und Ausgabe via printf und cout.
+                                                              
+   Stichworte:                                                
+       - printf, Formatstring, %d, %c                         
+       - Datentypen, char,  int                               
+       - cast                                                 
+** [[file:C_primitive_data_types/C02_primitive_data_types_V1.cpp][C02]] - PrimTypes1: fixed & unfixed size
+   
+   Primitive Datentypen und ihre jeweilige Groesse.       
+                                                          
+   Stichworte:                                            
+       - Datentypen, int, int8_t, size_t, signed, unsigned
+       - Praeprozessordirektiven, #pragma                 
+
+** [[file:C_primitive_data_types/C03_primitive_data_types_V2.cpp][C03]] - PrimType2 - from ~char~ to ~uint64_t~, Printf Formatting
+
+   Weitere primitive Datentypen und ihre jeweilige Groesse.
+                                                           
+   Stichworte:                                             
+       - printf, Formatstring fuer ganzzahlige Daten       
+       - Datentypen, char, short, int, long, long long     
+       - (u)int8_t, (u)int16_t, (u)int32_t, (u)int64_t
+
+** [[file:C_primitive_data_types/C04_primitive_data_types_V3.cpp][C04]] - PrimTypes3 - more types, sizes, printf formatting
+
+   Weitere primitive Datentypen und ihre jeweilige Groesse.
+                                                           
+   Stichworte:                                             
+       - printf, Formatstring fuer Fliesskommazahlen       
+       - Datentypen, float, double, long double            
+
+** [[file:C_primitive_data_types/C05_primitive_data_types_V4.cpp][C05]] - PrimTypes4 - char*, char[], string, C-String
+
+   Zeichen-Datentypen und ihre jeweilige "Groesse".        
+                                                           
+   Stichworte:                                             
+       - Datentypen, char, char*, char[], string, C-String 
+
+** [[file:C_primitive_data_types/C06_casts.cpp][C06]] - PrimTypes5 - Casting
+
+   Typumwandlungen                               
+                                                 
+   Stichworte:                                   
+       - cast, static_cast, cmath, round, lround 
+
+** [[file:C_primitive_data_types/C07_operations.cpp][C07]] - PrimTypes8 - Operations, =Sequence Point=
+
+   Uebliche Operationen und ndefiniertes Verhalten von Ausdruecken.
+                                                                   
+   Stichworte:                                                     
+       - Operationen                                               
+       - sequencing points                                         
+
+** [[file:C_primitive_data_types/C08_cin.cpp][C08]] - I/O - cin (C++), stoX (C)
+
+   Dateneingabe, Input
+                                
+   Stichworte:                  
+       - cin                    
+       - stoi, stol, stod, stof
+
+** [[file:C_primitive_data_types/C09_scope.cpp][C09]] - Scopes
+
+   Gueltigkeitsbereiche, scope
+                              
+   Stichworte:                
+       - scope                
+
+** [[file:C_primitive_data_types/C10_auto.cpp][C10]] - Typing / Declaration - ~auto~ keyword
+   
+   Automatische Datentypenermittlung.
+                                     
+   Stichworte:                       
+       - auto                        
+
+** [[file:C_primitive_data_types/C11_array_example.cpp][C11]] - Arrays
+
+   Felder/Arrays
+                
+   Stichworte:  
+       - op[]   
+
+** [[file:C_primitive_data_types/C12_string_example.cpp][C12]] - String1
+
+   String-Beispiel.
+                   
+   Stichworte:     
+       - string    
+   
+* D - Control Sructures
+** [[file:D_control_structures/D01_if.cpp][D01]] - if
+
+** [[file:D_control_structures/D02_for_while.cpp][D02]] - for, while
+   
+   for- und while-Kontrollstruktur   
+                                     
+   Stichworte:                       
+       - for, while, continue, break 
+
+** [[file:D_control_structures/D03_switch.cpp][D03]] - switch
+
+   switch-Kontrollstruktur                          
+                                                    
+   Stichworte:                                      
+       - switch, case, break, default, fall through 
+
+** [[file:D_control_structures/D04_function_call.cpp][D04]] - Function1 - Declaration, CBV
+
+   Aufruf einer Funktion, undefiniertes Auswertungsreihenfolge
+                                                              
+   Stichworte:                                                
+       - Funktionsaufruf, call by value, Rekursion            
+       - Funktionsdeklaration, Signatur                       
+       - sequencing points                                    
+
+** [[file:D_control_structures/D05_math_functions.cpp][D05]] - Function2 - Math
+
+   Mathematikfunktionen                                           
+   Achtung: man braucht im makefile die math-lib: Linkoption '-lm'
+                                                                  
+   Stichworte:                                                    
+       - sin,cos,tan,sinh,asin,log,log10,exp,fabs,floor,ceil      
+
+** [[file:D_control_structures/D06_static_data.cpp][D06]] - Function3 - ~static~ keyword
+
+   Statische Daten bzw. Variablen in Funktionen
+                                               
+   Stichworte:                                 
+       - static                                
+
+** [[file:D_control_structures/D07_simple_exceptions.cpp][D07]] - Exceptions
+   
+   Werfen und Fangen einfacher Ausnahmen
+                                        
+   Stichworte:                          
+       - throw, try, catch              
+
+** [[file:D_control_structures/D08_undef_expressions.cpp][D08]] - Undefined behavior
+
+   Undefiniertes Verhalten von Ausdruecken
+                                          
+   Stichworte:                            
+       - sequencing points                
+* E - Composed Data Types
+** [[file:E_composed_data_types/E01_enum.cpp][E01]] - Enums
+   Aufzaehlungstypen
+                    
+   Stichworte:      
+       - enum       
+** [[file:E_composed_data_types/E02_struct.cpp][E02]] - Struct, Copy vs Reference, CBC, CBR
+
+   In Strukturen zusammengefasste Datentypen, Referenz vs. Kopie
+                                                                
+   Stichworte:                                                  
+       - struct                                                 
+
+** [[file:E_composed_data_types/E03_unions.cpp][E03]] - Unions
+
+   Als Union zusammengefasste Datentypen
+                                        
+   Stichworte:                          
+       - union                          
+
+** [[file:E_composed_data_types/E04_typedef.cpp][E04]] - ~typedef~ keyword
+
+   Verwendung eigener Typdefinitionen
+                                     
+   Stichworte:                       
+       - typedef                     
+* F - Pointers and References
+** [[file:F_pointers_and_references/F00_example.cpp][F00]] - Pointer Example in Memory
+   Beispiel              
+                         
+   Stichworte:           
+       - pointer, memory 
+
+** [[file:F_pointers_and_references/F01_swap.cpp][F01]] - Swap example, CBR, CBV, Operators
+   
+   Verwendung von Referenzen (&) und Zeigern/Pointern
+                                                     
+   Stichworte:                                       
+       - call by reference, call by value            
+       - deref.op *, address-op &, ref &             
+
+** [[file:F_pointers_and_references/F02_references.cpp][F02]] - Using References
+   Referenzen  
+               
+   Stichworte: 
+       - ref & 
+
+** [[file:F_pointers_and_references/F03_pointers.cpp][F03]] - Using Pointers
+
+   Zeiger/Pointer          
+                           
+   Stichworte:             
+       - op *, op &, void* 
+
+** [[file:F_pointers_and_references/F04_arrays_V1.cpp][F04]] - Arrays & Ptr Arithmetic 1
+
+   Felder/Arrays                
+                                
+   Stichworte:                  
+       - op[], Zeigerarithmetik 
+
+** [[file:F_pointers_and_references/F05_arrays_V2.cpp][F05]] - Arrays & Ptr Arithmetic 2
+
+   Felder/Arrays                
+                                
+   Stichworte:                  
+       - op[], Zeigerarithmetik 
+** [[file:F_pointers_and_references/F06_dynamic_malloc.cpp][F06]] - Allocation C-Style: ~malloc~, ~free~ keywords
+
+   Dynamischen Speicher anfordern, nach alter C-Variante
+                                                        
+   Stichworte:                                          
+       - malloc, free                                   
+
+** [[file:F_pointers_and_references/F07_dynamic_new.cpp][F07]] - Dynamic Allocation C++-Style: ~new~, ~delete~ keywords
+
+
+   Dynamischen Speicher anfordern, nach neuer C++-Variante
+                                                          
+   Stichworte:                                            
+       - new, delete                                      
+
+** [[file:F_pointers_and_references/F08_pointerpointer.cpp][F08]] - Nested / verschachtelte Pointers Ptrs
+
+   Zeiger auf Zeiger auf Zeiger ... 
+                                    
+   Stichworte:                      
+       - op *, op &                 
+
+** [[file:F_pointers_and_references/F09_cstrings.cpp][F09]] - C-String Functions & Allocation
+   C-string Funktionen                                   
+                                                         
+   Stichworte:                                           
+       - C-string, strlen, strcpy, strcat, strchr, strstr
+       - malloc, free                                    
+
+** [[file:F_pointers_and_references/F10_strings.cpp][F10]] - C++-String Functions
+
+C++-string Funktionen                    
+                                         
+Stichworte:                              
+    - C++-string, size, find, op+, c_str 
+
+** [[file:F_pointers_and_references/F11_const_pointers.cpp][F11]] - ~const~ Pointers Ptrs, ~const_cast~
+
+   Verwendung von const, insbes. mit Zeigern
+                                            
+   Stichworte:                              
+      - const, const_cast                  
+
+** [[file:F_pointers_and_references/F12_function_pointers.cpp][F12]] - Function Pointers Ptrs   
+   Funktionszeiger        
+                          
+   Stichworte:            
+       - function pointer 
+
+
+** [[file:F_pointers_and_references/F13_scanf.cpp][F13]] - I/O: scanf Readin Data C-style
+
+   Vorstellen der C-Methode, um Daten einzulesen
+                                                
+   Stichworte:                                  
+       - scanf                                  
+
+** [[file:F_pointers_and_references/F14_varargs.cpp][F14]] - VarArgs C-Style
+
+   Die C-Methode, um eine variable Menge von Argumenten zu uebergeben.
+                                                                      
+   Stichworte:                                                        
+       - varg, va_list, va_arg                                        
+
+** [[file:F_pointers_and_references/F15_modifybytes.cpp][F15]] - Pointer Casting Ptr, Byte Bitwise Operators Manipulation
+   
+   Zeigerkonvertierung und gezielte Modifikation einzelner Bytes.
+                                                                 
+   Stichworte:                                                   
+       - pointer, cast
+
+
+** [[file:F_pointers_and_references/F16_return_pointers_references.cpp][F16]] - Local Pointer, Local Reference
+
+   Zeiger oder Referenzen auf lokale Variablen.
+                                               
+   Stichworte:                                 
+       - local pointer, local references       
+
+** [[file:F_pointers_and_references/F17_main.cpp][F17]] - I/O: ~main~, ~argv[]~, ~getenv~ read from command line
+
+   Ein Programm mit Parametern starten und Variablen vom Environment lesen
+                                                                          
+   Stichworte:                                                            
+       - main args, getenv                                                
+
+** [[file:F_pointers_and_references/F18_file_io.cpp][F18]] - File I/O
+
+   Dateien einlesen und schreiben             
+                                              
+   Stichworte:                                
+       - fopen, fclose, fgetc, fscanf, getline
+       - stream, ifstream, ofstream           
+
+* F - Pointers2, Ptr Arithmetic - 17SS
+** [[file:F_pointers2_17SS/F0A_example.cpp][F0A]] - PtrArithmetic mit 2 Variabeln
+** [[file:F_pointers2_17SS/F0B_example.cpp][F0B]] - PtrArithmetic mit Array size 3
+** [[file:F_pointers2_17SS/F0C_example.cpp][F0C]] - PtrArithmetic mit NestedPtrs
+** [[file:F_pointers2_17SS/F0D_example.cpp][F0D]] - PtrArithmetic mit References
+** [[file:F_pointers2_17SS/F0E_example.cpp][F0E]] - PtrArithmetic: Stack Hacking / Function Jumping
+** [[file:F_pointers2_17SS/F0F_example.cpp][F0F]] - =KLAUSURAUFGABE=: =LinkedList=
+* G - Classes
+** [[file:G_classes/G01_sneak_preview.cpp][G01]] - Preview wichtiger C++-Features
+
+** [[file:G_classes/G02_simple_classes.cpp][G02]], [[file:G_classes/G02a_simple_class.cpp][G02a]] - Ctor, Dtor, CCtor
+
+   Verwendung von Classen            
+                                     
+   Stichworte:                       
+       - class ctor, dtor, copy-ctor 
+
+** [[file:G_classes/G03_const_and_ref.cpp][G3]] - ~const~ and Refs for Classes
+
+   Verwendung von const und Referenzen
+                                      
+   Stichworte:                        
+       - const, ref &                 
+
+** [[file:G_classes/G04_rule_of_three_V1.cpp][G04]], [[file:G_classes/G05_rule_of_three_V2.cpp][G05]] - RuleOfThree
+
+   die Regel der Drei: copy-ctor, copy assignment op (=), dtor
+                                                              
+   Stichworte:                                                
+       - rule of three                                        
+
+** [[file:G_classes/G06_new_and_delete.cpp][G06]] - DynMem1 - Dynamic Memory for Classes
+
+   Verwendung von dynamischem Speicher mit Klassen
+                                                  
+   Stichworte:                                    
+       - new, delete, class                       
+
+** [[file:G_classes/G07_string_example.cpp][G07]] - DynMem2 - String, copy & swap Idiom
+
+   Verwendung c++ Klassen mit dynamischem Speicher
+                                                  
+   Stichworte:                                    
+       - copy and swap idiom                      
+
+** [[file:G_classes/G08_vectors.cpp][G08]] - Templates, STL Vectors for Classes
+
+   Verwendung von Templates und Klassen               
+   Ueberblick: http://www.cplusplus.com/reference/stl/
+                                                      
+   Stichworte:                                        
+       - template, vector, stl                        
+
+** [[file:G_classes/G09_simple_inheritance.cpp][G09]] - Iherit1 - Inheritance
+
+   Thema Vererbung, inheritance
+                               
+   Stichworte:                 
+       - inheritance           
+
+** G10 - Inherit2 - ~Virtual~ Functions, Overriding
+   [[file:G_classes/G10_virtual_functions_intro.cpp][G10 Intro]], [[file:G_classes/G10_virtual_functions.cpp][G10]]
+
+   Thema Vererbung, inheritance        
+                                       
+   Stichworte:                         
+       - inheritance, virtual functions
+       - virtual, override, final      
+
+** [[file:G_classes/G11_abstract_class_interfaces.cpp][G11]] - Inherit3 - AbstClass Abstract, Interfaces
+   
+   Thema Vererbung, abstrakte Klassen und Interfaces in C++
+                                                           
+   Stichworte:                                             
+       - interface, abstract classes                       
+
+** [[file:G_classes/G12_virtual_functions_example.cpp][G12]] - Inherit4 - Pure Virtual Functions
+
+   Thema Vererbung              
+                                
+   Stichworte:                  
+       - pure virtual functions 
+
+** [[file:G_classes/G13_multiple_inheritance_V1.cpp][G13]], [[file:G_classes/G14_multiple_inheritance_V2.cpp][G14]] - Inherit5 - MultInherit
+
+   Thema Vererbung            
+                              
+   Stichworte:                
+       - multiple inheritance 
+
+** [[file:G_classes/G15_line_example.cpp][G15]] - Inheritc6 =KLAUSURAUFGABE=
+   [[file:G_classes/G15_line_example_sol.cpp][G15 Solution]]
+
+** G16-20 - Inherit7 - Operators & OpOverloading
+
+   Thema Verwendung eigener Operatoren
+                                      
+   Stichworte:                        
+       - operator                     
+
+*** [[file:G_classes/G16_define_operators_V1.cpp][G16]] - ~op*~, ~op*=~ with ~friend~
+*** [[file:G_classes/G17_define_operators_V2.cpp][G17]] - one class, different =Units=
+*** [[file:G_classes/G18_define_operators_V3.cpp][G18]] - naive =Point= implementation
+*** [[file:G_classes/G19_define_operators_V4.cpp][G19]] - =CStringIII= class
+*** [[file:G_classes/G20_define_operators_V5.cpp][G20]] - Self-Defined Operators
+** [[file:G_classes/G21_vtbl_fun.cpp][G21]] - Virtual Table Vtable Example
+
+   Thema vtables
+                
+   Stichworte:  
+       - vtbl   
+
+** [[file:G_classes/G22_initializers.cpp][G22]] - Initializers, C++11-Style
+
+   Thema Initialisierung in C++11 ! 
+                                    
+   Stichworte:                      
+       - initializer_list           
+
+** [[file:G_classes/G23_ranged_base_for.cpp][G23]] - RangeBasedFor, C++11-Style
+
+   Thema range based for, C++11 !
+                                 
+   Stichworte:                   
+       - for (auto x : v)        
+
+** [[file:G_classes/G24_statics.cpp][G24]] - ~static~ class Members / Attributes
+
+   Thema statische Member
+                         
+   Stichworte:           
+       - static          
+
+** [[file:G_classes/G25_deleted_default_explicit.cpp][G25]] - Ctor and ~op=~ Implementation
+
+   Thema ctor and op= Implementation          
+                                              
+   Stichworte:                                
+       - default, deleted, implicit, explicit 
+
+** [[file:G_classes/G26_timing.cpp][G26]], [[file:G_classes/G27_fib_bench.cpp][G27]] - Tools: Measuring Time
+
+   Thema Zeitmessung
+                    
+   Stichworte:      
+       - static     
+** [[file:G_classes/G28_test_set.cpp][G28]], [[file:G_classes/G29_test_set_lsg.cpp][G29 (Solution)]] - =KLAUSURAUFGABE=
+   
+** G30-33 Lambda
+   Thema Lambda-Expressions
+                           
+   Stichworte:             
+       - () => { }         
+
+*** [[file:G_classes/G30_lambda_expression_V1.cpp][G30]] - simple examples
+*** [[file:G_classes/G31_lambda_expression_V2.cpp][G31]] - polynomial
+*** [[file:G_classes/G32_lambda_expression_V3.cpp][G32]] - trapezrule
+*** [[file:G_classes/G33_lambda_expression_V4.cpp][G33]] - trapezrule with vector
+
+
+** G34-36 - ~move~, ~move Assignment, =RValue=, =LValue=
+
+   Thema move, move assignment, r- und l-value
+                                              
+   Stichworte:                                
+       - &&
+*** [[file:G_classes/G34_move_V1.cpp][G34]] with ~op+~, ~op*~, and ~friend~
+*** [[file:G_classes/G35_move_V2.cpp][G35]] =MCtor=, =MoveAssignmentCtor=
+*** [[file:G_classes/G36_move_V3.cpp][G36]] =Rvalue=, =LValue=
+
+* H - Templates 16WS
+** [[file:H_templates/H01_simple_templates_V1.cpp][H01]] - Intro: Template with ~int~
+** [[file:H_templates/H02_simple_templates_V2.cpp][H02]] - ~typename~, =Specialized Templates=
+
+** [[file:H_templates/H03_simple_templates_V3.cpp][H03]] - Template with ~Vector<int>~
+
+** [[file:H_templates/H04_template_programming.cpp][H04]] - Fibonacci with a Template
+
+** [[file:H_templates/H05_smart_ptr_V1.cpp][H05]], [[file:H_templates/H06_smart_ptr_V2.cpp][H06]] - =SmartPointers= 1: ~unique_ptr~
+
+** [[file:H_templates/H07_smart_ptr_V3.cpp][H07]] - =SmartPointers= 2: ~shared_ptr~
+
+** [[file:H_templates/H08_simple_point.cpp][H08]] - Template Example: Use of Template Classes
+* H - Templates2 17SS
+** [[file:H_templates2_17SS/A_Templates_E1.cpp][A_E1]] - Template Generic Class Set
+** [[file:H_templates2_17SS/A_Templates_E2.cpp][A_E2]] - TemplateClass ~point<T>~
+** [[file:H_templates2_17SS/A_Templates_E3.cpp][A_E3]] - TemplateFct ~myswap~
+** [[file:H_templates2_17SS/B_Special_E1.cpp][B_E1]] - TemplateClass ~pair<T1,T2>~
+** [[file:H_templates2_17SS/B_Special_E2.cpp][B_E2]] - TemplateClass ~pair<T1,T2>~ mit TemplateSpecialization
+** [[file:H_templates2_17SS/B_Special_E4.cpp][B_E4]] - TemplateClass ~MyVector~ fixedLength
+** [[file:H_templates2_17SS/B_Special_E5.cpp][B_E5]] - TemplateFct inverseChar mit TSpec.
+** [[file:H_templates2_17SS/B_Special_E6.cpp][B_E6]] - TClass Fibonacci in CompileTime via ~enum~
+** [[file:H_templates2_17SS/B_Special_E7.cpp][B_E7]] - T =ContainerClass= 'es like ~vector~
+** [[file:H_templates2_17SS/B_Special_E8.cpp][B_E8]] - TClass mit =Traits= ValueHolder
+** [[file:H_templates2_17SS/B_Special_E9.cpp][B_E9]] - TClass MyPointer, MyCollection
+
+   
+* I - Threads
+
+** [[file:I_threads/I01_simple_threads_V1.cpp][I01]], [[file:I_threads/I02_simple_threads_V2.cpp][I02]] - Threads Intro Example
+
+** [[file:I_threads/I03_simple_threads_V3.cpp][I03]] - Thread with Function
+
+** [[file:I_threads/I04_simple_threads_V4.cpp][I04]] - Thread with Function CBR
+
+** [[file:I_threads/I05_mutex_locks_V1.cpp][I05]] - =Mutexes=, =Locks=
+** [[file:I_threads/I06_mutex_locks_V2.cpp][I06]] - =Mutexes= 1 - =Locks= with Function
+** [[file:I_threads/I07_wait_for_signal.cpp][I07]] - =Mutexes= 2 - Zeitvertreib mit ~try_lock()~
+   I07 and I08: threads warten auf LockRelease durch MainThread bis sie ihre
+   Arbeit tun. Bei I07 ist es ohne ConditionVariables gelöst mit einer einfachen
+   ~while(!mutex.try_lock()){/*looooooop*/}~ Schleife. Diese Version nehmen wenn
+   ~looooooooooop~ durch eine Nebenarbeit beim Warten ersetzt werden soll.
+   Zu beachten:
+   - Die übergebene =Work=-Funktion verpackt das ~mutex~ und die ~cnt~-Variable
+     in ~std::ref()~. Laut [[file:c:/C:/Users/johannesw/Desktop/Studium/Kurse/Cpp/Gonicup_CppNotizen_17FS/reference/en/cpp/utility/functional/ref.html][cppref offline Gonicup Repo]]:
+     #+BEGIN_QUOTE
+     ~std::reference_wrapper<T> ref(T& t);~ Function templates ref and cref are
+     helper functions that generate an object of type std::reference_wrapper.
+     ~std::reference_wrapper~ is a class template that wraps a reference in a
+     copyable, assignable object. It is frequently used as a mechanism to store
+     references inside standard containers (like std::vector) which cannot
+     normally hold references. std::reference_wrapper is also used to pass
+     objects to std::bind or to the constructor of ~std::thread~ by reference.
+     #+END_QUOTE
+     - Komischerweise schmiert Code ab wenn ich normale ref stattdessen verwende.
+   
+** [[file:I_threads/I08_condition_variables_V1.cpp][I08]] - =Mutexes= 3 -  Wartn mit ~condition_variable~
+   I07 and I08: threads warten auf LockRelease durch MainThread bis sie ihre
+   Arbeit tun. Die Version von I08 nehmen wenn statt Nebenarbeit nur auf
+   LockRelease gewartet werden soll. I08 verwendet dafür 
+** [[file:I_threads/I09_condition_variables_V2.cpp][I09]] - =Mutexes= 4 -  Condition Variables
+* J - Compile Link
+
+** J1 - External Functions
+
+*** ~main~
+*** =external=
+
+** J2 - External Functions
+
+*** ~main~
+*** =external=
+   
+  
+  

@@ -1,0 +1,52 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+* Diese orgmode-Datei formatiert anschauen
+  Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+
+
+* My Regex Regular Expression Collection JW <2017-08-18 Fr>
+** [[https://regex101.com/][Try them online]]
+** How to use in Java
+   If copied in IDE like Netbeans within string "", Java escapes are
+   automatically added. Otherwise, have to add them on your own. Example: for use in Java, this ...
+   #+BEGIN_EXAMPLE
+   (\/\*)([\S,\s]*)(\*\/)
+   #+END_EXAMPLE
+   ... needs to be converted to ...
+   #+BEGIN_EXAMPLE
+   String multilineJavaCommentPattern = "(\\/\\*)([\\S,\\s]*)(\\*\\/)";
+   #+END_EXAMPLE
+   
+
+** #multiline #java #javacomment #cpp #cppcomment
+
+   Original:
+   #+BEGIN_EXAMPLE
+   (\/\*)([\S,\s]*)(\*\/)
+   #+END_EXAMPLE
+
+   Matches e.g. (except sdfsdf):
+   #+BEGIN_EXAMPLE
+   /* bla  
+    
+   ds
+    
+    
+   sdf
+    
+   */ sdfsdf   
+   #+END_EXAMPLE
+
+** #java #import #java-import-statement
+
+   Original:
+   #+BEGIN_EXAMPLE
+   (import)([ ]+)((\w+\.*)+)(;)
+   #+END_EXAMPLE
+
+   Matches e.g. import statement in:
+   #+BEGIN_EXAMPLE
+   /* */import bla.blu; //usw.
+   #+END_EXAMPLE
+

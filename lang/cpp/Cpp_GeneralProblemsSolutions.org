@@ -1,0 +1,88 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:nil # disable export latex section numbering for org headings
+#+OPTIONS: toc:nil # no table of contents (doesn't work if num:nil)
+
+#+TITLE: Cpp_General_ProblemsSolutions
+#+DATE: <2019-01-13 Sun>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: de
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: 
+
+* Returning two (or more) variables in a C++ function and unpack
+[[https://stackoverflow.com/questions/15365860/returning-two-variables-in-a-c-function][Reference]]
+
+Works with ~std::pair~ and ~std::tuple~ (more than two).
+
+#+BEGIN_SRC C++ :results value output
+#include <utility>
+
+std::pair<double, double> foo()
+{
+  return std::make_pair(42., 3.14);
+}
+
+#include <iostream>
+#include <tuple> // C++11, for std::tie
+int main()
+{
+  std::pair<double, double> p = foo();
+  std::cout << p.first << ", " << p.second << std::endl;
+
+  // C++11: use std::tie to unpack into pre-existing variables
+  double x, y;
+  std::tie(x,y) = foo();
+  std::cout << x << ", " << y << std::endl;
+
+  // C++17: structured bindings
+  auto [xx, yy] = foo(); // xx, yy are double
+}
+#+END_SRC
+
+#+RESULTS:
+: 42, 3.14
+: 42, 3.14

@@ -1,0 +1,779 @@
+/<2016-12-28 Mi>/
+
+#+BEGIN_QUOTE
+  Diese orgmode-Datei formatiert anschauen\\
+  Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode
+  Viewer]] - Editor\\
+#+END_QUOTE
+
+* Stroustrup - The Essence of Cpp
+  :PROPERTIES:
+  :CUSTOM_ID: sec:orgheadline1
+  :END:
+
+#+BEGIN_QUOTE
+  This should be #+TITLE: Stroustrup - The Essence of Cpp But Spacemacs
+  0.106 export html can't handle this
+#+END_QUOTE
+
+Quelle: [[https://www.youtube.com/watch?v=86xWVb4XIyE][yt > The Essence
+of C++]] (Uni. Edinburgh), Upload /<2014-05-06 Di>/
+
+* What is *C++* ?
+  :PROPERTIES:
+  :CUSTOM_ID: sec:orgheadline2
+  :END:
+
+-  /Direct map to hardware/ ... of instructions and fundamental data
+   types for resource-constrained applications - comes from *C*
+
+-  /Zero-overhead abstraction/ ... classes with Ctors/Dtors,
+   inheritance, generics, functional for software infrastructure - comes
+   from *Simula*
+
+*  Management
+  :PROPERTIES:
+  :CUSTOM_ID: sec:orgheadline16
+  :END:
+
+-  : sth. that must be /acquired/ and /released/, explicitly or
+   implicitly. Examples: de/allocate memory, file handle open/close
+   file, acquire/release a lock, open/close a socket connection, ...
+
+-  a should have an /owner/, usually a .
+
+-  =leaks= are to be avoided, so resource management should not be
+   manual. Example: space probe should not run out of memory, cellphone
+   should not crash once everyday. In C-type languages, unclearness of
+   ownership is the source of a lot of problems (example: shape on
+   screen, get a ptr to shape, give it to sn. else - who is responsible
+   for getting the shape off the screen). A /handle/ should represent
+   sth meaningful, e.g. a =vector=, a ptr to sth, just about anything
+   possible.
+
+-  In , all standard-library containers follow this model, they manage
+   their elements, e.g. =vector=, =list=, =forward_list= etc., =map=,
+   =unordered_map= etc., =set=, =multi_set= etc. =string=. Whenever you
+   have sth like that, it is a /local object/, when it goes out of scope
+   it cleans up it's mess after itself.
+
+-  It's not just memory: other standard-library classes manage other
+   resources apart from memory as the recource, where in itself is not
+   sufficient: =thread=, =lock_guard= etc., =istream=, =fstream= etc.
+   =unique_ptr=, =shared_ptr= (which works /exactly/ like a conventional
+   pointer, no drawbacks!!).
+
+-  They all more or less like this:
+
+   #+BEGIN_SRC C++
+       template<typename T>
+       class Vector{                    //vector of elements of type T
+         Vector(initializer_list<T>);   //acquire memory; init elements
+         ~Vector();                     //destroy elements, release memory
+         // ...
+         private:
+           T* elem;                     //ptr to elts
+           int sz;                      //number of elts
+       };
+
+       void fct()
+       {
+         Vector<double>vd{1,1.618,3.14,2.99e8};
+         Vector<string>vs{"Strache","Seyffenstein","Palfrater"};
+         // ...
+       }
+   #+END_SRC
+
+   Note: in the example above, =strings= are themselves, so for the
+   vector to clean itself up, it has to tell all it's strings to clean
+   temselves up. The important thing is that the cleanup is /implicit/.
+
+** Better way to acquire a resource (in a *single scope*)
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline7
+   :END:
+
+*** Pointer misuse example I (with =new=, =delete=)
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline3
+    :END:
+
+A classical example still found in many code bases: say I want a
+=Gadget= and as a Java/C++ programmer think it's cool to write code like
+in the nineties. I make myself a =Gadget= and assign that to a ptr. I do
+some things that might throw an exception, then some that might
+=return=. The point of the example is: /I don't know what's in the
+=Gadget=/. Could have a file for example.
+
+#+BEGIN_SRC C++
+    void f(int n,int x)
+    {
+      Gadget* p = new Gadget{n};    //Java-style!
+      //...
+      if (x<100) throw std::runtime_error{"Weird!"}; //leak :(
+      if (x<200) return;                             //leak :(
+      //...
+      delete p;                     //man, this is tedious, want GC :(...
+    }
+#+END_SRC
+
+Problems with this code:
+
+-  use of =new=.
+
+   #+BEGIN_QUOTE
+     Stroustrup's rule these days: "If I see a =new=, I have to add a
+     =delete= somewhere, therefore I get it wrong, therefore I shouln't
+     use =new= at all."
+   #+END_QUOTE
+
+-  /naked pointer/: if I throw an exception OR =return=, I have leaked
+   the =Gadget=.
+
+*** Improvement with
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline4
+    :END:
+
+-  =std::shared_ptr= releases it's object when the last =shared_ptr= to
+   it is destroyed. Shared ptr is a form of garbage collection.
+
+#+BEGIN_SRC C++
+     void f(int n,int x)
+    {
+      auto p = make_shared<Gadget>(n);               //manage the ptr for me!
+      //...
+      if (x<100) throw std::runtime_error{"Weird!"}; //no leak :)
+      if (x<200) return;                             //no leak :)
+      //...
+    }
+#+END_SRC
+
+Problem with this code:
+
+-  I'm not sharing anything, I'm the only users of this Gadget. With
+   shared ptr, a use count is maintained. I own that gadget, so why
+   should I even deal with pointers?
+
+   #+BEGIN_QUOTE
+     Stroustrup: "If there is nothing shared, I should not introduce a
+     shared resource. We are in a world where lots of forms of
+     concurrency happen, and anything shared costs more than you
+     imagine."
+   #+END_QUOTE
+
+*** Improvement without pointers and =new=
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline5
+    :END:
+
+#+BEGIN_SRC C++
+     void f(int n,int x)
+    {
+      Gadget g{n};
+      //...
+      if (x<100) throw std::runtime_error{"Weird!"}; //no leak :)
+      if (x<200) return;                             //no leak :)
+      //...
+    }
+#+END_SRC
+
+Best version because:
+
+-  no explicit resource managment:
+
+   -  code not littered with *try-catch* which is easy to forget
+
+   -  no spurious de/allocs
+
+   -  no pointers
+
+      #+BEGIN_QUOTE
+        "If you can, just use a scoped variable."
+      #+END_QUOTE
+
+*** 
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline6
+    :END:
+
+The above pointer misuse example introduced this concept in a simple
+manner.
+
+-  *Resource Acquisition is Initialization*
+
+   -  Acquire during construction
+
+   -  Release in desctructor
+
+-  =Throw= exception in case of failure (throw is a Ctor, but cannot
+   construct an object)
+
+-  Never =throw= while holding a /not/ owned by a (never leak)
+
+-  In general, leave established invariants intact when leaving a scope
+   (i.e. don't use a dtor if you don't need one)
+
+** Better alternatives to ptr/ref (*communicating between scopes*)
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline15
+   :END:
+
+People want to return lots of objects from a function to a caller (or
+use a factory), like make a shape, make a large matrix. They tend to use
+=new= and return a pointer. Then all those resource management problems
+come back.
+
+#+BEGIN_QUOTE
+  Stroustrup: "These solutions to get a lot of data cheaply out of a
+  function are not new. But we have easier ways to access them now."
+#+END_QUOTE
+
+*** Pointer/Ref misuse example II (function with pointer)
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline13
+    :END:
+
+Use case example: add two large matrices and return the result. Even on
+a modern architecture you can tell that your shouldnt copy it for the
+adding and return it back.
+
+1. Approach with returning a pointer: [sec:orgheadline8]
+
+   #+BEGIN_SRC C++
+       M* operator+(const M&, const M&);
+       M* pm = m1+m2;                    //ugly: who does the delete?
+       M* q = *pm+m3;                    //ugly: who does the delete?
+   #+END_SRC
+
+   That's ugly. I don't want to go around dereferencing to get the
+   result. And there is a bug, so that this does not compile. We pass in
+   , so:
+
+2. Approach with returning a reference to the =new='d object:
+   [sec:orgheadline9]
+
+   #+BEGIN_SRC C++
+       M& operator+(const M&, const M&);
+       M m = m1+m2;                      //looks OK, but who does the delete, and d. what?
+   #+END_SRC
+
+   But here, who says =delete= to the pointer? Which pointer? I've just
+   /hidden the problem/. This almost certainly leaks /even faster/ than
+   the example above.
+
+3. Okay, how about passing in the target object? [sec:orgheadline10]
+
+   #+BEGIN_SRC C++
+       M& operator+(const M&, const M&, M& res);
+       M m;
+       operator+(m1,m2,m);              //ugly: smells like assembly code
+   #+END_SRC
+
+   This loses you about 300 years of math notation experience about
+   dealing with related objects.
+
+4. The underlying problem [sec:orgheadline11]
+
+   #+BEGIN_QUOTE
+     Stroustrup: "All these examples work if you have enough time to
+     deal with the problems. But often, you don't."
+   #+END_QUOTE
+
+   What do we want to do here anyway?
+
+   #+BEGIN_SRC C++
+       Matrix operator+(const Matrix& a, const Matrix& b)
+       {
+         Matrix re;
+         //copy a[i]+b[i] into re[i] for each i
+         return re;
+       }
+       Matrix res = a+b;
+   #+END_SRC
+
+   The problem here is that the /semantics of returning are the
+   semantics of copying/. What we should do instead of using tricks is
+   that we should move the object instead of copying and using reference
+   handles. Compiler optimization do the following trick anyway, but
+   this code does not rely on any optimization. The task is to move an
+   object from here to there. Only a computer scientist could get the
+   idea, make a copy, put it over there, and destroy the original, or to
+   use handles (references).
+
+5. The direct (and correct) approach with : [sec:orgheadline12] Do not
+   copy, but /steal the represenation/:
+
+   #+BEGIN_EXAMPLE
+       res: +--+
+            |  |
+            +-++
+              |                   re: +--+
+              +-+ +--------//---------+  |
+                | |                   +-++
+                v v                     |
+                                        v
+                +--+--+      +--+       null
+                |  |  |  ... |  |
+                +--+--+      +--+
+   #+END_EXAMPLE
+
+   So I make =re=. To put it over there (=res=), I take this pointer
+   (left), put it over there, and make this oner (right) point to
+   nothing so that the Dtor does not have to clean up any mess. We are
+   moving the matrix by doing two to copy the pointer. This is dirt
+   cheap. This is done with a :
+
+   #+BEGIN_SRC C++
+       class Matrix{
+          Representation rep;
+          //...
+          Matrix (Matrix&&a)  //cryptic move constructor semantics
+          {
+            rep = a.rep;      //*this gets a's elements
+            a.rep = {};       //a becomes the "empty Matrix"
+          }
+       };
+       Matrix res = a+b;
+   #+END_SRC
+
+   [[https://en.wikipedia.org/wiki/C%252B%252B11#Rvalue_references_and_move_constructors][Wikipedia]]
+   explains the move mechanism thus:
+
+   #+BEGIN_QUOTE
+     In C++11, a move constructor of =std::vector<T>= that takes an
+     rvalue reference to a =std::vector<T>= can copy the pointer to the
+     internal C-style array out of the rvalue into the new
+     =std::vector<T>=, then set the pointer inside the rvalue to null.
+     Since the temporary will never again be used, no code will try to
+     access the null pointer, and because the pointer is null, its
+     memory is not deleted when it goes out of scope. Hence, the
+     operation not only forgoes the expense of a deep copy, but is safe
+     and invisible.
+   #+END_QUOTE
+
+   So we have constructors that define what copying, deleting, moving
+   means. You don't have to write these constructors yourself. If your
+   representation knows what copying means, the compiler will write the
+   constructors for you:
+
+   #+BEGIN_SRC C++
+       class Matrix{
+         vector<double> elem; //elements go here
+         //...matrix access
+       };
+   #+END_SRC
+
+   This =Matrix= just "inherits" the from =vector=. Copy and move
+   operations can ofter be implicitly generated from members this way,
+   leading to . If you move such a =Matrix= (i.e. the elements that
+   /know/ how to move), then it is leak- and exception-prove:
+
+   -  good copy and move operations
+
+   -  e.g. from the STL
+
+*** Stroustrup's rant on
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline14
+    :END:
+
+-  neither general nor ideal
+
+-  imposes shared resource on a system. An example was a Sun server with
+   64 processors, where 63 wait on the 64th
+
+processor to GC most of the time. Especially in a distributed world this
+is a problem. Instead, apply these techniques in order:
+
+1. Keep your data (like our =Matrix=, maps, etc.) in containers
+
+2. Manage *all resources* with (Ctor, Dtor, CCtor, MCtor)
+
+3. Use "smart pointers", e.g. to interface =Shape= for =Triangle=,
+   =Square=, etc.:
+
+   -  =unique_ptr= if you're the only one using it
+
+   -  =shared_ptr= for e.g. concurrent tasks with locks where the last
+      one is responsible for cleaning up the shared objects (i.e. NOT
+      1,2,1,0 - not the optimal way but sadly how they are mostly used
+      nowadays)
+
+4. If you're still leaking, e.g. for old unconvertible cole, you can use
+   :
+
+   -  C++11 specifies a GC interface to run the GC every so often, e.g.
+      once/day
+
+   -  can still leak non-memory resources
+
+A modern C++-style illustrating this can be found in
+[[file:Stroustrup_Essence_example_elfinder.cpp][this example]].
+
+* Class hierarchies
+  :PROPERTIES:
+  :CUSTOM_ID: sec:orgheadline20
+  :END:
+
+** Hierarchies with an example
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline17
+   :END:
+
+Nice =Shape= example without the use of =new= or raw pointers that does
+not leak:
+
+#+BEGIN_SRC C++
+    vector<unique_ptr<Shape>> lst{ //shape is an interface
+                                   //unique_ptr represents ownership
+      make_unique<Circle>(Point{0,0},42),
+      make_unique<Triangle>(Point{20,200},p2,p3),
+      make_unique<Square>(Point{40,40},42)
+    };
+    void draw_all(Drawable_sequence& s)
+    {
+      for (auto& x : s) s->draw();
+    }
+#+END_SRC
+
+The underlying type is pretty conventional:
+
+#+BEGIN_SRC C++
+    struct Shape{            //interface - no data needed
+      virtual void draw()=0; //
+      //...
+    };
+
+    class Circle{            //abstract class since no full implementation
+    public:
+      void draw() override   //"override" is optional
+      Point center() const{ return c; }
+      //...
+    private:
+      Point c; //center
+      int r;
+    };
+#+END_SRC
+
+#+BEGIN_QUOTE
+  Stroustrup: "Why is a =Class= not called =Type=? Because Simula was
+  created by mathematicians and that sounded more natural for them."
+#+END_QUOTE
+
+** Some C++ class concepts
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline18
+   :END:
+
+-  : Stroustrup: "beware of =protected= for data".
+
+-  /No universal base class/
+
+   -  this avoids overhead and overly general interfaces
+
+-  
+
+   -  separate interface / implementation, and use abstract classes for
+      stable interfaces
+
+-  Minimal run-time type identification
+
+   -  e.g. =dynamic_cast<D*>(pb)= or =typeid(p)=
+
+** OOP/inheritance
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline19
+   :END:
+
+#+BEGIN_QUOTE
+  Stroustrup: "inheritance is seriously misplaced and overused. a lot of
+  good code is not OO, and a lot of OO-code is lousy."
+#+END_QUOTE
+
+-  great for hierarchical models, or run-time alternatives selection
+   like above
+
+-  good code coupling, but requires good planning
+
+-  it is costly
+
+   -  =virtual= not so much in new versions
+
+   -  but doesn't well
+
+   -  and dynamic memory costs (de/alloc, indirect obj access, memory
+      mgmt when not using =unique_ptr= or =shared_ptr= or
+      container-ownership
+
+* Generic programming
+  :PROPERTIES:
+  :CUSTOM_ID: sec:orgheadline30
+  :END:
+
+-  has grown enormously popular since the last 15 years
+
+** Some history
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline21
+   :END:
+
+#+BEGIN_QUOTE
+  Stroustrup: "The C array is my least favorite data structure. It's
+  ideal for directly accessing memory. But most of the time that's not
+  what we want. They have a tendency of loosing their size. With the
+  slightest excuse it turns into a pointer to one or more elements, and
+  other pointers can point to several more elements. So I wanted to
+  compete with that, to things that are
+
+  1. extremely flexible / general,
+
+  2. don't turn into pointers for zero overhead (e.g. vectors
+
+  instead of C arrays etc.), and
+
+  1. I wanted well-specified (checked) interfaces for straight-forward
+     usage.
+
+  I got success in the first two.
+#+END_QUOTE
+
+** Templates
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline26
+   :END:
+
+-  have improved over C++98 to C++11 to C++14
+
+-  you can parameterize a type, then parameterize an algorithm (STL
+   example):
+
+   #+BEGIN_SRC C++
+       template<typename T> class vector{/*...*/};
+       sort(v.begin(),v.end());
+   #+END_SRC
+
+-  first point: the STL sort algorithm blows away a CQ type by
+   /factors/. So use it!
+
+-  you have to be explicit about the parameter of a type (deduce what
+   =T= is), but not about it's use.
+
+-  leads to
+
+   -  i.e. just use the argument type. If it didn't work you get an
+      error message
+
+   -  bad news: error got at compile-time, but error message can be
+      spectacularly uninformative at the present
+
+-  with =constexp= as result of a value (C++11 and improved in C++14).
+   Popular, but overused witht template abusage.
+
+*** Template algorithms
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline22
+    :END:
+
+-  Guideline: often messy and inefficient, care about being explicit,
+   good design and testing. *Parametrize with element type and container
+   type*.
+
+-  Example: STL algos are expressed as half-open sequences
+   =[first:last)=:
+
+   #+BEGIN_SRC C++
+       void f(vector<int>& v, list<string>& lst)
+       {
+         sort(v.begin(),v.end());                       //sort the vector using <
+         auto p = find(lst.begin(),lst.end(),"Aachen"); //find "Aachen in the lst
+         if (p!=lst.end)                                //we found it!
+         //...
+       }
+   #+END_SRC
+
+*** Complex parametrization with
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline23
+    :END:
+
+You can also *parameterize with criteria, actions and algorithms* for
+flexibility and performance. Example: find sth that is not exactly
+/equal/ to sth else but matches some predicate:
+
+#+BEGIN_SRC C++
+    void g(vector<string>& vs)
+    {
+      auto p = find_if(vs.begin(), vs.end(), Less_than{"Griffin"});
+      //...
+    }
+#+END_SRC
+
+The *predicate* here is a (stateful little class, inlinable=efficient).
+This has an invocator (comparison) and a Dtor (store???):
+
+#+BEGIN_SRC C++
+    struct Less_than {
+      string s;
+      Less_than(const string& ss) :s{ss} {} //store value to compare against
+      bool operator()(const string& v) const{return v<s;} //comparison
+    };
+#+END_SRC
+
+The same can be written in (compiler writes the f.o. for us):
+
+#+BEGIN_SRC C++
+    auto p = find_if(vs.begin(), vs.end(),
+                     [](const string& v){return v<"Griffin";}
+                     );
+#+END_SRC
+
+The code you write to implement this /generically/ is then trivial. This
+works whether the container is list, vector, C-array, and so on.
+
+#+BEGIN_SRC C++
+    template<typename iter, typename Predicate>
+    iter find_if(iter first, iter last, Predicate pred)
+      //find first p in [first:last) so that pred(*p)
+    {
+      while (first!=last && !pred(*first))
+        ++first;
+      return first;
+    }
+#+END_SRC
+
+*** Container algorithms using the STL
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline24
+    :END:
+
+The previous examples assumed that it supports implementations going
+over any type of sequences (half-open sequence =[b:e)= includes whole
+sequence, first half and so on). Most of the time though, a whole
+sequence (i.e., the container) is desired. In that case, the writing
+becomes much simpler without drawback:
+
+#+BEGIN_SRC C++
+    template<typename Seq, typename Pred>
+    void void(Seq& s, Pred p)
+    {
+      std::sort(begin(s),end(s),p);
+    }
+#+END_SRC
+
+*** Better template interfaces with C++14 concepts
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline25
+    :END:
+
+This adresses the third goal mentioned in the *history* section quote
+above, addressing among other things the generic programming error
+handling. The concept improves on duck-typing by requiring that the user
+specifies:
+
+-  state intent
+
+-  requirements for template arguments
+
+Example with =Sortable=:
+
+#+BEGIN_SRC C++
+    template<typename Cont>
+      requires Sortable<Cont>() //Sortable: a Sequence with random access
+    void sort(Cont& container);
+#+END_SRC
+
+This is a kind of /short-hand notation for specifying the requirements/.
+We can say:
+
+#+BEGIN_SRC C++
+    void sort(Sortable& c);
+#+END_SRC
+
+This *short-hand* /means/:
+
+#+BEGIN_SRC C++
+    template<Sortable __S>
+    void sort(__S& c);
+#+END_SRC
+
+This in turn means:
+
+#+BEGIN_SRC C++
+    template<typename __S>
+      requires Sortable<__S>()
+    void sort(__S& c);
+#+END_SRC
+
+And, with lambdas we can use this thus:
+
+#+BEGIN_SRC C++
+    [](Sortable& c){sort(begin(c),end(c));}
+#+END_SRC
+
+Here is a *usage example for the specification above*:
+
+#+BEGIN_SRC C++
+    template<Sortable Cont> //Sortable: a Sequence with random access
+      void sort(Cont& container);
+
+    vector<double> vec{1.2, 0.5, -1.2};
+    vector<int> lst{1,3,5,8,2};
+
+    sort(vec); //OK: vector is a Sortable
+    sort(lst); //error: "list<int> does not satisfy the constraint Sorable"
+#+END_SRC
+
+** Rant about "Paradigms"
+   :PROPERTIES:
+   :CUSTOM_ID: sec:orgheadline29
+   :END:
+
+*** Generic Programming is just Programming
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline27
+    :END:
+
+#+BEGIN_SRC C++
+    double sqrt(double d);   //C++84: accept any d that is a double
+    int x = 7;
+    double d2 = sqrt(x);     //OK: x can be used as double
+    doulbe d3 = sqrt(&x);    //error: &x is not a double
+
+    void sort(Container &c); //C++14: accept any c that is a Container
+    vector<string>vs{"Hi","new","world"};
+    sort(vs);                //OK: vs can be used as Container
+    sort(&vs);               //error: &vs is not a Container
+#+END_SRC
+
+*** Encapsulating OO, Generics, Conventional into features does more
+harm than good
+    :PROPERTIES:
+    :CUSTOM_ID: sec:orgheadline28
+    :END:
+
+Example: drawing all containers for which the value-type is Shape, by
+calling the for$_{\text{each}}$ algorithm for the container, using the
+lambda that draws the shapes.
+
+#+BEGIN_SRC C++
+    void draw_all(Container &c)
+      requires Same_type<Value_type<Container>,Shape*>()
+    {
+      for_each(c,[](Shape*p){p->draw();});
+    }
+#+END_SRC
+
+This snippet is:
+
+-  OO: I'm doing runtime polymorphism on a class hierarchy of Shapes
+
+-  Generic: the container is a parametrized type, and
+   draw$_{\text{all}}$ is parametrized on the container type and the
+   element type of the container.
+
+-  Functional
+
+Kuhn's paradigm definition thought of it as /replacement/. But using the
+good stuff from all makes things better: close to the hardware,
+high-performance, /and/ abstraction above that.

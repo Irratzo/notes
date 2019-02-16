@@ -1,0 +1,20 @@
+#+OPTIONS: ^:nil
+# above: disables undercore-to-subscript when exporting
+
+
+* 2018/2019
+** [[file:Cpp_GeneralProblemsSolutions.org][Cpp General Problems&Solutions]]
+** [[file:Cpp_Math_ProblemsSolutions.org][Cpp Math Problems&Solutions]]
+** [[file:Cpp_Arrays_Notes.org][Cpp C Array Notes]]
+* 2017 and before
+** [[file:Cpp_Banas_Tutorial.org][Cpp Tutorial Banas]]
+** [[file:Cpp_FHAC_16WS_NotizenJW.org][Cpp FHAachen 16WS Notizen JW]]
+** [[file:Cpp_FHAC_16WS_Trickkiste.org][Cpp FHAachen 16WS Trickkiste]]
+** [[file:FHAachen_CppKurs_16WS/CppSnippets_16WS_TableOfContents.org][Cpp FHAachen 16WS TableOfContent (code links)]]
+** [[file:Cpp_Websnippets_NotesJW.org][Cpp Websnippets Notes JW]]
+** [[file:Cpp_Jetbrains_TourOfModernC++.org][Cpp Presentation Notes Jetbrains Modern C++]]
+** [[file:Stroustrup_EssenceOfModernC++/Cpp_Stroustrup_EssenceOfC++.tex][Cpp Presentation Notes Stroustrup Modern C++]]
+** Code
+*** to_insert
+** See also
+*** [[file:~/Desktop/Archive/Reference/para/Para_Notes.org][Para Notes]]

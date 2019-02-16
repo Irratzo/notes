@@ -1,0 +1,46 @@
+#+TODO: NEXT(n/!) TODO(t@/!) WAITING(w@/!) SOMEDAY(s/!) PROJ(p) | DONE(d@) CANCELLED(c)
+# Legend:
+# #+SEQ_TODO: STATE(k@/!)
+# k - hotkey for STATE
+# @ - log a timestamp and a note on item state change TO   STATE (entry)
+# ! - log a timestamp            on item state change FROM STATE (leave)
+#+TAGS: PHONE(o) COMPUTER(c) GARAGE(g) SHOPPING(s) FAMILY(f) URGENT(u)
+#+ARCHIVE: workarchive03.org::
+
+* GTD related things
+** NEXT Weekly Review                                       :REVIEW:COMPUTER:
+   SCHEDULED: <2018-11-16 Fri ++1w>
+
+
+* Consulting jobs
+** NEXT Time management training for ACME company [2/5]            :TRAINING:
+   - [X] Day 1: Brain dump, write everything down
+   - [X] Day 2: Split larger tasks into smaller tasks
+   - [ ] Day 3: Weekly Review
+   - [ ] Day 4: Setting goals
+   - [ ] Day 5: Learning to delegate and to say "NO"
+   :PEOPLE:
+   - PHB: The boss type manager that knows nothing but everything better
+   - Dilbert: Smart engineer, bright mind
+   - Wally: Another engineer, but more procrastinator
+   - Dogbert: The evil director of Human Resources
+   - Asok: An intern that does most of the work
+   :END:   
+   :LOGBOOK:
+   - Note taken on [2018-11-06 Tue 03:30] \\
+     There's also Tina the technical writer who is very much interested in
+     participating in the course.
+   - Note taken on [2018-11-06 Tue 03:28] \\
+     Thank god the first day is over. Nice people, but the PHB obviously needs some
+     individual coaching. Dogbert doesn't seem to have a lot of interest.
+   :END:
+
+* Skeletons in the closet
+
+** TODO The ugly task that is there for a long time
+   SCHEDULED: <2018-12-01 Sat>
+   :LOGBOOK:
+   - Rescheduled from "[2018-10-01 Mon]" on [2018-11-08 Thu 16:23] \\
+     Really need to do that now.
+   :END:
+   - We need to reschedule that

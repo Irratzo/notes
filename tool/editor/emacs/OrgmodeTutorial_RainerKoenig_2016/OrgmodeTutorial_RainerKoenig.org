@@ -1,0 +1,538 @@
+#+OPTIONS: ':nil *:t -:t ::t <:t H:3 \n:nil ^:t arch:headline author:t
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t num:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t toc:t todo:t |:t
+#+TITLE: OrgmodeTutorial_RainerKoenig
+#+DATE: <2018-11-03 Sat>
+#+AUTHOR: Johannes Wasmer
+#+EMAIL: johannes@joe-9470m
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+- Source: [[https://www.youtube.com/playlist?list=PLVtKhBrRV_ZkPnBtt_TD1Cs9PJlU0IIdE][youtube playlist 2016 Rainer König OrgMode Tutorial]]
+- Accompanying blog posts: [[https://koenig-haunstetten.de/?s=Orgmode+tutorial&submit=Suche][Rainer Koenig Blog > orgmode tutorial]]
+
+* [[file:~/Desktop/Archive/Reference/tool/editor/emacs/orgmode.orgTutorials/orgmode.orgTutorials.org][org mode Tutorials Master File]]
+* Used Tutorial Agenda Files
+- [[file:mylife.org][Tutorial Agenda File]] for E01 and E02
+  - it's [[file:myarchive.org][Archive File]]
+- [[file:checklist.org][Tutorial DailyPlan File]]
+- [[file:mylife03.org][Tutorial Agenda File3]] for E03
+  - it's [[file:myarchive03.org][Archive File]]
+- Split of [[file:mylife03.org][Tutorial Agenda File3]] for E03S02:
+  - [[file:mywork03.org][Tutorial Agenda File3: Work]] (same archive)
+    - it's [[file:workarchive03.org][Archive File]]
+  - [[file:mylife03.org][Tutorial Agenda File3]] for private stuff
+  - [[file:mylife03_backupBeforeSplitupInE03S02.org][Backup of Tutorial Agenda File3 before splitup]]
+- Capture Templates for E03S03:
+  - [[file:tpl-todo.txt][tpl-todo.txt]]
+* Preliminary Remarks
+- in these notes, I confuse a bit the org mode terminology.
+  - Org calls *stuff preceded by asterisks* a =heading=, and *list items* an
+    =item=. So from org terminology perspective, an item is not a heading, and a
+    heading is not an item. I here call headings items often. Proof:
+    ~org-next-item~ works only on list items, ~org-next-heading~ only on
+    headings.
+  - A =task= is always a heading. A heading maybe a task. I sometimes call
+    tasks 'todo items' or similar.
+  - A task has always a =task keyword=. I often call these todo keywords or
+    similar.
+  - A heading may have one =tag= or more. A tag is an independent concept of
+    task keywords.
+* Customizations
+- Rainer does customizations via a GUI / ~customize-variable~ (emacs manages
+  elisp code). I gathered all in one snippet in my [[file:~/.emacs.d/init.el::;;%20JW%20added%2020181104:%20Customizations%20from%20youtube%20Rainer%20K%C3%B6nig%20Orgmode%20tutorial%20START][init.el]] (user manages elisp
+  code), by copying the stuff emacs wrote under ~custom-set-variables~ when
+  Rainer's customizations were applied.
+* e01: basics
+** [[https://www.youtube.com/watch?v=sqs06qjnkcc&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide&index=1][e01s01: headlines & outline mode]]
+ - stuff already known
+ -                                                emacs               spacemacs
+ - org-refile an item/subtree                     =C-c C=w=           =M-RET r=
+   - we use that here to /move a headline/item under another top level
+     headline/item/.
+   - *Note*: Rainer says the key is =C-c C-w=. However, in my Spacemacs, the
+     only keybinding for ~org-refile~ is =M-RET- r=.
+
+** [[https://www.youtube.com/watch?v=15w3i6mwcfs&index=2&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e01s02: todo state keywords]]
+- adding todos to [[file:orgmodetutorial_rainerkoenig_todos.org::*%5b%5bfile:orgmodetutorial_rainerkoenig.org%5d%5bmaster%20file%5d%5d][tutorial agenda file]]
+- cycle todos                                     =c-s left / right=
+- cycle todos, with shortcuts if defined          =c-c c-t=
+- set in-file todo sequence example:
+  #+begin_src org mode
+  #+todo: next(n) todo(t) waiting(w) someday(s) | done(d) cancelled(c)
+  #+end_src
+  - load line with =c-c c-c= (on line) or =c-x c-v= (in file)
+  - =c-c c-t= now accepts shortcuts defined above
+  -  see also [[info:org#per-file%20keywords][info:org#per-file keywords]], [[info:org#in-buffer%20settings][info:org#in-buffer settings]]
+
+** [[https://www.youtube.com/watch?v=iofhvutuwv0&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide&index=3][e01s03: Introducing the Agenda (schedule, deadlines & agenda views]])
+- see also [[file:~/.emacs.d/layers/+emacs/org/readme.org::*org%20agenda][layer org readme - org agenda]]
+- file: [[file:mylife.org][tutorial agenda file]]
+-                                                 emacs               spacemacs
+- adding timestamps
+- schedule (start work on timestamp)              =c-c c-s=
+- deadline (end work on timestamp)                =c-c c=d=
+- a timestamp can be extended to a time period:
+  <2018-11-03 sat> --> <2018-11-03 sat 20:00-24:00>
+- now how to manage this? *agendas*!
+- add file to agendas                             =c-c [=
+  - remember to remove after tutorial:            =c-c ]=
+- org-cycle-agenda-files                          =c-'=
+- see & manipulate agenda file list               =M-x customize-variable org-agenda-files=
+- see & manipulate agenda file list               =M-x org-edit-agenda-file-list=  
+- show org-agenda windows with all commands       =c-c a=             =spc m a=
+- [[help:org-agenda-list][agenda-list]] (for current week)                  =c-c a a=           =spc a o a=
+*** org agenda view
+   - see also [[info:org#agenda%20commands][info:org#agenda commands]]
+   - follow mode: show in other window            =s-f=
+   - week forward, backward                       =f, b=
+   - quit, returns to last buffer                 =q=
+** [[https://www.youtube.com/watch?v=nbc-gl5wcf4&index=4&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e01s04: repeating tasks]]
+- see also [[info:org#repeated%20tasks][info:org#repeated tasks]]
+- file: [[file:mylife.org][tutorial agenda file]]
+- problem: [[file:orgmodetutorial_rainerkoenig_e01s04.org::*weekly%20review][weekly review]]: how to repeat that todo?
+- solution: add a *repeater* =+1w= to the timestamp
+  - effect: in [[help:org-agenda-list][agenda-list]], every week now has weekly review
+  - =y/w/m/d/h=
+- repeater 1 month with 3-day warning: =<2005-10-01 sat +1m -3d>=
+- in fact, there are three different timestamps:
+  | +x  | if last occ. in past and set done,            |
+  |     | increments to next occ. of same date,         |
+  |     | which may also be in the past                 |
+  |-----+-----------------------------------------------|
+  | ++x | if last occ. in past and set done,            |
+  |     | increments to next *future* occ. of same date |
+  |-----+-----------------------------------------------|
+  | .+x | if set done, sets next occ. to *now +x*,      |
+  |     | so date may change                            |
+  |-----+-----------------------------------------------|
+** [[https://www.youtube.com/watch?v=gvgfmed8rd4&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide&index=5][e01s05: checklists]]
+- file: [[file:checklist.org][tutorial dailyplan file]]
+-                                                 emacs               spacemacs
+- 
+- new checkbox in list                            =m-s-ret=
+- toggle checkbox in line                         =c-c c-c=
+- de/promote headline/item <-> list item          =c-c -/*=
+- rainer: uses *agenda as calendar, and checklists as daily plan*,
+  does the daily plan the evening before or in the morning
+- progress: add ~[/]~ or ~[%]~ headline and =c-c c-c=
+- rainer has a file like that that runs over 2 years with entries for each day
+- benefit: easy, searchable, shows ratio of green and red days
+- important: as simple as possible: "practice bass" instead of "10:00-12:00 bass
+  book xyz exercises abc to def"
+
+
+* e02: your agenda as a database
+** [[https://www.youtube.com/watch?v=gcuvvlclo9k&index=6&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e02s01: tags]]
+- see also [[info:org#tags][info:org#tags]]
+- file: [[file:mylife.org][tutorial agenda file]]
+-                                                 emacs               spacemacs
+- tags categorize headlines = items
+- syntax: end of headline =:thisistag:a@@nother_one:=
+- tags are inherited
+- tag
+- define tags inplace/infile:
+  #+begin_src org mode
+  #+tags: phone(o) computer(c) garage(g) shopping(s) family(f) urgent(u)
+  #+end_src
+- assign tag while on item                        =c-c c-c=
+- assign tag while on/in item                     =c-c c-q=
+- predefined tags, define new one                 =c-c c-q tab=
+- clear tags while on/in item                     =c-c c-q spc=
+- 
+** [[https://www.youtube.com/watch?v=u00pgldfgx4&index=7&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e02s02: agenda view (advanced)]]: views = filtered views = querying
+-                                                 emacs               spacemacs
+- timeline only for current buffer                =c-c a l=
+  - timeline view has been removed, source [[https://www.reddit.com/r/orgmode/comments/7hps9j/rip_orgtimeline/][reddit thread]]. recreated it with
+    that, by customizing ~org-agenda-custom-commands~ see [[file:~/.emacs.d/init.el::;;%20this%20modified%20version%20(stripped%20down)%20does%20work:][init.el]]. Funnily, it's
+    also set under [[file:~/.spacemacs::(custom-set-variables][dotfile: custom-set-variables]].
+- todo items of one type only                     =c-c a t=
+- todo items of subset, e.g. =next|todo=          =c-c a t=
+- match query for tag/prop/todo                   =c-c a m=
+- match query for todo only                       =c-c a m=
+  - change query                                  =c-u r=
+  - example queries:
+    - only next phone calls: =phone/next= returns only [[file:orgmodetutorial_rainerkoenig_e01s04.org::*call%20uncle%20tom%20after%20his%20surgery][call uncle tom after his
+      surgery]]
+    - office work example: u have 10 waiting for other people, query those and
+      abarbeit die liste, make done or canceled.
+    - it's like a database with different views
+    - and if u don't know what you're looking for, you can search
+- search with state keyword                       =c-c a s=
+  - in file example: search for 'chain'. see that part has been delivered, now
+    schedule mounting chain for tomorrow. (note: task since moved to archive,
+    see [[*%5b%5bhttps://www.youtube.com/watch?v=5m8l7vtwy1k&index=10&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide%5d%5be02s05: archiving%5d%5d][e02s05: archiving]])
+** [[https://www.youtube.com/watch?v=pj3qhil-eom&index=8&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e02s03: customized agenda views]]
+- motivation: custom view to see what's important when the workday begins
+- insert new custom agenda view                   =c-c a c=
+- example of a custom agenda view that matches tags =phone= and =urgent= (note:
+  this has the same effect on dotfile as a ~customize-variable~):
+  - click =ins= to insert a new view
+    - click =value menu=, select 'command series'
+    - enter access key: for this example, we choose =u=
+    - enter description: 'urgent things and phone calls'
+    - click =ins= after word 'component' to insert a block
+      - click =value menu=, select 'tags search'
+      - enter match: =urgent= tag
+      - click =ins= after words 'remember to quote values:'
+      - enter headline: 'urgent things to do'
+    - click =ins= after word 'component', 2nd one, to insert another block
+      - click =value menu=, select 'tags search'
+      - enter match: =phone= tag
+      - click =ins= after words 'remember to quote values:'
+      - enter headline: 'phone calls to do'
+- when saved, the following is written to the dotfile (in spacemacs, in
+  ~custom-set-variables~ ):
+  #+begin_src elisp
+  '(org-agenda-custom-commands
+     (quote
+      (
+       ("u" "urgent things and phone calls"
+        ((tags "urgent"
+               ((org-agenda-overriding-header "urgent things to do")))
+         (tags "phone"
+               ((org-agenda-overriding-header "phone calls to do"))))
+        nil nil)))) 
+  #+end_src
+- what =c-c a u= now prints is this:
+  #+begin_example
+urgent things to do
+  orgmodetutorial_rainerkoenig_e01s04:next prepare tax declaration                                                   :computer:urgent:
+
+======================================================================================================================================
+phone calls to do
+  orgmodetutorial_rainerkoenig_e01s04:todo call the tax lawyer after documents were sent                                       :phone:
+  orgmodetutorial_rainerkoenig_e01s04:next call uncle tom after his surgery                                            :family::phone:  
+  #+end_example
+** [[https://www.youtube.com/watch?v=nuvdddkzqzs&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide&index=9][e02s04: drawers, logging & quck notes]]
+*** intro
+- drawers starts with a line ~:drawername:~ and ends with ~:end:~. this is
+  *hidden by default*, compared to other regions like code, and so on.
+- reserved drawernames:
+  - ~:logbook:~    <- gonna customize that now
+  - ~:properties:~ <- future episode snippet
+-                                                 emacs               spacemacs    
+- org-insert-drawer                               =m-ret d=
+*** prep: customize ~org-log-into-drawer~
+  - click 'value menu', select =logbook=
+  - save
+*** application case
+- file: [[file:mylife.org][tutorial agenda file]], new item [[file:orgmodetutorial_rainerkoenig_e01s04.org::*consulting%20jobs][consulting jobs]]
+- application case: user joe is a time-management coach.
+  - he has one consulting job / task / todo item: [[file:orgmodetutorial_rainerkoenig_e01s04.org::*time%20management%20training%20for%20acme%20company][time management training for acme company]]
+  - job duration: 5 days
+  - task has a drawer ~:people:~ describing the attendees, and an as of yet
+    empty drawer ~:logbook:~
+  - joe has completed first task, back at hotel, wants to write it up
+    - check off first item                        =c-c c-c=
+    - org-add-note to current entry               =c-c c-z=
+    - take another note
+    - the note has been stored into the ~:logbook:~ drawer
+    - the ~:logbook:~ is practically a microblog / journal of your task. they
+      are helpful. you can look it up again after years. or you have a boss that
+      says 'what about task xy?' then you can look into your records = logbook.
+      for rainer this is nearly the most important feature in org mode.
+** [[https://www.youtube.com/watch?v=5m8l7vtwy1k&index=10&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide][e02s05: archiving]]
+- motivation: what to do when done tasks are piling up?
+- in header of file [[file:mylife.org][Tutorial Agenda File]], define a new line:
+  #+BEGIN_SRC org mode
+  #+ARCHIVE: myarchive.org::
+  #+END_SRC
+- move [[file:myarchive.org::*Drawer%20example%20for%20the%20sreencast][Drawer example for the sreencast]] to the archive:
+-                                                 emacs               spacemacs
+- org-archive-subtree-default = entry             =C-c C-x C-a=
+- org-archive-subtree                             =C-c C-x C-s=       =M-RET A=
+- iter over all DONE subtrees, ask if archive     =C-u C-c C-x C-s=
+* E03: Splitting things up
+** [[https://www.youtube.com/watch?v=R4QSTDco_w8&index=11&list=PLVtKhBrRV_ZkPnBtt_TD1Cs9PJlU0IIdE][E03S01: Automatic logging of status changes]]
+- files: [[file:mylife03.org][Tutorial Agenda File3]]
+  - file subtree state backup:
+  :mylife03fors01stateatstart:
+# ** NEXT Orgmode Tutorial Episode 03 [0/5]
+#    - [ ] Function: Automatic logging of status changes
+#      + Logging ToDo keyword transitions
+#      + Logging rescheduling and closing
+#    - [ ] Concept: Splitting your org file into several files
+#    - [ ] Function: The first capture template
+#    - [ ] Function: The :PROPERTIES: drawer
+#    - [ ] Function: Archiving to different files
+# ** TODO Change keyword to NEXT now
+#    - This is an example for E03S01
+# ** TODO This task is considered to be finished
+#    - So please mark it done now
+# ** TODO The ugly task that is there for a long time
+#    - We need to reschedule that
+:END:
+*** Automatic :LOGBOOK: entry for item Todo state / status changes
+- extend the in-file todo state keywords setting introduced in [[*%5B%5Bhttps://www.youtube.com/watch?v=15w3I6MwCfs&index=2&list=PLVtKhBrRV_ZkPnBtt_TD1Cs9PJlU0IIdE%5D%5BE01S02: ToDo keywords%5D%5D][E01S02: ToDo keywords]]:
+  #+BEGIN_SRC org mode
+  From basic hotkeys:
+  #+TODO: NEXT(n) TODO(t) WAITING(w) SOMEDAY(s) PROJ(p) | DONE(d) CANCELLED(c)
+  to hotkeys with logging:
+  #+TODO: NEXT(n/!) TODO(t@/!) WAITING(w@/!) SOMEDAY(s/!) PROJ(p) | DONE(d@) CANCELLED(c)
+  # Legend:
+  # #+SEQ_TODO: STATE(k@/!)
+  # k - hotkey for STATE
+  # @ - log a timestamp and a note on item state change TO   STATE (entry)
+  # ! - log a timestamp            on item state change FROM STATE (leave)
+  #+END_SRC
+- Example on subitem [[file:mylife03.org::*Change%20keyword%20to%20NEXT%20now][Change keyword to NEXT now]], change ~TODO(t@/!)~ -> ~NEXT(n/!)~:
+  - before state change:
+    #+BEGIN_EXAMPLE
+    ** TODO Change keyword to NEXT now
+      - This is an example for E03S01
+    #+END_EXAMPLE
+  - after state change:
+    #+BEGIN_EXAMPLE
+   ** NEXT Change keyword to NEXT now
+     :LOGBOOK:
+     - State "NEXT"       from "TODO"       [2018-11-08 Thu 16:00]
+     :END:
+     - This is an example for E03S01    
+    #+END_EXAMPLE
+- Example on subitem [[file:mylife03.org::*Change%20keyword%20to%20NEXT%20now][Change keyword to NEXT now]], change ~NEXT(n/!)~ -> ~WAITING(w@/!)~:
+  - since WAITING has a ~@~, the entry change to WAITING also prompts for and
+    stores a note, e.g. for a customer support job:
+    #+BEGIN_EXAMPLE
+    ** WAITING Change keyword to NEXT now
+       :LOGBOOK:
+       - State "WAITING"    from "NEXT"       [2018-11-08 Thu 16:07] \\
+         sent out mail to customer, waiting for response
+       - State "NEXT"       from "TODO"       [2018-11-08 Thu 16:00]
+       :END:
+       - This is an example for E03S01    
+    #+END_EXAMPLE
+*** Log CLOSED timestamp when something is DONE
+ - For this, additionally to setting ~DONE(d@)~ in in-file todo state keywords
+   setting, we can customize the variable ~org-log-done~.
+   - the default value is =Record CLOSED timestamp=. We'll leave it at that.
+ - Example on subitem [[file:mylife03.org::*This%20task%20is%20considered%20to%20be%20finished][This task is considered to be finished]], change TODO -> DONE:
+   - before state change:
+     #+BEGIN_EXAMPLE
+     ** TODO This task is considered to be finished
+        - So please mark it done now
+     #+END_EXAMPLE
+   - after state change:
+     #+BEGIN_EXAMPLE
+     ** DONE This task is considered to be finished
+        CLOSED: [2018-11-08 Thu 16:15]
+        :LOGBOOK:
+        - State "DONE"       from "TODO"       [2018-11-08 Thu 16:15] \\
+          Problem solved.
+        :END:
+        - So please mark it done now     
+     #+END_EXAMPLE
+*** Log rescheduling events
+- Customize variable ~org-log-reschedule~:
+  - changed value to =Record timestamp with note=.
+- Example on subitem [[file:mylife03.org::*The%20ugly%20task%20that%20is%20there%20for%20a%20long%20time][The ugly task that is there for a long time]]:
+  - before state change:
+    #+BEGIN_EXAMPLE
+    ** TODO The ugly task that is there for a long time
+       SCHEDULED: <2018-10-01 Mon>
+       - We need to reschedule that    
+    #+END_EXAMPLE
+  - after state change:
+    #+BEGIN_EXAMPLE
+    ** TODO The ugly task that is there for a long time
+       SCHEDULED: <2018-12-01 Sat>
+       :LOGBOOK:
+       - Rescheduled from "[2018-10-01 Mon]" on [2018-11-08 Thu 16:23] \\
+         Really need to do that now.
+       :END:
+       - We need to reschedule that    
+    #+END_EXAMPLE
+** [[https://www.youtube.com/watch?v=ECWtf6mAi9k&list=PLVtKhBrRV_ZkPnBtt_TD1Cs9PJlU0IIdE&index=12][E03S02: Splitting your system up to several files]]
+*** Intro
+- Goal: split [[file:mylife03.org][Tutorial Agenda File3]] items into files for private and work tasks:
+  - [[file:mywork03.org][Tutorial Agenda File3: Work]]
+  - [[file:mylife03.org][Tutorial Agenda File3]]: Private stuff
+  - Rainer Sidenote: in his personal system, he has for agenda files: one for
+    private-stuff, two for the job/office/work-stuff: one for work in general,
+    and one 'schedule' for scheduling projects/milestones, and one for
+    club/association he's the president of. Of course, one could also have
+    project-specific agenda files. *Just remember to put the files in the
+    ~org-agenda-files~ list, and define ~org-refile-targets~ accordingly!*
+- [X] add new agenda file to agenda file list
+- for moving items from one agenda file to another /correctly/, have to
+  customize some ~org-refile~ variables first
+*** Prep: Sidenote: keybinding deviations for moving/archiving items/subtrees
+**** The Problem
+- *Problem*: here, tutor Rainer mentions that in a previous episode the commands
+  =C-c C-w= for *A)* /moving items/ and =C-c M-w= for *B)* /copying items/ were
+  introduced. However, I have no note of that. Further, my Spacemacs does not
+  know these commands (=SPC h d k=).
+**** The Task
+- *Task*: I must find out now which commands I do use for these tutorial commands.
+  - My [[file:~/Desktop/KEYS_EMACS_ORGMODE.org::*Capture%20-%20Refile%20-%20Archiving][KEYS_ORGMODE file > Capture - Refile - Archiving]] has A) listed as /refile
+    subtree/, maybe?
+  - *Found A)*: under [[*%5B%5Bhttps://www.youtube.com/watch?v=sqs06qjnkcc&list=plvtkhbrrv_zkpnbtt_td1cs9pjlu0iide&index=1%5D%5Be01s01: headlines & outline mode%5D%5D][e01s01: headlines & outline mode]]: =M-RET R=, so what Rainer
+    calls /moving items/ (subtree) is actually ~org-refile~. See =SPC h d k M-RET
+    R=.
+  - *Found B)*: /most/ of the org functions use the word ~subtree~ instead of 'item',
+    and *there is one for copying items/subtrees*. They just don't have any
+    keybindings. Especially B), as used by Rainer, has no keybinding
+    #+BEGIN_EXAMPLE
+        org-mime-org-subtree-htmlize
+        org-cut-subtree
+        org-show-subtree
+        org-mark-subtree (C-c @)
+    --> org-copy-subtree
+        org-paste-subtree
+        org-demote-subtree (M-RET S l)
+        org-archive-subtree (M-RET A)
+        org-move-subtree-up (M-RET S k)
+        org-promote-subtree (M-RET S h)
+        org-list-make-subtree (C-c C-*)
+        org-move-subtree-down (M-RET S j)
+        org-narrow-to-subtree (M-RET n)
+        org-babel-execute-subtree (C-c C-v s)
+        org-archive-subtree-default (C-c C-x C-a)
+        org-advertized-archive-subtree
+        org-reset-checkbox-state-subtree
+        org-clone-subtree-with-time-shift (C-c C-x c)
+    #+END_EXAMPLE
+  - *Found B) as second time*: aha, my Spacemacs actually knows B). But it's not
+    bound to ~org-copy-subtree~, but to ~org-copy~:
+    #+BEGIN_QUOTE
+  C-c M-w runs the command org-copy (found in org-mode-map), which is an
+  interactive Lisp closure in ‘org.el’.
+   
+  It is bound to C-c M-w.
+   
+  (org-copy)
+   
+  Like ‘org-refile’, but copy.
+  #+END_QUOTE
+**** The Result: keybindings for A) move item, and B) copy item
+-                                                 emacs               spacemacs
+- ~org-refile~ move item/subtree                                    =M-RET R=
+- ~org-copy~ copy item/subtree                    =C-c M-w=
+- (org-copy-subtree: no keybinding)
+  
+*** Prep: Customize ~org-refile~ variables
+- ~org-refile-targets~:
+  - ~INS~,
+    'Choice:' ~Value Menu~ =All agenda files=
+  - 'Identify target headline by:' ~Value Menu~ =Level number=
+    - 'Integer:' =1=
+    - Meaning: refile my things at the first level of headlines
+- ~org-refile-outline-path~:
+  - ~Value Menu~ =Start with file name=
+- ~org-refile-allow-creating-parent-nodes~:
+  - ~Value Menu~ =Prompt for confirmation=
+  - Meaning: if in the target file a parent does not exist but i want one, then
+    i can ask for conformation and i get what i want.
+*** Split items into files
+- important note beforehand: org mode works on the buffers, not the files. so
+  you can refile stuff as you like and the agenda will reflect that, without the
+  need to save the files first. once everything is in it's place, the files must
+  be saved however.
+**** Copy Items so they appear in both files
+- =C-c M-w mywork03.org/=: *copy item* [[file:mylife03.org::*GTD%20related%20things][GTD related things]] to [[file:mywork03.org][mywork03.org]], since the item is
+  both related to private-stuff and work-stuff
+- =C-c C-s= reschedule private-stuff [[file:mylife03.org::*Weekly%20Review][Weekly Review]] to Sunday
+  - =C-a a= now produces this:
+    #+BEGIN_EXAMPLE
+    Friday     16 November 2018
+      mywork03:   Scheduled:  NEXT Weekly Review
+    Saturday   17 November 2018
+    Sunday     18 November 2018
+      mylife03:   Scheduled:  NEXT Weekly Review
+    #+END_EXAMPLE
+**** Move items to other file
+- =M-RET R mywork03.org/= *move item* "Consulting jobs" to [[file:mywork03.org][mywork03.org]].
+**** Move items to other file nodes/topitems
+- want to move subitem "The ugly task that is there for a long time" away, but
+  to another topitem/headline:
+- =M-RET R mywork03.org/Skeletons=: a new topitem is created and subitem moved
+  there
+- move item "Prepare tax declaration" to same place, now using =M-RET R
+  mywork03.org/= and tab completion on items, then move it back to it's original
+  location
+** [[https://www.youtube.com/watch?v=Af4NVJbNAB4&list=PLVtKhBrRV_ZkPnBtt_TD1Cs9PJlU0IIdE&index=13][E03S03: The first capture template(s)]]
+*** Intro
+- Files:
+  - [[file:mylife03.org][Tutorial Agenda File3]] for private-stuff
+  - [[file:mywork03.org][Tutorial Agenda File3: Work]] for work-stuff
+  - Capture Templates:
+    - [[file:tpl-todo.txt][tpl-todo.txt]]    
+- Goal: capturing tasks, ideas and whatever
+-                                                 emacs               spacemacs
+- ~org-capture~                                   DEFINE-YOURSELF     =M-m C c=
+- show where it went ([[http://members.optusnet.com.au/~charles57/GTD/datetree.html][source]])                     =C-u C-u M-m C c=
+- ~org-capture~ configure templates                                   =M-m C c C=
+*** Example: A capture template for private-stuff TODO items 
+**** The capture template file [[file:tpl-todo.txt][tpl-todo.txt]]
+ - Line1:
+   - template has one *, but emacs will expand to correct level when inserted
+   - ~%^{Description}~ means: ~%~ prompt for variable, ~%^~ prompt for string
+     variable, ~%^{bla}~ display 'bla:' when prompting
+ - Line 2: ~%?~ means: cursor stops here and blinks when all prompted variables
+   have been entered
+ - Line 3: ~%U~ means: put a timestamp there
+**** Configure the template
+ - add ~INS~:
+   - Choice: =Multikey description=
+     - Keys: =p=
+     - Description: =My private templates=.
+     - save
+ - add ~INS~:
+   - Choice: =Template entry=
+     - Keys: =pt= (means: press ~p~ -> press ~t~)
+     - Description: =TODO entry=
+     - Capture Type: =Org entry=
+     - Target location: =File & Headline=
+       - File: =absolute path to the agenda file, here .../mylife03.org=. Aside
+         tip: Rainer has all these files conveniently under ~~/org~.
+         - ~ValueMenu~: =Literal= I guess? In Rainer's screencast, this button is
+           not present.
+       - Headline: =Capture Headline for E03S03=
+     - Template: =File=:
+       - Template File: =abspathto tpltfile, here .../tpl-todo.txt=
+     - List:
+       - leave all unchecked except =Key: :empty-lines-before 1=
+     - save
+     - this produces the following code in dotfile:
+#+BEGIN_SRC elisp
+ '(org-capture-templates
+   (quote
+    (("p" "My private templates")
+     ("pt" "My TODO entry" entry
+      (file+headline "/home/johannes/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/mylife03.org" "Capture Headline for E03S03")
+      (file "/home/johannes/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/tpl-todo.txt")
+      :empty-lines-before 1))))
+#+END_SRC
+     - or, in Rainer's [[https://koenig-haunstetten.de/2014/08/29/the-power-of-orgmode-capture-templates/][capture template blog post]]:
+#+BEGIN_SRC elisp
+ '(org-capture-templates
+   (quote 
+    (("p" "Private Templates")
+     ("pt" "ToDo Entry" entry
+      (file+headline "~/Dropbox/org/privat.org" "Capture")
+      (file "~/Dropbox/org/tpl-todo.txt")
+      :empty-lines-before 1))))
+#+END_SRC       
+**** Use the template
+- capture: =M-m C c p t=, provide a description, =C-c C-c= confirm
+  - the item appears under [[file:mylife03.org::*Capture%20Headline%20for%20E03S03][Capture Headline for E03S03]]
+- =M-RET C= refile to [[file:mylife03.org::*Examples][Examples]]
+*** Other capture template examples
+**** Journaling capture template
+- like above I guess, but 
+**** StuffToRead capture template
+- video shows in action, no config. For config, see [[https://koenig-haunstetten.de/2016/06/25/orgmode-tutorial-episode-3/][blog post]]:
+#+BEGIN_EXAMPLE
+  * SOMEDAY %^{Author} - %^{Title}
+    :PROPERTIES:
+    :PAGES: %^{Pages}
+    :GENRE: %^{Genre}
+    :END:
+    - Recommended by %^{recommended by}
+    :LOGBOOK:
+    - Added: %U
+    :END:
+#+END_EXAMPLE

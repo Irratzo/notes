@@ -1,0 +1,91 @@
+<2016-09-25 So>
+
+* Diese orgmode-Datei formatiert anschauen
+  Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+
+
+* Java 8 - Collections Refueled
+  Quelle: [[https://www.youtube.com/watch?v=LgR9ByD1dEw][yt > JavaOne > Collections Refueled]]
+
+  - ~ArrayDeque~ sei under-appreciated (value-based, duplicate values, double-ended queue)
+  
+** ~Iterable~ Interface
+   - ~Iterable.forEach~ -- _works on ALL collections_
+     #+BEGIN_SRC java
+     list.forEach(System.out::println);
+     #+END_SRC
+
+** ~Iterator~ Interface
+   - ~remove()~ nicht mehr obligatorisch zu implementieren
+   - aber anscheinend machen die Leute heute eh ~Spliterator~ statt ~Iterator~
+
+** ~Collection~ Interface
+*** ~Collection.removeIf~
+    =Java8= - Version ist in O(n), =Java7= in O(n^2)!
+    #+BEGIN_SRC java
+    coll.removeIf(str -> str.startsWith("A"));
+    #+END_SRC
+
+*** ~Collections.sort~
+    siehe List.sort
+
+** ~List~ Interface
+*** ~List.replaceAll~
+    Nur same-type-replacement
+    #+BEGIN_SRC java
+    list.replaceAll(String::toUpperCase);
+    #+END_SRC
+
+*** ~List.sort~
+    - default kopiert hin und her
+    - ~ArrayList.sort~ macht jetzt =copy-in-place=
+    - ~Collections.sort~ ruft automatisch ~List.sort~
+
+
+** ~Map~ Interface
+*** ~Map.forEach~
+    #+BEGIN_SRC java
+    map.forEach((k,v,) -> System.out.println(k + v));
+    #+END_SRC
+
+*** ~Map.replaceAll~
+    #+BEGIN_SRC java
+    map.replaceAll((k,v,) -> v.toUpperCase());
+    #+END_SRC
+
+*** =Multi-maps= implementieren in =Java8=
+    - one key, multiple values (Bsp.: ~Map<String, Stet<Integer>>~)
+    - =Guava= und =EclipseCollections= haben diese Built-In
+    - Hier gezeigt am obigen Bsp.: =Multi-map= nachbauen ohne diese in =Java8= mit =Default Methods= und =Lambdas=:
+    #+BEGIN_SRC java
+    //put(str,i)
+    mumap.computeIfAbsent(str, x -> new HashSet<>()).add(i);
+
+    //remove(str,i) //entfernt entry auch wenn jetzt in value keine integer mehr drin sind
+    multimap.computeIfPresent(k, (k1, set) -> set.remove(v) && set.isEmpty() ? null : set);
+
+    //contains(str,i)
+    mumap.getOrDefault(str, Collection.emptySet()).contains(i);
+
+    //size()
+    mumap.values().stream().mapToInt(Set::size).sum();
+
+    //values()
+    mumap.values().stream().flatMap(Set::stream);
+    #+END_SRC
+
+
+** ~Comparator~ Interface
+   - =Lambdas= verkürzen den Code hier nicht wirklich
+   - stattdessen hat ~Comparator~ neue statische Methoden, zum Ersetzen komplexer =Conditional Logic=:
+     + ~comparing~     one-Level-sort: 
+     + ~thenComparing~ two-Level-sort: falls one-Level-sort returns ~equal~
+     + ~nullsFirst~    macht ~naturalOrder~ =null-safe=
+     + ~naturalOrder~  ruft ~compareTo()~ auf zwei ~Comparable~-Objekte
+   - Beispiel:
+   #+BEGIN_SRC java
+   students.sort(comparing(Student::getLastName)             //extract key, return =Comparator= to compare key
+                 .thenComparing(Student::getFirstName,       //extract key, pass in first comparator
+                                nullFirst(naturalOrder()))); //null-safe comparison
+   #+END_SRC
+

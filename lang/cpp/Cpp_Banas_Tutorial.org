@@ -1,0 +1,19 @@
+<2017-01-05 Do> - 
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+
+* Derek Banas - C++ Programming
+  /or C++ in One Hour - Video/
+  #+BEGIN_QUOTE
+  This should be #+TITLE: Derek Banas - C++ Programming
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+  
+
+  Quelle: [[https://www.youtube.com/watch?v=Rub-JsjMhWY][Banas - C++ Programming]], Upload <2014-11-20>
+

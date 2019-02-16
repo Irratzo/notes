@@ -1,0 +1,94 @@
+<2017-01-31 Di>- ?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* [[file:Cpp_Notes.org][Cpp Notes Index]]
+* FH Aachen Modul C++ 16WS/17SS Trickkiste JW
+  #+BEGIN_QUOTE
+  This should be #+TITLE: FH Aachen Modul C++ 16WS/17SS Trickkiste JW
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+  Dies ist eine Art Notizbuch, entstanden während der Bearbeitung des
+  Übungsmaterials des Kurses C++ von J.Wasmer, für die Prüfungsvorbereitung im
+  SS17. Diese Datei enthält eher Lösungen für spezielle Probleme, und weniger
+  allgemeine Dokumentation zur Sprache, den Übungen und Snippets. Die Einteilung
+  ist aber gleich nach den Abschnitten der Vorlesung.
+
+* Abschnitt C - Basistypen, Init, Cast, IO, Scope
+
+** Integer Buffer Overflow erkennen
+
+   [[http://stackoverflow.com/questions/199333/how-to-detect-integer-overflow-in-c-c][Quelle]]
+   
+   Angewandt in:
+   - <2017-01-31 Di> FHAC Cpp 16WS Aufgabe Derufin Potenz berechnen
+
+*** Methode 1: Checkers for add/sub/mult
+
+    #+BEGIN_SRC C++
+      // for addition
+      #include <limits.h>
+      int a = <something>;
+      int x = <something>;
+      if ((x > 0) && (a > INT_MAX - x)) /* `a + x` would overflow */;
+      if ((x < 0) && (a < INT_MIN - x)) /* `a + x` would underflow */;
+    #+END_SRC
+
+    #+BEGIN_SRC C++
+      // for subtraction
+      #include <limits.h>
+      int a = <something>;
+      int x = <something>;
+      if ((x < 0) && (a > INT_MAX + x)) /* `a - x` would overflow */;
+      if ((x > 0) && (a < INT_MIN + x)) /* `a - x` would underflow */;
+    #+END_SRC
+
+    #+BEGIN_SRC C++
+       // for multiplication
+      #include <limits.h>
+      int a = <something>;
+      int x = <something>;
+      if (a > INT_MAX / x) /* `a * x` would overflow */;
+      if ((a < INT_MIN / x)) /* `a * x` would underflow */;
+      // there may be need to check for -1 for two's complement machines
+      if ((a == -1) && (x == INT_MIN)) /* `a * x` can overflow */
+      if ((x == -1) && (a == INT_MIN)) /* `a * x` (or `a / x`) can overflow */
+    #+END_SRC
+
+*** Methode 2: Clang 3.4+ / GCC 5+ Builtin Checkers
+
+    #+BEGIN_SRC C++
+      unsigned long b, c, c_test;
+      if (__builtin_umull_overflow(b, c, &c_test))
+      {
+          // returned non-zero: there has been an overflow
+      }
+      else
+      {
+          // return zero: there hasn't been an overflow
+      }
+    #+END_SRC
+
+    The Clang documentation doesn't specify whether ~c_test~ contains the
+    overflowed result if an overflow occurred, but the GCC documentation says
+    that it does.
+
+    There is a ~__builtin~ for each arithmetic operation that can overflow
+    (addition, subtraction, multiplication), with signed and unsigned variants,
+    for int sizes, long sizes, and long long sizes. The syntax for the name is
+    ~__builtin_[us](operation)(l?l?)_overflow~:
+
+      - ~u~ for /unsigned/ or ~s~ for /signed/;
+      - operation is one of ~add~, ~sub~ or ~mul~;
+      - no ~l~ suffix means that the operands are ~int~; one ~l~ means ~long~;
+        two ~l~s mean ~long long~.
+
+    So for a checked signed long integer addition, it would be
+    ~__builtin_saddl_overflow~.
+
+    
+   

@@ -1,0 +1,42 @@
+<2017-01-30 Mo>-?
+
+#+BEGIN_VERSE
+Diese orgmode-Datei formatiert anschauen
+Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Editor
+#+END_VERSE
+
+* Linux Notizen
+  #+BEGIN_QUOTE
+  This should be #+TITLE: Linux Notizen
+  But Spacemacs 0.106 export html can't handle this
+  #+END_QUOTE
+
+
+* Package Manager
+** Updating
+*** OpenSuse
+    #+BEGIN_SRC sh
+    zypper up
+    #+END_SRC
+    Bei VM Guest: Desktop-Updater verschluckt sich als an
+    vbox-guest-dependencies. Mit zypper flutschts dagegen meistens.
+
+* Disks, Partitions, File systems, Mounts
+
+** Disk Usage
+*** OpenSuse
+    How to find disk usage?
+    #+BEGIN_SRC shell
+    df -h
+    #+END_SRC
+    ...will only show you data from mounted file systems. Unmounted file systems
+    may include Swap partitions, partitions used as raw partitions by any
+    application, file systems not mounted because they belong to another system
+    in a multi boot situation or for any other reason.
+
+    A disk may be partitioned and not all of the disk may be used for
+    partitioning. Thus there may still be free space on the disk. Look with
+    #+BEGIN_SRC shell
+    fdisk -l
+    #+END_SRC
+     

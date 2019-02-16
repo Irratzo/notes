@@ -1,0 +1,120 @@
+# See also: https://orgmode.org/manual/Advanced-topics-in-ODT-export.html
+# See also: M-x describe-variable org-odt-styles-file
+
+
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \definecolor{darkgreen}{rgb}{0,0.4,0}
+#+ODT_STYLES_FILE: "odt-export-styles.xml"
+
+This appears in all exports and is regular black text.
+
+*This appears in all exports and is bold.*
+
+/This appears in all exports and is italic./
+
+_This appears in all exports and is underlined._
+
+~This appears in all exports and is monospaced.~
+
+=This appears in all exports and is also monospaced (code font).=
+
+@@odt:<text:span text:style-name="Highlight">This appears only in odt and has
+red background.</text:span>@@ This appears in all exports and is regular.
+
+@@odt:<text:span text:style-name="red">
+This appears only in odt and is red.
+</text:span>@@ This appears in all exports and is regular.
+
+@@odt:<text:span text:style-name="green">
+This appears only in odt and is green.
+</text:span>@@ This appears in all exports and is regular.
+
+# org-styling doesn't work inside odt-styled blocks, e.g. use *bla* for bold.
+# Instead, the 'bla' must be inside it's own odt-style. These basic styles don't have to
+# be defined manually.
+@@odt:<text:span text:style-name="red">
+This appears <text:span text:style-name="Bold">only in odt</text:span> and is red.
+</text:span>
+@@ 
+
+# Reference for basic odt styles that don't have to be defined manually:
+@@odt:
+This appears only in odt and is 
+<text:span text:style-name="Bold">bold</text:span>, 
+<text:span text:style-name="Emphasis">italic</text:span>, 
+<text:span text:style-name="Underline">underlined</text:span>, 
+<text:span text:style-name="Source_20_Text">monospaced</text:span>.
+@@
+
+# however, org-styling works inside a latex-styled block.
+@@latex:{\color{red}@@
+This appears in *all exports*, but is only red in latex.
+@@latex:}@@
+
+@@latex:
+This appears only in latex, and is regular.
+@@
+
+# If you have combined styling for latex and odt, do it like this.
+@@latex:{\color{red}@@
+@@odt:<text:span text:style-name="red">@@
+This appears in all exports, but is only red in (latex, odt).
+@@odt:</text:span>@@
+@@latex:}@@
+
+# If you have combined AND NESTED styling for latex and odt, do it like this.
+# (Tip: for the inner styling, do one-liners of duplicated text for latex and odt.
+#  Seems that multi-line nesting leads to errors. Only tested for nesting depth 2, like here.)
+@@latex:{\color{darkgreen}@@ @@odt:<text:span text:style-name="green">@@ This
+appears in all exports, is only green in (latex, odt), and @@latex:\textbf{this
+part is bold there.}@@ @@odt:<text:span text:style-name="Bold">this part is bold
+there.</text:span>@@ This part is not bold anymore. @@odt:</text:span>@@
+@@latex:}@@
+
+This appears in all exports and is regular.
+
+# Tip: to find out syntax of advanced odt export styles,
+# create an odt file with LibreOffice, add a styled text.
+# Then open the file with a zip/archive tool, and search for the text in content.xml. 
+
+# # CAUTION:
+# # This apporoach NOT work with lists!
+# # E.g. this does NOT work:
+# @@latex:{\color{red}@@
+# @@odt:<text:span text:style-name="red">@@
+# This is a list:
+# - First item.
+# @@odt:</text:span>@@
+# @@latex:}@@
+# # What WOULD work here is either using the "red" style on each list item individually
+# # (then the bullets will be regular black), OR defining a list and item style (then item
+# # style still needs to be applied to each item, but bullets are red).
+# # 
+# # The first could be done with an org-mode macro to make it more readable.
+# #+MACRO: odt-red @@odt:<text:span text:style-name="red">@@ $1 @@odt:</text:span>@@
+# # And then define the item:
+# @@latex:{\color{red}@@
+# {{{odt-red(This is a list:)}}}
+# - {{{odt-red(First item.)}}}
+# @@latex:}@@
+
+
+# With org macro for odt-red:
+#+MACRO: odt-red @@odt:<text:span text:style-name="red">@@$1@@odt:</text:span>@@
+@@latex:{\color{red}@@
+{{{odt-red(This is a red list:)}}}
+- {{{odt-red(First item.)}}}
+@@latex:}@@
+
+# With macro for all latex, odt styles:
+#+MACRO: tex-red @@latex:{\color{red}@@$1@@latex:}@@
+#+MACRO: odt-red @@odt:<text:span text:style-name="red">@@$1@@odt:</text:span>@@
+#+MACRO: odt-green @@odt:<text:span text:style-name="green">@@$1@@odt:</text:span>@@
+#+MACRO: odt-bf @@odt:<text:span text:style-name="Bold">$1@@$1@@odt:</text:span>@@
+#+MACRO: odt-it @@odt:<text:span text:style-name="Emphasis">$1@@$1@@odt:</text:span>@@
+#+MACRO: odt-under @@odt:<text:span text:style-name="Underline">$1@@$1@@odt:</text:span>@@
+#+MACRO: odt-tt @@odt:<text:span text:style-name="Source_20_Text">$1@@$1@@odt:</text:span>@@
+
+# NOTE: org macros do NOT work with multiline arguments. So macros inside macros will not work
+#       if linebreaks are involved.
+
