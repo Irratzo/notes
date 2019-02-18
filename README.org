@@ -1,9 +1,9 @@
-# In Emacs org-mode: before exporting, comment this out START
-;; Local Variables:
-;; ispell-check-comments: exclusive
-;; ispell-local-dictionary: "english"
-;; End:
-# In Emacs org-mode: before exporting, comment this out FINISH
+# # In Emacs org-mode: before exporting, comment this out START
+# ;; Local Variables:
+# ;; ispell-check-comments: exclusive
+# ;; ispell-local-dictionary: "english"
+# ;; End:
+# # In Emacs org-mode: before exporting, comment this out FINISH
 
 # Org-mode Export LaTeX Customization Notes:
 # - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
