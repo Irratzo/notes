@@ -42,3 +42,31 @@
 ** [[file:SiScLab_AiiDa_Installation_Notes.org][AiiDa Installation Notes]]
 * [[file:SiScLab_SideNotes.org][Side Notes]] (ideas, thoughts to sort)
 * [[file:SiScLab_Scratch_Notes.org][Scratch Book]]
+* to_sort
+<2019-02-18 Mon>: fileupload instead filechooser for remote-hosting
+- https://github.com/peteut/ipython-file-upload used in aiidalab_widgets:
+  https://github.com/aiidalab/aiidalab-widgets-base/blob/master/aiidalab_widgets_base/structures.py:
+  use this as basis for defining my dashboard as one widget!!!
+
+<2019-02-17 Sun>: overlooked jupyter dashboard deployment options
+- overlooked stuff in https://github.com/markusschanta/awesome-jupyter#renderingpublishingconversion:
+  - https://www.nbinteract.com/: Create interactive webpages from Jupyter notebooks.
+  - https://getnikola.com/ Static Site Generator that converts notebooks into websites.
+  - https://github.com/SimonBiggs/scriptedforms Quickly create live-update GUIs
+    for Python packages using Markdown and simple HTML elements.
+
+<2019-02-17 Sun>: notebooks as modules, functions, part of pipelines:
+- https://github.com/tritemio/nbrun
+- https://github.com/takluyver/nbparameterise
+- https://github.com/nteract/papermill
+
+<2019-02-17 Sun>: more useful jupyterlab stuff:
+- https://github.com/mauhai/awesome-jupyterlab
+- https://pylantern.readthedocs.io/en/latest/quickstart.html similar project: a
+  generic interface for plotting in jupyter using different plot libaries as
+  'plot backends'. the author's other projects: http://tim.paine.nyc/
+- https://github.com/vidartf/jupyterlab_discovery: manage and discover extensions within jupyterlab as sidetab
+
+
+
+
