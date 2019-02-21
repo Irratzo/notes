@@ -43,10 +43,19 @@
 * [[file:SiScLab_SideNotes.org][Side Notes]] (ideas, thoughts to sort)
 * [[file:SiScLab_Scratch_Notes.org][Scratch Book]]
 * to_sort
+<2019-02-21 Thu>: Fleur and Spex code IS publicly availabe, as well as the docs! The judft.de homepage is just awful.
+- https://iffgit.fz-juelich.de/fleur/fleur/ fleur git repo
+- http://www.flapw.de/pm/index.php?n=User-Documentation.FLEUR fleur docs
+- https://spex.readthedocs.io spex docs
+- http://www.flapw.de/pm/index.php?n=User-Documentation.Tutorial-DFT-Lecture-2018-DAY11#Choosing_Orbitals
+  stefans MATLAB tool, our project code's predecessor
+
+
 <2019-02-18 Mon>: fileupload instead filechooser for remote-hosting
 - https://github.com/peteut/ipython-file-upload used in aiidalab_widgets:
   https://github.com/aiidalab/aiidalab-widgets-base/blob/master/aiidalab_widgets_base/structures.py:
   use this as basis for defining my dashboard as one widget!!!
+- and this https://github.com/aiidalab/aiidalab-units
 
 <2019-02-17 Sun>: overlooked jupyter dashboard deployment options
 - overlooked stuff in https://github.com/markusschanta/awesome-jupyter#renderingpublishingconversion:

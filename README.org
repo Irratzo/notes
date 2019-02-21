@@ -28,7 +28,7 @@
 #+OPTIONS: num:nil # disable export latex section numbering for org headings
 #+OPTIONS: toc:nil # no table of contents (doesn't work if num:nil)
 
-#+TITLE: Notes
+#+TITLE: Dev Notes
 #+DATE: 
 #+AUTHOR: Johannes Wasmer
 # #+EMAIL: johannes.wasmer@gmail.com
@@ -53,7 +53,7 @@
 #+LATEX_COMPILER: pdflatex
 #+DATE: \today
 
-My ongoing notes, mostly on coding, software development and configuration. Hierarchically organized and interlinked.
+My ongoing notes, mostly on coding, software development, and configuration. Hierarchically organized and interlinked.
 
 This README is the [[file:README.org][Notes Master File]]. It serves as Table of Contents from which all notes may be accessed.
 
