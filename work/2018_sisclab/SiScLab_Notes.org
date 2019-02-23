@@ -43,6 +43,7 @@
 * [[file:SiScLab_SideNotes.org][Side Notes]] (ideas, thoughts to sort)
 * [[file:SiScLab_Scratch_Notes.org][Scratch Book]]
 * to_sort
+** Links
 <2019-02-21 Thu>: Fleur and Spex code IS publicly availabe, as well as the docs! The judft.de homepage is just awful.
 - https://iffgit.fz-juelich.de/fleur/fleur/ fleur git repo
 - http://www.flapw.de/pm/index.php?n=User-Documentation.FLEUR fleur docs
@@ -79,3 +80,92 @@
 
 
 
+** Code <2019-02-22 Fri>
+from emacs *scratch*
+#+BEGIN_EXAMPLE
+# Binder Demo
+
+
+## Find masci-tools folder
+
+Since `studentproject18ws` is not installed as a module, need to add it manually.
+Since we're not local but on mybinder.org, we don't know the absolute path.
+So assume that we're in a subfolder of studentproject18ws and go up until we find the folder that contains it. That must be the `masci-tools` folder.
+
+
+
+import os
+
+dir_masci = None
+dir_here = os.getcwd()
+dir_stupro = "studentproject18w"
+found_dir_masci = True
+
+if dir_stupro not in os.listdir():
+    found_dir_masci = False
+    while os.getcwd() != "/":
+        if dir_stupro in os.listdir():
+            found_dir_masci = True
+            break
+        os.chdir("..")
+
+if found_dir_masci:
+    dir_masci = os.getcwd()
+else:
+    raise ImportError("Did not find masci-tools/studentproject18ws. If not installed as module, need location of this folder.")
+
+
+
+import sys
+
+# Adjust to your local masci-tools path!
+path_mtools = dir_masci
+if path_mtools not in sys.path:
+    # add only once
+    sys.path.append(path_mtools)
+
+
+
+### 2018 ############################################
+
+# NO DOS file:
+figure_title = "Si + C defect"
+filename = 'banddos.hdf'
+filenames_dos = []
+
+# # # NO DOS file:
+# figure_title = "Sodium"
+# filename = 'banddos_sodium.hdf'
+# filenames_dos = []
+
+# # 2 DOS files:
+# figure_title = "Co conductor"
+# filename = os.path.join('Co', 'banddos_Co.hdf')
+# filenames_dos = [os.path.join('Co', 'DOS.1'), os.path.join('Co', 'DOS.2')]
+
+
+
+
+# Setup
+...
+
+
+
+filepath = ['studentproject18w', 'binder_test_data', filename]
+filepath = os.path.join(*filepath)
+filepaths_dos = [['..', '..', '..', 'data', 'input', fd] for fd in filenames_dos]
+filepaths_dos = [os.path.join(*fpd) for fpd in filepaths_dos]
+
+data = None
+reader = Reader(filepath=filepath)
+with reader as h5file:
+    data = reader.read(recipe=Recipes.FleurBands)
+    #
+    # Note:
+    # Inside the with statement (context manager),
+    # all data attributes that are type h5py Dataset are available (in-file access)
+    # When the statement is left,the HDF5 file gets closed and the datasets are closed.
+    #
+    # Use data outside the with-statement (in-memory access: all HDF5 datasets converted to numpy ndarrays):
+    data.move_datasets_to_memory()
+#+END_EXAMPLE
