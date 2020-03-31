@@ -724,19 +724,25 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
      class resources (like e.g. =DynMem= array, =file= or Database) should be
      initialized in Ctor, and freed in Dtor.
    - Example:
-   #+BEGIN_SRC C++
+   #+BEGIN_SRC C++ :includes <iostream> <thread> <assert.h> :libs -lpthread :results output
+   using namespace std;
    class R{
    private:
      int *arr; int len;
    public:
-     R(int leng){ assert(len>0); len = leng; arr = new int[len]; }
-     ~R(){ delete[] arr; }
+     R(int leng): len(leng)
+     { assert(len>0); arr = new int[len]; cout << "constred" << endl;}
+     ~R(){ delete[] arr; cout << "destred" << endl;}
      void setVal(int i, int val){ arr[i]=val; }
    };
    int main(){
      R r(10); /*set values, do stuff*/
    }// ~R() is called here
    #+END_SRC
+
+   #+RESULTS:
+   : constred
+   : destred
 
    
 ** constClassObject, constMemberFct
@@ -841,14 +847,15 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
      #+END_SRC
 
 ** CopyConstructor CCtor
-   #+BEGIN_SRC C++
+   #+BEGIN_SRC C++ :includes <iostream> <thread> :libs -lpthread :results output
+     using namespace std;
      class F{ //Fraction
        int n,d; //numerator, denominator
      public:
        /*Ctor*/
        F(int num=0, int denom=1) : n(num), d(denom) {}
        /*CCtor*/
-       F(const F &f) : n(f.n), d(f.d) {}
+       F(const F &f) : n(f.n), d(f.d) { cout << "copied" << endl;}
        /*this one eqv to the DefaultCCtor*/
      };
 
@@ -857,6 +864,10 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
        F fcopy(f); //CCtor
      }
    #+END_SRC
+
+   #+RESULTS:
+   : copied
+
    - =CCtor= uses =MemberWiseInit=: each member inited from src object's member
    - see also below > OpOverloading > =assignmentOp=
 
@@ -1632,9 +1643,8 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
 
 ** [BoQuian] Shared_Pointer =SharedPtr=
    [[file:websnippets/arrays-ptrs-ref/BoQuian_SmartPointers/main.cpp][Code: websnippets > arrs-ptrs > SmartPtrs]] just copy-pasted in here:
-   #+BEGIN_SRC C++
+   #+BEGIN_SRC C++ :includes <iostream> <thread> :libs -lpthread :results output
      #include <cstdlib>
-     #include <iostream>
      #include <string>
      #include <memory> //smartPtrs
 
@@ -1699,7 +1709,6 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
          p2 = nullptr; //Responsibility moved to p3
          p3.reset(); //Rantanplan is DESTROYED!
      }
-
      void usingACustomDeleterOnAnArrayOfDogs(){
          /*in such a case the default deleter wont do. We create one with Lambda.*/
      //    shared_ptr<Dog> p3(new Dog[3]); //ptr just points to the first dog
@@ -1726,6 +1735,34 @@ Inhalt kopieren in [[http://mooz.github.io/org-js/][Online Orgmode Viewer]] - Ed
          return 0;
      }   
    #+END_SRC
+
+   #+RESULTS:
+   #+begin_example
+   A new Dawg has risen, he's The Ugly
+   A new Dawg has risen, he's Pepe
+   Woof, said Pepe
+   Dog Pepe HAS BEEN DESTROYED (by argument)!
+   Dog The Ugly HAS BEEN DESTROYED (by argument)!
+
+   A new Dawg has risen, he's Zuzu
+   I'm a Hound, no matter what you point at me!, said Zuzu
+   I'm a Hound, no matter what you point at me!, said Zuzu
+   I'm a Hound, no matter what you point at me!, said Zuzu
+   I'm a Hound, no matter what you point at me!, said Zuzu
+   Dog Zuzu HAS BEEN DESTROYED (by argument)!
+
+   A new Dawg has risen, he's The Ugly
+   A new Dawg has risen, he's Rantanplan
+   Dog The Ugly HAS BEEN DESTROYED (by argument)!
+   Dog Rantanplan HAS BEEN DESTROYED (by argument)!
+
+   A new Nameless Dog, probably a wolf
+   A new Nameless Dog, probably a wolf
+   A new Nameless Dog, probably a wolf
+   Dog  HAS BEEN DESTROYED (by argument)!
+   Dog  HAS BEEN DESTROYED (by argument)!
+   Dog  HAS BEEN DESTROYED (by argument)!
+   #+end_example
    
      
 * STL: Containers, Iterators, Algorithms

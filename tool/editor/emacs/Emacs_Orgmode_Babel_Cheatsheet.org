@@ -22,6 +22,43 @@
 #+DATE: \today
 
 
+* Language-agnostic
+** call/reuse/import code from other code block
+- one way to do it: use ~:noweb~. [[https://emacs.stackexchange.com/a/3514][source]]. example:
+  #+NAME: init_block1
+  #+BEGIN_SRC python
+    constant=19
+    def some_function(x):
+      return constant * x
+  #+END_SRC
+   
+  Call the function on an integer
+  #+BEGIN_SRC python :noweb yes 
+    <<init_block1>>
+    return some_function(13)
+  #+END_SRC
+
+  #+RESULTS:
+  : 247
+   
+   
+  Call the function on a string
+  :PROPERTIES:
+  :noweb:    yes
+  :END:
+   
+  #+BEGIN_SRC python :noweb yes
+  <<init_block1>>
+  return some_function('abc')
+  #+END_SRC
+
+  #+RESULTS:
+  : abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc
+
+** stop evaluation of code block (possibly hanging)
+- one answer: =C-g=. [[https://emacs.stackexchange.com/q/16880][source]]. but i don't know if that works.
+- problem: babel evaluation doesn't show up in =M-x list-processes=. where then?
+* Shell
 
 #+BEGIN_SRC shell
 echo $PATH
@@ -30,14 +67,73 @@ echo $PATH
 #+RESULTS:
 : /home/johannes/anaconda3/bin:/home/johannes/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/home/johannes/gsp/project/Cube2.0/CubeLib/branches/RB-4.5/vpath/_install/bin:/home/johannes/gsp/project/Cube2.0/CubeGUI/branches/RB-4.5/vpath/_install/bin
 
+#+begin_src bash :results output
+tree
+#+end_src
 
+#+RESULTS:
+#+begin_example
+.
+├── auto
+│   ├── Emacs_Orgmode_Babel_Cheatsheet.el
+│   └── OrgmodeTutorial_RainerKoenig.el
+├── emacs24.5AucteX_Doc
+│   ├── auctex.pdf
+│   ├── dired-ref.pdf
+│   ├── elisp.pdf
+│   ├── emacs.pdf
+│   ├── emacs-ref.pdf
+│   ├── emacs-xtra.pdf
+│   ├── preview-latex.pdf
+│   └── tex-ref.pdf
+├── Emacs_Orgmode_Babel_Cheatsheet.org
+├── Emacs_Orgmode_Babel_Cheatsheet.pdf
+├── Emacs_Orgmode_Babel_Cheatsheet.tex
+├── org-export
+│   ├── auto
+│   │   └── odt-export-styles.el
+│   ├── macro-test.odt
+│   ├── macro-test.org
+│   ├── normal-odt-for-finding-advanced-styles.odt
+│   ├── odt-export-styles.html
+│   ├── odt-export-styles.odt
+│   ├── odt-export-styles.org
+│   ├── odt-export-styles.pdf
+│   ├── odt-export-styles.tex
+│   └── odt-export-styles.xml
+├── orgmode.orgTutorials
+│   ├── orgmode.orgTutorials.org
+│   └── OrgSpreadsheetTutorial.org
+├── OrgmodeTutorial_RainerKoenig_2016
+│   ├── checklist.org
+│   ├── johannes@joe-9470m.10750:1539764178
+│   ├── myarchive03.org
+│   ├── myarchive.org
+│   ├── mylife03_backupBeforeSplitupInE03S02.org
+│   ├── mylife03.org
+│   ├── mylife.org
+│   ├── mywork03.org
+│   ├── OrgmodeTutorial_RainerKoenig.org
+│   ├── tpl-todo.txt
+│   └── workarchive03.org
+└── sandbox_org.org
+
+6 directories, 37 files
+#+end_example
+
+
+* Python
+
+** Resources
+- [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-python.html][orgmode.org - Python Source Code Blocks in Org Mode]]
+** Examples
 
 #+BEGIN_SRC python :results value
-return 2+3
+return 2+7
 #+END_SRC
 
 #+RESULTS:
-: 5
+: 9
 
 #+BEGIN_SRC python :session
 2+2
@@ -53,3 +149,6 @@ print("Hello World")
 
 #+RESULTS:
 : Hello World
+* C/C++
+
+- [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-C.html][orgmode.org - C, C++, D Source Code Blocks in Org Mode]]

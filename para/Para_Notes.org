@@ -25,3 +25,85 @@
 
 
 * [[file:mpi/MPI_Notes.org][MPI Notes]]
+* GSP2018 Wiki - MPI & OpenMP Recources
+** Tutorial 1 - Git, LaTeX
+- [[https://gsp.fz-juelich.de/wiki/attachments/36][Linux, Latex and Git Introduction]]
+**** Additional Material
+***** Git
+- [[http://rogerdudler.github.io/git-guide/][git - the simple guide]]
+- [[https://git-scm.com/docs][Official Reference Manual]]
+- [[https://git-scm.com/book][The Pro Git Book]]
+***** Software Engineering in CSE and HPC
+- [[https://guide.esciencecenter.nl/][Guide to Software Development by the Netherlands eScience Center]]
+- [[https://bssw.io/][Better Scientific Software (BSSw) community]]
+- [[https://hpc-carpentry.github.io/][HPC Software Carpentry]]
+- [[https://carpentries.org/][carpentries.org]]
+- [[https://hacker-tools.github.io/lectures/][GitHub > 'hacker-tools']]
+** Tutorial 2 - GPU Programming
+- CUDA, CUDA+MPI, OpenACC, HIP
+- Held by Andreas Herten and Jan Meinke.
+- course material: /see comments/
+**** Additional Material
+/nothing here/
+** Tutorial 3 - MPI & OpenMP
+- Held by Benedikt Steinbusch
+**** Additional Material
+***** Useful Links
+****** General links on PP, HPC and clusters
+- [[https://en.wikipedia.org/wiki/Template:Parallel_computing][Wikipedia Template:Parallel Computing]]
+****** MPI
+- [[https://www.mpi-forum.org/docs/][MPI Specifications]]
+- [[http://mpi.deino.net/mpi_functions/index.htm][MPI Routines]]
+- MPI Man Pages [[http://www.mpich.org/static/docs/latest/www/][MPICH]], [[https://www.open-mpi.org/doc/current/][OMPI]]
+****** OpenMP
+- [[https://www.openmp.org/specifications/][OpenMP Specifications]]
+- [[http://www.openmp.org/wp-content/uploads/OpenMP3.1-CCard.pdf][OpenMP 3.1 C/C++ Summary Card (PDF)]]
+***** Books
+****** Parallel Programming / HPC
+- [[http://pages.tacc.utexas.edu/~eijkhout/istc/istc.html][Victor Eijkhout's Books]]:
+  - Introduction to Scientific Programming in C++17 and Fortran2008
+  - Parallel Programing in Science and Engineering
+  - Introduction to High-Performance Scientific Computing
+****** C/C++
+- [[https://stackoverflow.com/questions/388242/the-definitive-c-book-guide-and-list][The StackOverflow Definitive C++ Book Guide and List]]
+- [[http://shop.oreilly.com/product/0636920033707.do][Scott Meyers - Effective Modern C++]]
+- [[http://csapp.cs.cmu.edu/3e/home.html][Randal Bryant - Computer Systems: A Programmer's Perspective]]
+***** Other OpenMP & MPI Courses
+A list for sites that contain course materials or accumulate such sites.
+Course materials may include lectures, lecture videos, exercises, code
+snippets, and useful links like e.g. references.
+****** HPC Centers Europe
+- [[http://www.training.prace-ri.eu/][PRACE Training Portal]]
+- [[http://www.fz-juelich.de/ias/jsc/EN/Expertise/Workshops/Courses/courses_node.html][JSC Jülich Training Courses & Archive]]
+- RWTH Aachen IT Center (ITC):
+  - [[https://doc.itc.rwth-aachen.de/display/CCP/General][RWTH Cluster Parallel Programming Resources]]
+  - [[https://doc.itc.rwth-aachen.de/display/VE/PPCES+2018][PPCES Workshop Archive]]
+  - [[https://www.youtube.com/channel/UCtdrEoe46tD2IvJJRs_JH1A/videos][PPCES 2014 Lecture Videos (Youtube)]]
+- [[http://www.hlrs.de/solutions-services/service-portfolio/training/][HLRS Stuttgart Training]]
+- [[https://www.lrz.de/services/compute/courses/x_lecturenotes/][LRZ Munich Learning Resources]]
+- [[https://www.cscs.ch/publications/tutorials/][CSCS Switzerland Tutorials]]
+- Edinburgh Parallel Computing Center (EPCC):
+  - [[https://www.epcc.ed.ac.uk/online-learning][EPCC Online Learning]]
+  - [[http://www.archer.ac.uk/training/online/][ARCHER Online Training Course Materials]]
+- ETH Zurich:
+  - [[http://www.cse-lab.ethz.ch/teaching/hpcse-i_hs17/][High Performance Computing for Science and Engineering (HPCSE) I]]
+  - [[http://www.cse-lab.ethz.ch/teaching/high-performance-computing-for-science-and-engineering-hpcse-ii/][High Performance Computing for Science and Engineering (HPCSE) II]]
+- [[https://www.hpc.ntnu.no/display/hpc/MPI+and+MPI+IO+Training+Tutorial][Norwegian Tech Uni - HPC Group - MPI Tutorial]] with examples
+****** HPC Centers Americas
+- [[https://portal.xsede.org/online-training][XSEDE Training Portal]]
+- HPC University:
+  - [[http://hpcuniversity.org/resources/search/][HPC University Resources]]
+  - [[http://hpcuniversity.org/educators/programs/][HPC University Resources on Computational Science Education]]
+- [[https://cvw.cac.cornell.edu/default][Cornell University Virtual Workshop]]
+****** Other
+- [[http://mpitutorial.com/][mpitutorial.com]]
+- [[https://tech.io/playgrounds/349/introduction-to-mpi/][tech.io Introduction to MPI]]
+***** HPC Tools
+- [[https://www.vi-hps.org/tools/][VI-HPS Tools Guide]]
+- [[https://github.com/qres/HowToSimtech/blob/master/HowToSimTech.md][Private HowToSimTech Tools List]]
+***** Recreational Reading
+- "[[https://www.dursi.ca/post/hpc-is-dying-and-mpi-is-killing-it.html][HPC is dying, and MPI is killing it]]" by Jonathan Dursi ([[https://insidehpc.com/2015/04/rce-podcast-jonathan-dursi-on-hpc-is-dying-and-mpi-is-killing-it/][Podcast Follow-Up
+  Discussion]])
+- "[[https://blogs.fau.de/hager/archives/5260][Fooling the masses with performance results on parallel computers]]" by Georg
+  Hager
+- "[[http://highscalability.com/blog/2014/12/31/linus-the-whole-parallel-computing-is-the-future-is-a-bunch.html][The whole 'parallel computing is the future' is a bunch of crock.]]"

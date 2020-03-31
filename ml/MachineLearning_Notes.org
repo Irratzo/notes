@@ -49,12 +49,8 @@
 #+LATEX_HEADER_EXTRA:
 #+DESCRIPTION:
 #+KEYWORDS:
-#+SUBTITLE: Recources on ML
+#+SUBTITLE: Recources on LM
 #+LATEX_COMPILER: pdflatex
 #+DATE: \today
 
-* Learning Resources
-
-- <2018-12-25 Tue> [[https://colab.research.google.com/][Google AI Colab]]: Set of online-running Jupyter Notebooks. Intro to Jupyter,
-  pandas, TensorFlow, GPU computing.
-- <2019-01-29 Di> [[https://www.datacamp.com/home][datacamp.com]]: registered via google
+* [[file:~/ownCloud/SiSc/19W/ML/exercise_johannes/SiSc_MachineLearning_Notes.org][SiSc_ML_Notes]]

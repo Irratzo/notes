@@ -13,7 +13,10 @@ int n = getN();
 arr = new double[n]{}; //{}: uniformInit (C++11 best-practice)
 arr = new double[n]{}; //(): directInit
 #+END_SRC
-But prefer ~std::vector~ in almost all cases.
+But prefer ~std::vector~ in almost all cases:
+#+BEGIN_SRC C++
+std::vector<int> vector1(length, 0);
+#+END_SRC
 
 
 * Init numeric static C Arrays to zero (value)

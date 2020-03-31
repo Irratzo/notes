@@ -2,6 +2,12 @@
 # above: disables undercore-to-subscript when exporting
 
 
+* 2019/2020
+** build
+*** [[https://bazel.build/][bazel]]
+** to_sort
+- [[https://www.youtube.com/playlist?list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb][yt playlist cherno c++ 2020-2017]]
+- [[http://blog.sourcepole.com/sources/programming/cpp/cppqref.html][blog.sourcepole.com - C++ QUICK REFERENCE]]
 * 2018/2019
 ** [[file:Cpp_GeneralProblemsSolutions.org][Cpp General Problems&Solutions]]
 ** [[file:Cpp_Math_ProblemsSolutions.org][Cpp Math Problems&Solutions]]

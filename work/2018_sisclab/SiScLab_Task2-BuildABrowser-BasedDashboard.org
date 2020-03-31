@@ -383,6 +383,7 @@ Legend:
 
 ** Jupyter (General)
 *** Resources
+- [[https://danmackinlay.name/notebook/jupyter.html][danmackinlay.name/notebook/jupyter]] all about jupyter for science WIP
 *** Extension packages
  | lists   | [[https://github.com/markusschanta/awesome-jupyter][awesome-jupyter]] A curated list of awesome Jupyter projects       |
 ** Jupyter Widgets
