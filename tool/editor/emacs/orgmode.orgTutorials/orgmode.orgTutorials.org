@@ -25,6 +25,7 @@ THIS IS THE MASTER FILE FOR NOTES ON ORGMODE.ORG TUTORIALS
 
 
 * MAIN REFERENCE / OVERVIEW: [[https://orgmode.org/worg/org-tutorials/][org.mode org-tutorials]]
+* bernt hansen [[http://doc.norang.ca/org-mode.html][Org Mode - Organize Your Life In Plain Text!]]
 * TODO Rainer König 'Get Organized with org mode' [[file:~/Desktop/Archive/Reference/tool/editor/emacs/OrgmodeTutorial_RainerKoenig_2016/OrgmodeTutorial_RainerKoenig.org][Master File]]
 - started ca. <2018-11-02 Fri>, postponed <2018-11-10 Sat>
 * DONE Org as a spreadsheet system [[file:OrgSpreadsheetTutorial.org][file]] [[https://orgmode.org/worg/org-tutorials/org-spreadsheet-intro.html][URL]]

@@ -21,6 +21,7 @@
 #+LATEX_COMPILER: pdflatex
 #+DATE: \today
 
+* Note: <2020-05-15 Fri> bug with babel python and HTML export
 
 * Language-agnostic
 ** call/reuse/import code from other code block
@@ -31,15 +32,18 @@
     def some_function(x):
       return constant * x
   #+END_SRC
+
+  #+RESULTS: init_block1
+  : None
    
   Call the function on an integer
   #+BEGIN_SRC python :noweb yes 
     <<init_block1>>
-    return some_function(13)
+    return some_function(14)
   #+END_SRC
 
   #+RESULTS:
-  : 247
+  : 266
    
    
   Call the function on a string
@@ -49,15 +53,17 @@
    
   #+BEGIN_SRC python :noweb yes
   <<init_block1>>
-  return some_function('abc')
+  return some_function('gatc')
   #+END_SRC
 
   #+RESULTS:
-  : abcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabcabc
+  : gatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatcgatc
 
-** stop evaluation of code block (possibly hanging)
+** COMMENT stop evaluation of code block (possibly hanging)
 - one answer: =C-g=. [[https://emacs.stackexchange.com/q/16880][source]]. but i don't know if that works.
 - problem: babel evaluation doesn't show up in =M-x list-processes=. where then?
+
+
 * Shell
 
 #+BEGIN_SRC shell
@@ -136,11 +142,11 @@ return 2+7
 : 9
 
 #+BEGIN_SRC python :session
-2+2
+2+3
 #+END_SRC
 
 #+RESULTS:
-: 4
+: 5
 
 
 #+BEGIN_SRC python :results output
@@ -149,6 +155,8 @@ print("Hello World")
 
 #+RESULTS:
 : Hello World
+
+
 * C/C++
 
 - [[https://orgmode.org/worg/org-contrib/babel/languages/ob-doc-C.html][orgmode.org - C, C++, D Source Code Blocks in Org Mode]]

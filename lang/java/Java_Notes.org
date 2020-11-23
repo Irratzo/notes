@@ -1,0 +1,240 @@
+# Source file is org file. View org file online: paste content of org file into http://mooz.github.io/org-js/.
+
+# # In Emacs org-mode: before exporting, comment this out START
+# ;; Local Variables:
+# ;; ispell-check-comments: exclusive
+# ;; ispell-local-dictionary: "english"
+# ;; End:
+# # In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:Johannes Wasmer
+#+OPTIONS: email:johannes.wasmer@gmail.com
+
+#+OPTIONS: num:t
+# t or nil: disable export latex section numbering for org headings
+#+OPTIONS: toc:t
+# t or nil: no table of contents (doesn't work if num:nil)
+
+#+TITLE: Java Notes
+#+DATE: <2020-02-14 Fri>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+
+#+LATEX_HEADER: \usepackage{array}% http://ctan.org/pkg/array
+#+LATEX_HEADER: % Source: http://www.jevon.org/wiki/Fancy_Quotation_Boxes_in_Latex
+#+LATEX_HEADER: % for adjustwidth environment
+#+LATEX_HEADER: \usepackage[strict]{changepage}
+#+LATEX_HEADER: %
+#+LATEX_HEADER: % for formal definitions
+#+LATEX_HEADER: \usepackage{framed}
+#+LATEX_HEADER: % environment derived from framed.sty: see leftbar environment definition
+#+LATEX_HEADER: \definecolor{formalshade}{rgb}{0.95,0.95,1}
+#+LATEX_HEADER: \definecolor{darkblue}{rgb}{0.0, 0.0, 0.55}
+#+LATEX_HEADER: %
+#+LATEX_HEADER: \newenvironment{formal}{%
+#+LATEX_HEADER:   \def\FrameCommand{%
+#+LATEX_HEADER:     \hspace{1pt}%
+#+LATEX_HEADER:     {\color{darkblue}\vrule width 2pt}%
+#+LATEX_HEADER:     {\color{formalshade}\vrule width 4pt}%
+#+LATEX_HEADER:     \colorbox{formalshade}%
+#+LATEX_HEADER:   }%
+#+LATEX_HEADER:   \MakeFramed{\advance\hsize-\width\FrameRestore}%
+#+LATEX_HEADER:   \noindent\hspace{-4.55pt}% disable indenting first paragraph
+#+LATEX_HEADER:   \begin{adjustwidth}{}{7pt}%
+#+LATEX_HEADER:   \vspace{2pt}\vspace{2pt}%
+#+LATEX_HEADER: }
+#+LATEX_HEADER: {%
+#+LATEX_HEADER:   \vspace{2pt}\end{adjustwidth}\endMakeFramed%
+#+LATEX_HEADER: }
+
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION: 
+#+KEYWORDS: 
+#+SUBTITLE: 
+
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+* COMMENT [[file:~/Desktop/Archive/Reference/lang/lang.org][master file]]
+* to_sort
+** <2020-02-14 Fri> small java interface tutorial for chantal
+
+*** whatsapp format
+
+One thing I didn't mention is what the point of interfaces is. More importantly, I made an error when talking about interfaces. The definition of an interface consists of *two* parts, not one: An interface is a class which
+1) has no constructor,
+2) has only *empty* methods.
+
+(Note: to test any of the following code, just put it in a file ```MyClass.java``` and run or copy-paste in some java online editor like e.g. https://www.jdoodle.com/online-java-compiler-ide/ .)
+
+Example for an empty method: ```public int f(int x);```. The curly braces ```{}``` are missing. That's an empty method. What the hell is the use of empty methods you might ask. What the hell is the use of a class with no attributes, no constructor, and empty methods! As is always best, let's look at an example.
+
+Let's say we want to create a dog and a duck (objects, so a concrete dog and a concrete duck). We want them to be able to make a noise. But a dog barks, and a duck quacks. How do we do that? That's a job for an interface! We will make an interface ```MakesNoise``` with an empty method ```makesNoise()```. Then our classes ```Dog``` and ```Duck``` will _implement_ the interface method by _defining_ what the method ```makesNoise()``` will actually do. For a dog, it will print ```Bark bark!``` to the screen, for a duck it will print ```Quack quack``` to the screen. Here is the code.
+
+```
+interface MakesNoise {
+    public void makeNoise();
+    // notice: empty method!
+}
+class Dog implements MakesNoise {
+    public Dog() {} //default constructor, could be omitted  
+    public void makeNoise() {
+        System.out.println("Bark bark!");
+    }
+}
+class Duck implements MakesNoise {
+    public Duck() {}
+    public void makeNoise() {
+        System.out.println("Quack quack!");
+    }
+}
+public class MyClass {
+    public static void main(String args[]) {
+        Dog henry = new Dog();
+        Duck donald = new Duck();
+        henry.makeNoise();
+        donald.makeNoise();
+    }
+}
+```
+
+So the _point_ of an interface is, it gives you the ability to make a _specialization_. You can have objects of different types (in our case a Dog and a Duck) with the _same method_, but different behavior. If we have different classes with some common _ability_ (can make a noise), but a different _behavior_ (barks or quacks), then we use an interface.
+
+Our two animal objects now can bark and quack, but they are nameless. Of course, this is also a common property. But it is more of a common _attribute_ instead of a common _behavior_. So for that, we can use a class instead. Let's declare that they both are pets, and all pets must have a name. Here is the code.
+
+```
+class Pet {
+    private String name;
+    public void setName(String aname) {
+        this.name = aname;
+    }
+    public String getName() {
+        return this.name;
+    }
+}
+
+class Dog extends Pet {}
+
+public class MyClass {
+    public static void main(String[] args) {
+        Pet henry = new Dog();
+        henry.setName("Henry");
+        System.out.println(henry.getName());
+    }
+}
+```
+
+Notice that the ```Dog``` class inherits the ```name``` from the ```Pet``` class. So we don't have to write that attribute in any new ```Pet``` subclass declaration, like e.g. ```Horse```. We can just reuse it. Time saver!
+
+Notice also that we didn't declare any constructors, and instead introduced a set-method to set the object's name. But that allows anyone to rename our pet! So instead, let's give the pet a name at birth, by only allowing to name it when it's created, namely by the constructor.
+
+```
+class Pet {
+    private String name;
+    public Pet(String aname) {
+        this.name = aname;
+    }
+    public String getName() {
+        return this.name;
+    }
+}
+
+class Dog extends Pet {
+    public Dog(String name){
+        super(name);
+    }
+}
+
+public class MyClass {
+    public static void main(String[] args) {
+        Pet henry = new Dog("Henry");
+        System.out.println(henry.getName());
+    }
+}
+```
+
+The ```super``` keyword in the subclass ```Dog``` constructor hands the ```name``` parameter up to the superclass ```Pet``` constuctor. Again, think of the computer going jumping from the line you create ```henry``` to the ```Dog``` constructor, then jumping to the ```Pet``` constructor, for creating ```henry```.
+
+Good! Now noone can rename our pet ^^.
+
+A practical note: access modifiers ```private``` and ```protected```, and thus set- and get-methods are almost never needed and just blow up the code. Instead, just use ```public``` everywhere and set attributes directly. this is a good time-saving practice unless you're writing an exam or writing big enterprise code.
+
+Now, let's put everything together. We make our dog and duck, both with names, and each able to bark and quack. We just reuse what we have already written.
+
+```
+interface MakesNoise {
+    public void makeNoise();
+    // notice: empty method!
+}
+
+class Pet {
+    public String name;
+}
+
+class Dog extends Pet implements MakesNoise {
+    public Dog() {} //default constructor, could be omitted  
+    public void makeNoise() {
+        System.out.println("Bark bark!");
+    }
+}
+class Duck extends Pet implements MakesNoise {
+    public Duck() {}
+    public void makeNoise() {
+        System.out.println("Quack quack!");
+    }
+}
+
+public class MyClass {
+    public static void main(String args[]) {
+        Dog henry = new Dog();
+        henry.name = "Henry";
+        Duck donald = new Duck();
+        donald.name = "Donald";
+        henry.makeNoise();
+        donald.makeNoise();
+    }
+}
+```
+
+Notice how making the attribute ```name``` public makes the code much more readable. Since ```Dog``` and ```Duck``` both are ```Pet```s, both have an attribute ```name```.
+
+Also notice that now, we can't create henry (and donald likewise) anymore with ```Pet henry = new Dog();```, because below we let henry make a noise, and ```Pet```s can't make a noise, as we defined it. So instead we have to write ```Dog henry = new Dog();```. Because dogs can ```makeNoise()```.
+
+And that's it!
+
+One last thing: a Java class can only inherit from (extend) _one_ class, but it can implement _many_ interfaces. Why? Other languages allow multiple class inheritance, and that can make code unstable. The Java creators said, okay we will forbid multiple inheritance with full-blown classes, but instead allow it with these safer, kind of stripped-down classes, which we'll call interfaces. 
+
+Example: you might decide that you now also want to be able to compare your ducks by ```weight``` (let's say ducks have an attribute ```double weight```), so that you get a true/false answer for e.g. ```isDuck2Heavier = duck2 > duck1```. Java comes with an interface ```Comparable``` for such things. So you let ```Duck implements MakesNoise, Comparable```, and in ```Duck``` implement that    interface's method ```compare(...)```, by comparing the ```weight``` of the two ducks. Voilà, ```Duck``` implements multiple interfaces.

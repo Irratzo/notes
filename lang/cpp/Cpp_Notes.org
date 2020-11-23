@@ -1,9 +1,11 @@
 #+OPTIONS: ^:nil
 # above: disables undercore-to-subscript when exporting
 
-
+* COMMENT [[file:~/Desktop/Archive/Reference/lang/lang.org][master file]]
 * 2019/2020
 ** build
+*** cmake
+**** [[https://cliutils.gitlab.io/modern-cmake/][Schreiner - Introduction to Modern CMake 3.1+ 2020]] 
 *** [[https://bazel.build/][bazel]]
 ** to_sort
 - [[https://www.youtube.com/playlist?list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb][yt playlist cherno c++ 2020-2017]]

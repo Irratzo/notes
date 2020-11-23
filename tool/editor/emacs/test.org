@@ -1,0 +1,15 @@
+
+
+#+begin_src python
+return 2+3
+#+end_src
+
+#+RESULTS:
+: 5
+
+# #+BEGIN_SRC shell :exports both
+# echo $PATH
+# #+END_SRC
+
+# #+RESULTS:
+# : /home/johannes/.pyenv/plugins/pyenv-virtualenv/shims:/home/johannes/.pyenv/shims:/home/johannes/.pyenv/bin:/home/johannes/texlive2018/bin/x86_64-linux:/home/johannes/anaconda3/bin:/home/johannes/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/home/johannes/julia-1.0.3/bin:/home/johannes/gsp/project/Cube2.0/CubeLib/branches/RB-4.5/vpath/_install/bin:/home/johannes/gsp/project/Cube2.0/CubeGUI/branches/RB-4.5/vpath/_install/bin:/home/johannes/Downloads/apache-jena-3.13.1//bin:/usr/lib/x86_64-linux-gnu/emacs/26.3/x86_64-linux-gnu

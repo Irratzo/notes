@@ -1,0 +1,116 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:Johannes Wasmer
+#+OPTIONS: email:johannes.wasmer@gmail.com
+
+#+OPTIONS: num:t
+# t or nil: disable export latex section numbering for org headings
+#+OPTIONS: toc:t
+# t or nil: no table of contents (doesn't work if num:nil)
+
+#+TITLE: Reference/lang
+#+DATE: <2020-04-10 Fri>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+* COMMENT [[file:~/Desktop/Archive/Reference/Reference.org][master file]]
+* external resources
+** collections
+*** [[https://learnxinyminutes.com/][learnxinyminutes.com]]
+*** sentdex programming tutorials
+**** sentdex online presences
+- https://twitter.com/sentdex
+- https://www.youtube.com/user/sentdex/
+- https://hkinsley.com/
+- https://pythonprogramming.net/
+- https://nnfs.io/ Neural Networks From Scratch
+*** sentdex tutorials python
+**** sentdex tutorials python Basics
+- https://pythonprogramming.net/python-fundamental-tutorials/
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDeAams7fkdcwOGBpGdHpXln][yt py3.7 2018]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfju7ADVp5W1GF9jVhjbX-_][yt python intermediate 2018]]
+**** sentdex tutorials python Web
+- https://pythonprogramming.net/web-development-tutorials/
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDe9nqlirjacLkBYdgc2inh3][yt django 2019]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDc_owjTbIY4rbgXOFkUYOUB][yt flask 2016]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDdzLB_0JSTTcl8E8jsJLhR5][yt sockets 2019]]
+- https://pythonprogramming.net/bot-tutorials/
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDeA05ZouE4OzDYLHY-XH-Nd][yt django 2016]]
+**** sentdex tutorials python DB
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDezJh0sC5CqXLKZTSKU1YNo][yt SQlite3 2016]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDcppfxEowvKiMYyILwOQIHF][yt mysql 2015]] 
+**** sentdex tutorials python DataAna
+- https://pythonprogramming.net/data-analysis-tutorials/
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfSfqQuee6K8opKtZsh7sA9][yt dataAna pandas 2019]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfsGImWNt1eUEveHOepkjqt][yt dash 2018]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfefDfXb9Yf0la1fPDKluPF][yt matplotlib 2016]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDc-3szzjeP6N6b0aDrrKyL-][yt dataAna pandas 2015]]
+**** sentdex tutorials python ML
+- https://nnfs.io/ 2020
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDcjD5BAw2DxE6OF2tius3V3][yt NNs from Scratch 2020]]
+- https://pythonprogramming.net/machine-learning-tutorials/
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDdeMyHEYc0gxFpYwHY2Qfdh][yt pytorch 2019]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDezJFIOU5wDdfy4e9vdnx-7][yt RL 2019]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfhTox0AjmQ6tvTgMBZBEXN][yt tensorflow keras 2018]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfKTOs3Keq_kaG2P55YRn5v][yt ML 2017]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDdfN3lrO0NDYxa1JwCYes-E][yt unconventional NNs 2018]]
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDd0flgGphKCej-9jp-QdzZ3][yt scikit-learn 2015]]
+**** sentdex tutorials python CSE
+- [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDdhOnp-FnVStDsALpYk2hk0][yt monteCarlo 2014]]
+**** sentdex tutorials python QC
+- https://pythonprogramming.net/quantum-computer-programming-tutorial/
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDc79w6NcGB0pnoJBgaKdfrW][Quantum Computer Programming w/ Qiskit 2019]]
+**** sentdex tutorials python GUI
+- https://pythonprogramming.net/gui-development-tutorials/
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDfwnDTZWw8H3hN_VRQfq8rF][yt kivy 2019]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDdVpDFNq4FwY9APZPGSUyR4][yt pyQT 2015]]
+  - [[https://www.youtube.com/playlist?list=PLQVvvaa0QuDclKx-QpC9wntnURXVJqLyk][yt tkinter 2014]]
+**** sentdex tutorials python misc
+* [[file:cpp/Cpp_Notes.org][cpp]]
+* [[file:java/Java_Notes.org][java]]
+* [[file:latex/LaTeX_Notes.org][LaTeX]]
+* [[file:python/Python_Notes.org][python]]

@@ -21,7 +21,7 @@
 #+LATEX_COMPILER: pdflatex
 #+DATE: \today
 
-
+* [[file:../../../../Studium/Kurse_RWTH/SiSc_Studium_Notes.org][master file]]
 * [[file:SiScLab_Meetings_Notes.org][Meetings]]
 * Tasks
 ** November: [[file:SiScLab_Task1-PlotBanddos_Notes.org][Task 1 - Plot Banddos]]

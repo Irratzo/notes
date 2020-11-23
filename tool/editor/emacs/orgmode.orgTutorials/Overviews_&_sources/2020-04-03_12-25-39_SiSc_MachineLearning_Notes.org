@@ -1,0 +1,636 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:t
+# t or nil: disable export latex section numbering for org headings
+#+OPTIONS: toc:t
+# t or nil: no table of contents (doesn't work if num:nil)
+
+#+TITLE: SiSc MachineLearning Notes
+#+DATE: <2019-10-12 Sat>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: en
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: 
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+* Glossary, List of Abbreviations
+| Abbrev | Term                        | Synonyms | Connecting Concepts |
+|--------+-----------------------------+----------+---------------------|
+| DS     | data science                |          |                     |
+| ML     | machine learning            |          |                     |
+| NLP    | natural language processing |          |                     |
+
+* 19W Time Schedule
+
+|                                                           | ~#pages |
+|-----------------------------------------------------------+---------|
+| Lecture 1: Intro                                          |      61 |
+| Lecture 2: Probability Density Estimation I               |      54 |
+| Lecture 3: Probability Density Estimation II              |      56 |
+| Lecture 4: Probability Density Estimation III             |      43 |
+| Exercise 1: Python Tutorial, Probability Density, GMM, EM |      30 |
+| Lecture 5: Linear Discriminants I                         |      62 |
+| Lecture 6: Linear Discriminants II                        |      34 |
+| Lecture 7: Linear Discriminants III                       |      52 |
+| Lecture 8: SVMs                                           |      63 |
+| Lecture 9: SVMs II                                        |      42 |
+| Exercise 2: Linear Discriminants, SVM                     |      34 |
+| Lecture 10: AdaBoost                                      |      44 |
+| Lecture 11: Random Forests                                |      57 |
+| Exercise 3: AdaBoost                                      |      12 |
+| Lecture 12: Neural Networks I                             |      63 |
+| Lecture 13: Neural Networks II                            |      64 |
+| Lecture 14: Optimization                                  |      71 |
+| Exercise 4: Backprop, Softmax                             |      36 |
+| Lecture 15: CNNs I                                        |      52 |
+| Lecture 16: CNNs II                                       |      82 |
+| Lecture 17: CNNs III                                      |      63 |
+| Exercise 5: CNN                                           |     100 |
+| Lecture 18: Word Embeddings                               |      37 |
+| Lecture 19: RNNs I                                        |      50 |
+| Lecture 20: RNNs II                                       |      47 |
+| Exercise 6: RNN                                           |      30 |
+| Lecture 21: Wrap-up                                       |      48 |
+| Lecture 22: Wrap-up II                                    |      14 |
+| Lecture 23: Repetition                                    |     134 |
+| Tensorflow Tutorial                                       |       8 |
+|-----------------------------------------------------------+---------|
+|                                                           |    1543 |
+#+TBLFM: @2$2=62-1::@3$2=116-62::@4$2=172-116::@5$2=215-172::@7$2=277-215::@8$2=311-277::@9$2=363-311::@10$2=426-363::@11$2=468-426::@13$2=512-468::@14$2=569-512::@16$2=632-569::@17$2=696-632::@18$2=767-696::@20$2=819-767::@21$2=901-819::@22$2=964-901::@24$2=1001-964::@25$2=1051-1001::@26$2=1098-1051::@28$2=1146-1098::@29$2=1160-1146::@30$2=1294-1160::@6$2=31-1::@12$2=65-31::@15$2=70-58::@19$2=106-70::@31$2=105-97::@32$2=vsum(@2..@-1)
+
+pages statistics: 30 events, sum 1500 pages, average/events: 50.
+* Course Outline
+** Fundamentals L01-L02
+*** Review: Probability Theory L01
+**** Probabilities
+**** Probability densities
+**** Expectations and covariances
+- audio podcast [[https://dataskeptic.com/blog/episodes/2015/covariance-and-correlation][dataskeptic | covariance and correlation]]
+*** Bayes Decision Theory L01 L02
+**** Basic concepts
+- audio podcast [[https://dataskeptic.com/blog/episodes/2018/being-bayesian][data skeptic | being bayesian]]
+- audio podcast [[https://dataskeptic.com/podcast?year=2014&limit=10&offset=30][dataskeptic | bayesian updating]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2015/bayesian-ab-testing][dataskeptic | bayesian a/b testing]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2018/spam-filtering-with-naive-bayes][dataskeptic | Spam Filtering with Naive Bayes]]
+**** Minimizing the misclassification rate
+**** Minimizing the expected loss
+**** Discriminant functions
+** Probability Density Estimation L02-L04
+*** General concepts L02
+- [[*Bronwlee - %5B%5Bhttps://machinelearningmastery.com/%5D%5Bmachinelearningmastery.com%5D%5D][Bronwlee - machinelearningmastery.com]] > [[https://machinelearningmastery.com/bayes-theorem-for-machine-learning/][A Gentle Introduction to Bayes Theorem for Machine Learning]]
+*** Gaussian distribution L02
+*** Parametric Methods L02
+**** Maximum Likelihood approach
+**** Bayesian vs. Frequentist views on probability
+*** Non-Parametric Methods L03
+**** Histograms
+**** Kernel density estimation
+**** K-Nearest Neighbors
+- audio podcast [[https://dataskeptic.com/blog/episodes/2015/k-nearest-neighbors][dataskeptic | k-nearest neighbors]]
+**** k-NN for Classification
+- audio podcast [[https://dataskeptic.com/blog/episodes/2015/bias-variance-tradeoff][dataskeptic | bias-variance tradeoff]]
+*** Mixture distributions L03
+**** Mixture of Gaussians (MoG)
+**** Maximum Likelihood estimation attempt
+*** K-Means Clustering L04
+- audio podcast [[https://dataskeptic.com/blog/episodes/2015/k-means-clustering][dataskeptic | k-means clustering]]
+**** Algorithm
+**** Applications
+*** EM Algorithm L04
+**** Credit assignment problem
+**** MoG estimation
+**** EM Algorithm
+**** Interpretation of K-Means
+**** Technical advice
+*** Applications L04
+** Classification Approaches L05-L12 
+*** Linear Discriminants L05-L06 
+**** Linear discriminant functions L05
+***** Definition
+***** Extension to multiple classes
+**** Least-squares classification L05 
+***** Derivation
+***** Shortcomings
+**** Generalized linear models L05
+***** Connection to neural networks
+***** Generalized linear discriminants & gradient descent
+**** Gradient Descent L06
+- audi podcast [[https://dataskeptic.com/blog/episodes/2016/gradient-descent][dataskeptic | gradient descent]]
+**** Logistic Regression L06
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/logistic-regression-on-audio-data][dataskeptic | logistic regression on audio data]]
+***** Probabilistic discriminative models
+***** Logistic sigmoid (logit function)
+***** Cross-entropy error
+***** Iteratively Reweighted Least Squares
+**** Softmax Regression L06
+***** Multi-class generalization
+***** Gradient descent solution
+**** Note on Error Functions L06
+***** Ideal error function
+***** Quadratic error
+***** Cross-entropy error
+*** Support Vector Machines L07-L09
+**** Linear Support Vector Machines L07
+***** Lagrangian (primal) formulation
+***** Dual formulation
+***** Discussion 
+**** Nonlinear Support Vector Machines L08
+***** Nonlinear basis functions
+***** The Kernel trick
+***** Mercer’s condition
+***** Popular kernels
+**** Analysis L08
+***** Error function
+**** Applications L08
+*** Ensemble Methods & Boosting L10
+**** Ensembles of classifiers L10
+***** Bagging
+***** Bayesian Model Averaging
+**** AdaBoost L10
+***** Intuition
+- audio podcast [[https://dataskeptic.com/blog/episodes/2016/adaboost][dataskeptic | adaboost]]
+***** Algorithm
+***** Analysis
+***** Extensions
+*** Randomized Trees, Forests & Ferns L11
+**** Decision Trees L11
+***** Basic concepts
+***** Learning decision trees
+- audio podcast [[https://dataskeptic.com/blog/episodes/2016/gini-coefficient][dataskeptic | gini coefficient]]
+**** Randomized Decision Trees L11
+***** Randomized attribute selection
+**** Random Forests L11-L12
+- audio podcast [[https://dataskeptic.com/blog/episodes/2016/random-forest][dataskeptic | random forests]]
+***** Bootstrap sampling
+- audio podcast [[https://dataskeptic.com/blog/episodes/2016/the-bootstrap][dataskeptic | the bootstrap]]
+***** Ensemble of randomized trees
+***** Posterior sum combination
+***** Analysis
+** Deep Learning L12-22
+*** Foundations L12-14
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/primer-on-deep-learning][dataskeptic | primer on deep learning]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/feed-forward-neural-networks][dataskeptic | feed-forward neural network]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/the-complexity-of-learning-neural-networks][dataskeptic | complexity of learning neural networks]]
+**** A Brief History of Neural Networks L12
+**** Perceptrons L12
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/the-perceptron][dataskeptic | the perceptron]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/activation-functions][dataskeptic | activation functions]]
+***** Definition
+***** Loss functions
+***** Regularization
+***** Limits
+**** Multi-Layer Perceptrons L12
+***** Definition
+***** Learning with hidden units
+**** Obtaining the Gradients L12
+***** Naive analytical differentiation
+***** Numerical differentiation
+***** Backpropagation
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/backpropagation][dataskeptic | backpropagation]]
+**** Learning Multi-layer Networks L13
+***** Backpropagation 
+***** Computational graphs
+***** Automatic differentiation
+***** Practical issues
+**** Gradient Descent L13 
+***** Stochastic Gradient Descent & Minibatches
+***** Choosing Learning Rates
+***** Momentum
+***** RMS Prop
+***** Other Optimizers
+**** Tricks of the Trade L13
+***** Shuffling
+***** Data Augmentation
+***** Normalization
+**** Optimization L13
+***** Momentum
+***** RMS Prop
+***** Effect of optimizers
+**** Nonlinearities L14
+**** Initialization L14
+**** Advanced techniques L14
+***** Batch Normalization
+***** Dropout
+*** Convolutional Neural Networks L15-18
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/convolutional-neural-networks][dataskeptic | convolutional neural networks]]
+- audio podcast [[https://dataskeptic.com/blog/episodes/2017/max-pooling][dataskeptic | max pooling]]
+**** Convolutional Neural Networks L15
+***** Neural Networks for Computer Vision
+***** Convolutional Layers
+***** Pooling Layers
+**** CNN Architectures L15
+***** LeNet
+***** AlexNet
+***** VGGNet
+***** GoogLeNet
+***** ResNets
+**** Visualizing CNNs L16
+***** Visualizing CNN features
+***** Visualizing responses
+***** Visualizing learned structures
+**** Applications L16
+**** Residual Networks L17
+***** Detailed analysis
+***** ResNets as ensembles of shallow networks
+**** Applications of CNNs L17
+***** Object detection
+***** Semantic segmentation
+***** Face identification
+**** Word Embeddings L18
+***** Neuroprobabilistic Language Models
+***** word2vec
+***** GloVe
+***** Hierarchical Softmax
+***** Embeddings in Vision
+****** Siamese networks
+****** Triplet loss networks
+*** Recurrent Neural Networks (RNNs) L19-20
+***** Motivation
+***** Intuition
+**** Learning with RNNs
+***** Formalization
+***** Comparison of Feedforward and Recurrent networks
+***** Backpropagation through Time (BPTT)
+**** Problems with RNN Training
+***** Vanishing Gradients
+***** Exploding Gradients
+***** Gradient Clipping
+**** Recap: Recurrent Neural Networks (RNNs)
+***** Backpropagation through Time (BPTT)
+***** Problems with RNN Training
+***** Handling Vanishing Gradients
+**** Improved hidden units for RNNs
+***** Long Short-Term Memory (LSTM)
+***** Gated Recurrent Units (GRU)
+**** Applications of RNNs
+*** Current Research Directions L21-L22
+**** Generative Models
+***** Networks for image generation
+***** Generative Adversarial Networks (GAN)
+**** Towards General Models of Computation
+***** Memory Networks
+***** Neural Turing Machines
+**** Deep Reinforcement Learning
+** Repetition L23
+* HW01
+** Coding part - Python configuration
+For creating special conda env: List of modules used in provided code q5, q6:
+- scipy
+- numpy
+- matplotlib
+
+added by other donijor:
+- imageio
+
+added by johannes:
+- jupyterlab?
+
+* HW05 CNN
+** remarks from solution tutorial ml_w13e <2020-01-16 Thu> 
+- preprocessing the data:
+  - 2:32: subtask 1b, slides / input_cs.py
+  - 2:34: subtask 1c, input_cs.python- 
+  - 2:35: subtask 1d, input_cs.py
+- implementation of architeture, part e and f:
+  - 2:36: slide: input -> conv1-conv3 -> FC1-3 (fully connected layer)
+  - 2:38: code: solution (i think model.py): ~_kernel_sizes~, ..., helper
+    functions (boilerplate you have to do in tensorflow):
+    ~get_conv_build_block~, ~get_conv_layer~, main function ~build_model~
+  - 2:43: code: ~start subtask 1f~: 
+    - helper functions: ~_get_fc_layer~
+  - 2:44: code: ~add fc-classification-layers~
+- 2:46: part g: implement loss function:
+  - code > model > def loss: actually used is ~cross_entropy_mean~
+  - 2:48: ~get_train_op_for_loss~ = implmt the optimizer.
+- 2:48: subtask j: 
+  - 2:49: code: train.py i think. 
+  - actual loop is in try-catch-block cause tf tell you like by throwing
+    exception that it's finished.
+  - operations we want to run: =merged_summary, train_op, cross_ent_mean=
+  - 2:52: code: validation run
+- 2:55 subtask k: implement test function
+  - code: ~main_cityscape.py~: ~run_test~. =labels= = 'the ground truth lables'
+  - 2:59: ex5_output.txt: interpretation of output, confusion matrix explains
+    it. 1st column corresponds to person class, 2nd to, 3rd to car class: 2919
+    correct predictions (M33), 30 incorrect predicitons (M32) so good for
+    class3. but bad for class2.
+** tmp resources to_sort
+- used:
+  - [[*stanford/li/karpathy cs321n CNNs for Visual Recognition][stanford/li/karpathy cs321n CNNs for Visual Recognition]]
+- TODO use:
+  - [[*andrew-ng %5B%5Bhttps://www.coursera.org/learn/machine-learning%5D%5Bcoursera/ng machine learning%5D%5D][andrew-ng coursera/ng machine learning]]
+* External Resources - Learning ML
+** [[file:~/Desktop/Archive/Reference/ml/MachineLearning_Notes.org][Archive / MachineLearning_Notes]]
+** Forums
+- [[https://www.reddit.com/r/learnmachinelearning/][r/learnmachinelearning]]
+** Collections
+*** medium/robbieallen [[https://medium.com/machine-learning-in-practice/over-200-of-the-best-machine-learning-nlp-and-python-tutorials-2018-edition-dd8cf53cb7dc][Over 200 of the Best Machine Learning, NLP, and Python Tutorials — 2018 Edition]]
+*** elitedatascience [[https://elitedatascience.com/learn-math-for-data-science][Learn Math for Data Science, Self-Starter]]
+- neural networks
+  - [[*%5B%5Bhttps://iamtrask.github.io/%5D%5Biamtrask.github.io%5D%5D - deep learning tutorials python][iamtrask.github.io - deep learning tutorials python]]
+*** kdnuggets
+**** kdnuggets 2020-03 [[https://www.kdnuggets.com/2020/03/50-must-read-free-books-every-data-scientist-2020.html][50 Must-Read Free Books For Every Data Scientist in 2020]]
+** Background knowledge
+*** Math
+**** Mathematics lectures at ETH Zurich PDE funcAna numMeth
+ - [[http://metaphor.ethz.ch/][ETHZ math lecture homepages: metaphor.ethz.ch]], often with solutions
+ - [[http://vvz.ethz.ch/Vorlesungsverzeichnis/sucheLehrangebot.view?lerneinheitscode=&deptId=8&famname=&unterbereichAbschnittId=&seite=0&lerneinheitstitel=&rufname=&lehrsprache=&bereichAbschnittId=&semkez=2019W&studiengangAbschnittId=81056&studiengangTyp=BSC&ansicht=1&lang=de&katalogdaten=&wahlinfo=][ETHZ math bsc course catalogue]], helps to make sense of the list
+*** Statistics
+**** [[*epfl cs-401 %E2%80%93 Applied Data Analysis][epfl cs-401 – Applied Data Analysis]]
+*** Computer Science
+**** [[https://github.com/ossu][OSSU Open Source Society Universty]] <2019-10-06 So> 
+ - Computer Science:
+   - [[*%5B%5Bhttps://github.com/ossu%5D%5BOSSU Open Source Society Universty%5D%5D <2019-10-06 So>][OSSU]] [[https://ossu.firebaseapp.com][CS Firebase]]
+   - [[*%5B%5Bhttps://github.com/ossu%5D%5BOSSU Open Source Society Universty%5D%5D <2019-10-06 So>][OSSU]] [[https://github.com/ossu/computer-science][CS github]]
+ - [[*%5B%5Bhttps://github.com/ossu%5D%5BOSSU Open Source Society Universty%5D%5D <2019-10-06 So>][OSSU]] [[https://github.com/ossu/data-science][DataScience github]]
+ - [[*%5B%5Bhttps://github.com/ossu%5D%5BOSSU Open Source Society Universty%5D%5D <2019-10-06 So>][OSSU]] [[https://github.com/ossu/bioinformatics][Bioinformatics github]]
+**** [[https://carpentries.org/][carpentries.org]]
+**** Algorithms lectures at ETH Zurich
+ - [[https://www.cadmo.ethz.ch/education/lectures/HS19][ETHZ algorithms lecture homepages: cadmo.ethz.ch]], often with solutions
+ - [[http://vvz.ethz.ch/Vorlesungsverzeichnis/sucheLehrangebot.view?lerneinheitscode=&deptId=5&famname=&unterbereichAbschnittId=&seite=0&lerneinheitstitel=&rufname=&lehrsprache=&bereichAbschnittId=&semkez=2019W&studiengangAbschnittId=81055&studiengangTyp=&ansicht=1&lang=en&katalogdaten=&wahlinfo=][ETHZ CS bsc course catalogue]], helps to make sense of the list, see also msc
+** ML books, preferably w code eg python
+*** Trask - Grokking Deep Learning, 1e-2019
+- book code repo: [[https://github.com/iamtrask/Grokking-Deep-Learning][github.com/iamtrask/Grokking-Deep-Learning]]
+*** Niesen - Neural Networks and Deep Learning, 2019
+**** niesen - neural networks book - [[http://neuralnetworksanddeeplearning.com/][book online]]  
+**** niesen - neural networks book - [[https://github.com/mnielsen/neural-networks-and-deep-learning][code on github]]
+*** Grus - Data Science from Scratch, 2e-2019 
+- [[file:~/ownCloud/SiSc/19W/ML/books/other/][local copies]]
+- [[https://github.com/joelgrus/data-science-from-scratch][github page with chapter notebooks]]
+- [[https://joelgrus.com/books/][official site (just an ad)]]
+*** Bronwlee - [[https://machinelearningmastery.com/][machinelearningmastery.com]]
+guides:
+
+blog:
+- [[https://machinelearningmastery.com/setup-python-environment-machine-learning-deep-learning-anaconda/][How to install everything]]
+- Your first complete project
+- Your first neural network
+
+books:
+*** Kersting - Wie Maschinen lernen, 1e-2019
+Künstliche Intelligenz verständlich erklärt
+- direct link to pdf: [[https://link.springer.com/content/pdf/10.1007%252F978-3-658-26763-6.pdf][web PDF @link.springer]], [[file:~/ownCloud/SiSc/19W/ML/books/other/Kersting_WieMaschinenLernen_1e-2019.pdf][JW local]] 
+- article mentioning the book 2019 [[https://www.welt.de/wirtschaft/bilanz/article202860588/Sieger-des-deutschen-KI-Preises-Der-Traum-von-der-starken-KI.html][welt.de Der Traum von der starken KI]]
+*** Chollet - Deep Learning with Python, 1e-2017
+- [[https://fchollet.com/#books][book homepage]]
+- [[https://github.com/fchollet/deep-learning-with-python-notebooks][code on github]]
+*** Rashid - Make Your Own Neural Network, 1e-2016
+- https://makeyourownneuralnetwork.blogspot.com/
+- https://github.com/makeyourownneuralnetwork
+*** Molnar - Interpretable Machine Learning, 2019
+- [[https://christophm.github.io/interpretable-ml-book/][book homepage]]
+** ML course materials
+*** hackerearth [[https://www.hackerearth.com/de/practice/machine-learning/prerequisites-of-machine-learning/basic-probability-models-and-rules/tutorial/][machine learning]]
+*** [[https://cs.stanford.edu/people/karpathy/][andrej karpathy]] ml resources
+- introductory
+***** [[*stanford/li/karpathy cs321n CNNs for Visual Recognition][stanford/li/karpathy cs321n CNNs for Visual Recognition]] 
+*** stanford/li/karpathy cs321n CNNs for Visual Recognition
+- introductory
+- no ml only dl
+- for NN part, most similar resource to rwth ml leibe 19w lectures. especially
+  the winter2016 edition. leibe seems to have copied a lot from here.
+**** stanford/li/karpathy cs231n by topic
+**** stanford/li/karpathy cs231n [[http://vision.stanford.edu/teaching/cs231n/][official homepage]]
+**** stanford/li/karpathy cs231n [[http://vision.stanford.edu/teaching/cs231n/syllabus.html][syllabi]] PDF video
+**** stanford/li/karpathy cs231n [[https://cs231n.github.io/][course notes]] 
+**** stanford/li/karpathy cs231n [[https://www.reddit.com/r/cs231n/][reddit channel]]
+**** stanford/li/karpathy cs231n [[https://www.youtube.com/playlist?list=PLkt2uSq6rBVctENoVBg1TpCC7OQi31AlC][winter2016 yt playlist]]
+***** stanford/li/karpathy cs231n [[https://www.youtube.com/watch?v=LxfUGhug-iQ&list=PLkt2uSq6rBVctENoVBg1TpCC7OQi31AlC&index=7][winter2016 yt video: Lecture 7: Convolutional Neural Networks]]
+
+*** [[https://www.fast.ai/][fast.ai]] ML/DL courses
+**** description / reviews
+- introductory/intermediate
+- both ml and dl
+- recommended by lex fridman <2020-01-10 Fri> [[http://www.youtube.com/watch?v=0VH1Lim8gL8&t=67m0s][here]] and <2019-10-07 Mo> here [[https://www.youtube.com/watch?v=XHyASP49ses][short]] [[https://www.youtube.com/watch?v=J6XcP4JOHmk][long]]
+- review https://www.simonwenkel.com/2019/07/15/review-of-fastai-courses.html
+- review / recommendation on how to succeed at fast.ai's top-down approach of
+  teaching
+  https://hackernoon.com/how-not-to-do-fast-ai-or-any-ml-mooc-3d34a7e0ab8c
+
+**** fast.ai [[https://github.com/fastai/fastbook][The fastai book]] current
+**** fast.ai [[https://course.fast.ai/][Practical Deep Learning for Coders]] current
+**** fast.ai [[https://course.fast.ai/part2][Part 2: Deep Learning from the Foundations]] current
+**** fast.ai [[http://course18.fast.ai/ml][Introduction to Machine Learning for Coders]] 2018
+**** fast.ai [[https://github.com/fastai/numerical-linear-algebra][Computational Linear Algebra for Coders]] 2017
+**** fast.ai [[https://www.fast.ai/2019/07/08/fastai-nlp/][Code-First Introduction to NLP]] 2019/current
+*** epfl [[https://www.epfl.ch/research/domains/ml/courses/][ml course collection]]
+- both ml and dl and beyond
+**** epfl cs-233 – Introduction to Machine Learning
+***** epfl cs-233a [[https://edu.epfl.ch/coursebook/en/introduction-to-machine-learning-ba3-CS-233-A?cb_cycle=bama_cyclebachelor&cb_section=in][coursebook page]]
+***** epfl cs-233b [[https://edu.epfl.ch/coursebook/en/introduction-to-machine-learning-ba4-CS-233-B?cb_cycle=bama_cyclebachelor&cb_section=in][coursebook page]]
+**** epfl mgt-418 – Convex optimization
+***** epfl mgt-418 [[https://edu.epfl.ch/coursebook/en/convex-optimization-MGT-418][coursebook page]]
+**** epfl math-403 – Low-rank approximation techniques
+***** epfl math-403 [[https://www.epfl.ch/labs/anchp/index-html/teaching/low-rank-approximation-techniques/][official homepage]]
+**** epfl cs-439 – Optimization for Machine Learning
+***** epfl cs-439 [[https://edu.epfl.ch/coursebook/en/optimization-for-machine-learning-CS-439][coursebook]]
+***** epfl cs-439 [[https://github.com/epfml/OptML_course][github page]]
+**** epfl cs-401 – Applied Data Analysis
+***** epfl cs-401 [[https://dlab.epfl.ch/teaching/fall2019/cs401/][official homepage]]
+***** epfl cs-401 [[https://github.com/epfl-ada][github page]]
+**** epfl ee-559 – Deep Learning
+***** epfl ee-559 [[https://fleuret.org/ee559/][official homepage]]
+**** epfl cs-433 – machine Learning
+***** epfl cs-433 [[https://edu.epfl.ch/coursebook/en/machine-learning-CS-433][coursebook]]
+***** epfl cs-433 [[https://www.epfl.ch/labs/mlo/machine-learning-cs-433/][official homepage]]
+***** epfl cs-433 [[https://github.com/epfml/OptML_course][github page]]
+*** mit 6.s191 Introduction to Deep Learning
+- no ml only dl
+**** mit 6.s191 [[http://introtodeeplearning.com/][official homepage]]
+**** mit 6.s191 [[https://www.youtube.com/playlist?list=PLtBw6njQRU-rwp5__7C0oIVt26ZgjG9NI][winter2018 yt playlist]]
+**** mit 6.s191 [[https://github.com/aamini/introtodeeplearning_labs][github page]]
+**** mit 6.s191 other recources
+- [[https://medium.com/tensorflow/mit-introduction-to-deep-learning-4a6f8dde1f0c][medium.com article on mit winter2018 6.s191]]
+- [[https://twitter.com/mitdeeplearning][mit 6.s191 twitter channel]]
+*** nvidia-dl
+- no ml only dl i think
+**** nvidia-dl [[https://www.nvidia.com/en-us/deep-learning-ai/education/][DLI Deep Learning Institute]]
+**** nvidia-dl [[https://www.nvidia.com/en-us/gtc][gtc]]
+*** lmu/compstat i2ml intro to machine learning 2020
+- only ml no dl
+**** lmu/compstat i2ml [[https://compstat-lmu.github.io/lecture_i2ml/][official homepage]] 
+**** lmu/compstat i2ml [[https://github.com/compstat-lmu/lecture_i2ml][github page]]
+*** berkeley cs189 intro to machine learning
+- only ml no dl
+**** berkeley cs189 [[https://www.eecs189.org/][official homepage]] 
+*** jan jensen [[https://sites.google.com/view/ml-basics/home][machine learning basics]] for chemists 2020
+*** [[http://www.morrisriedel.de/][riedel fzj]] ml+hpc talks
+**** riedel fzj [[http://www.morrisriedel.de/prace-tutorial-parallel-and-scalable-machine-learning-introduction][PRACE Tutorial: Parallel and Scalable Machine Learning]] 2020
+**** riedel fzj smaller talks
+- http://www.morrisriedel.de/demystifying-quantum-computing
+- http://www.morrisriedel.de/ai-in-international-activities
+
+*** nyu/shiffman=codingtrain ml theory and coding with python/javascript
+- introductory
+- [[https://shiffman.net/][shiffman.net]], [[https://thecodingtrain.com/][thecodingtrain.com]]
+**** nyu/shiffman yt playlist Beginners Guide to Machine Learning in JavaScript ml5.js 2019
+- https://thecodingtrain.com/Courses/ml5-beginners-guide/
+- [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YPSwT06y_AEYTqIwbeam3y][yt playlist]]
+***** ml5.js Friendly machine learning for the web!
+- [[https://ml5js.org/][ml5js.org]], [[https://github.com/ml5js/ml5-library][github.com/ml5js]]
+**** nyu/shiffman yt playlist [[https://www.youtube.com/user/shiffman/playlists?view=50&sort=dd&shelf_id=16][Neural Networks and Machine Learning]] 2017-2019
+***** [[*nyu/shiffman natureOfCode github %5B%5Bhttps://github.com/nature-of-code/NOC-S17-2-Intelligence-Learning%5D%5BNOC-S17-2-Intelligence-Learning%5D%5D][nyu/shiffman natureOfCode github NOC-S17-2-Intelligence-Learning]]
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6bePNiZLnglXUp2LXIjlCdb][Session 1 - Algorithms and Graphs - Intelligence and Learning]]
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6bw4n02JP28QDuUdNi3EXxJ][Session 2 - Genetic Algorithms - Intelligence and Learning]]
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6bCN8LKrcMa6zF4FPtXyXYj][Session 3 - Intro to Machine Learning - Intelligence and Learning]]
+- content: nearestN, linreg OLS, gradesc, chainrule
+****** nyu/shiffman yt video [[https://www.youtube.com/watch?v=jc2IthslyzM&list=PLRqwX-V7Uu6bCN8LKrcMa6zF4FPtXyXYj&index=9&t=1060s][3.5: Mathematics of Gradient Descent - Intelligence and Learning]]
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6Y7MdSCaIfsxc561QI0U0Tb][Session 4 - Neural Networks - Intelligence and Learning]]
+- content: perceptron, multilayer perceptron, NN matrix, NN feedforw, NN backprop
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6Zs14zKVuTuit6jApJgoYZQ][Session 5 - Doodle Classifier - Intelligence and Learning]]
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6YIeVA3dNxbR9PYj4wV31oQ][Session 6 - TensorFlow.js - Intelligence and Learning]] 
+***** nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6bmMRCIoTi72aNWHo7epX4L][Session 7 - TensorFlow.js Color Classifier - Intelligence and Learning]]
+**** nyu/shiffman Nature of Code
+***** nyu/shiffman natureOfCode [[https://natureofcode.com/book/][book online]]
+- deprecated edition, see eg [[https://github.com/nature-of-code/noc-book-2][repo of the new version]]
+***** nyu/shiffman natureOfCode [[https://github.com/nature-of-code][github]]
+****** nyu/shiffman natureOfCode github [[https://github.com/nature-of-code/noc-syllabus-S19][noc-syllabus-S19]]
+****** nyu/shiffman natureOfCode github [[https://github.com/nature-of-code/NOC-S18][NOC-S18]]
+****** nyu/shiffman natureOfCode github [[https://github.com/nature-of-code/NOC-S17-2-Intelligence-Learning][NOC-S17-2-Intelligence-Learning]]
+***** nyu/shiffman Nature of Code (Animation and Physics)
+- [[https://tisch.nyu.edu/itp/courses/itp-courses][course listing]]
+****** nyu/shiffman yt playlist [[https://www.youtube.com/user/shiffman/playlists?view=50&sort=dd&shelf_id=16][The Nature of Code: Simulating Natural Systems with Processing]]
+******* nyu/shiffman yt playlist [[https://www.youtube.com/playlist?list=PLRqwX-V7Uu6aCibgK1PTWWu9by6XFdCfh][10: Neural Networks - The Nature of Code]]
+- same as [[*nyu/shiffman yt playlist %5B%5Bhttps://www.youtube.com/playlist?list=PLRqwX-V7Uu6Y7MdSCaIfsxc561QI0U0Tb%5D%5BSession 4 - Neural Networks - Intelligence and Learning%5D%5D][nyu/shiffman yt playlist Session 4 - Neural Networks - Intelligence and Learning]]
+
+***** nyu/shiffman Nature of Code (Intelligence and Learning)
+- [[https://tisch.nyu.edu/itp/courses/itp-courses][course listing]]
+- see [[*nyu/shiffman yt playlist %5B%5Bhttps://www.youtube.com/user/shiffman/playlists?view=50&sort=dd&shelf_id=16%5D%5BNeural Networks and Machine Learning%5D%5D 2017-2019][nyu/shiffman yt playlist Neural Networks and Machine Learning 2017-2019]]
+
+*** [[http://www.r2d3.us/][r2d3.us]] A Visual Introduction to Machine Learning
+- introductory
+** ML online courses / MOOCs
+*** andrew-ng courses
+**** andrew-ng [[https://www.deeplearning.ai/][deeplearning.ai]]
+**** andrew-ng [[https://www.coursera.org/learn/machine-learning][coursera/ng machine learning]]
+- that one ml course that everyone mentions first; especially good for beginners
+*** andrew-ng [[http://openclassroom.stanford.edu/MainFolder/HomePage.php][openclassroom.stanford]] short course videos 2012
+- introductory
+
+- [[http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=MachineLearning][Andrew Ng Machine Learning Videos @openclassroom]]
+- [[http://openclassroom.stanford.edu/MainFolder/CoursePage.php?course=ufldl][Andrew Ng Unsupervised Learning and Deep Learning Videos @openclassroom]]
+*** [[https://course.elementsofai.com/][elementsofai.com]]
+- recommended by german government for general business audience, made by uni
+  helsinki
+
+** ML articles, blogs, videos
+*** 3blue1brown yt playlists
+**** 3blue1brown [[https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi][neural networks]] 2017
+*** welch_labs yt playlists
+- recommented by 3blue1brown 2017
+**** welch_labs [[https://www.youtube.com/playlist?list=PLiaHhY2iBX9ihLasvE8BKnS2Xg8AhY6iV][learning to see]] 2017
+**** welch_labs [[https://www.youtube.com/playlist?list=PLiaHhY2iBX9hdHaRr6b7XevZtgZRa1PoU][neural networks demystified]] 2015
+*** [[https://colah.github.io/][colah.github.io]] - olah's blog - clearly explaining ml
+- recommented by 3blue1brown 2017
+*** [[https://distill.pub/][distill.pub]] - ml journal interactive visualizations
+- recommented by 3blue1brown 2017
+*** [[https://iamtrask.github.io/][iamtrask.github.io]] - deep learning tutorials python
+**** iamtrask.github.io - [[https://iamtrask.github.io/2015/07/12/basic-python-network/][A Neural Network in 11 lines of Python (Part 1)]]
+**** iamtrask.github.io - [[https://iamtrask.github.io/2015/07/27/python-network-part2/][A Neural Network in 13 lines of Python (Part 2 - Gradient Descent)]]
+*** wagstaff [[https://www.wkiri.com/research/papers/wagstaff-MLmatters-12.pdf][Machine Learning that Matters]] 2012
+*** [[https://www.simonwenkel.com/projects/][simonwenkel.com]] Practical Aspects of AI/ML
+** NLP
+- here: stuff similar to [[http://cssh.rwth-aachen.de/courses/view/?course=Text%2520Mining&semester=WS%252019-20][RWTH Prof. Strohmaier's 19W course Text Mining]].
+*** stanford/manning cs224n Natural Language Processing with Deep Learning
+- advanced
+**** stanford/ cs224n [[http://web.stanford.edu/class/cs224n/index.html][official homepage]]
+*** Stanford CS224U Natural Language Understanding 2019
+- [[https://web.stanford.edu/class/cs224u/][course homepage]] with plenty of resources
+- [[https://www.youtube.com/playlist?list=PLoROMvodv4rObpMCir6rNNUlFAn56Js20][youtube playlist]]
+** to_sort external learning resources
+- <2020-01-29 Wed> from github trends:
+  - https://github.com/rasbt/deeplearning-models
+  - 
+- <2020-01-27 Mon>:
+  - https://km.aifb.kit.edu/services/fairnets/ a search engine for / database of
+    neural networks based on FAIR data principles
+- <2020-01-08 Wed>:
+  - https://digitaldefynd.com/best-machine-learning-and-deep-learning-courses/
+  - https://www.freecodecamp.org/news/every-single-machine-learning-course-on-the-internet-ranked-by-your-reviews-3c4a7b8026c0/
+  - https://www.quora.com/Which-are-the-best-online-courses-for-machine-learning
+- <2019-11-28 Thu> [[https://www.youtube.com/channel/UCm5mt-A4w61lknZ9lCsZtBw/playlists?disable_polymer=1][yt Steve Brunton vids on DS, ML, DL]]
+- <2019-10-27 Sun> code library [[https://www.giotto.ai/][giotto.ai]]: high performance topological machine
+  learning toolbox in Python from EPFL
+- <2019-10-27 Sun> video [[https://www.youtube.com/watch?v=Cx9iUjE4F0Q][yt presentation: Petros Koumoutsakos: Computing and Data to
+  predict and to understand 2018]]: natural integration of ML into the
+  computational science toolset
+- <2019-04-07 Sun> [[https://www.kdnuggets.com/2019/04/another-10-free-must-see-courses-machine-learning-data-science.html?fbclid=IwAR2yren9yTN1DmYVKklcZScfZxSI8X7nlBe7nRe-369URRnJGJXo2DeNJVQ][kdnuggets]]: Another 10 Free Must-See Courses for Machine
+  Learning and Data Science
+- <2019-04-01 Mon> [[https://www.kdnuggets.com/2018/09/meverick-lin-data-science-cheat-sheet.html?fbclid=IwAR0a06SuRtXTdDUJLLuALE3GgxM9cSJpRyySd1EVIe8Ad2mmVY9EUEzlXXc][kdnuggets]]: Data Science Cheatsheet
+- <2019-03-31 Sun> [[https://machine-learning-for-physicists.org/][machine-learning-for-physicists.org]]: UErlangen course 2018 incl.
+  notes, lecture videos
+- <2019-03-31 Sun> more gsearch results physics ml:
+  - [[https://physicsml.github.io/][physicsml.github.io]]: blog about subject
+  - [[http://deeplearnphysics.org/][deeplearnphysics.org]]: particle phycisists group collab, just research
+- <2019-03-31 Sun> [[https://www.kdnuggets.com/2018/09/machine-learning-cheat-sheets.html?fbclid=IwAR2u6JmdVTMoSwr1_eJZVUDd9tGYQ_kPy2TybkKVqQeaax9IVHJ002Xhrtk][kdnuggets]]: cheat sheets for ML:
+  - [[https://github.com/afshinea/stanford-cs-229-machine-learning][repo]], [[https://stanford.edu/~shervine/teaching/cs-229/][stanford home]], 
+- <2019-01-29 Di> [[https://www.datacamp.com/home][datacamp.com]]: registered via google
+- <2018-12-25 Tue> [[https://colab.research.google.com/][Google AI Colab]]: Set of online-running Jupyter Notebooks. Intro to Jupyter,
+  pandas, TensorFlow, GPU computing.
+** JW Older Selfmade Resources
+*** BSc_JW
+- [[file:../../../../projects/jw782093_SCDB/scdb_workingcopy/doc/2017-10_Bachelorarbeit_JohannesWasmer/doc_sandbox/daten/common_cfg.tex][BSc v2]] tex and view PDF. summary of notes 
+- [[file:../../../../projects/jw782093_SCDB/scdb_workingcopy/doc/2017-10_Bachelorarbeit_JohannesWasmer/notes/BSc_JW_Notes0-Central.org][BSc Notes]] see v7 stat/ana
+*** [[file:../../../Studium/Kurse_RWTH_19S/AlgDS/sciebo/AlgDS_Johannes/SiSc_AlgDS_Notes.org][SiSc_AlgDS_Notes]]
+* External Resources - Tools
+** numerical libraries
+*** [[https://danmackinlay.name/notebook/numerical_libraries.html][danmackinlay.name/notebook/numerical_libraries]]
+** data science
+*** build tools
+**** [[https://danmackinlay.name/notebook/build_tools.html][danmackinlay.name/notebook/build_tools]]
+** tensorflow
+*** [[https://danmackinlay.name/notebook/tensorflow.html][danmackinlay.name/notebook/tensorflow]]
+** Coding standards
+*** Project Structure
+**** [[https://github.com/drivendata/cookiecutter-data-science][github.com/drivendata/cookiecutter-data-science]]
+**** [[https://github.com/makcedward/ds_project_template][github.com/makcedward/ds_project_template]]
+- [[https://towardsdatascience.com/manage-your-data-science-project-structure-in-early-stage-95f91d4d0600][blog article]]
+** to_sort external resources tools
+- <2020-02-22 Sat> [[https://epistasislab.github.io/tpot/][tpot free autoML tool]]
+* External Resources - Datasets
+** [[https://datasetsearch.research.google.com/][datasetsearch.research.google.com]]
+* External Resources - Challenges/Competitions
+** [[https://www.drivendata.org/competitions/][drivendata.org/competitions/]]
+

@@ -1,0 +1,555 @@
+# In Emacs org-mode: before exporting, comment this out START
+;; Local Variables:
+;; ispell-check-comments: exclusive
+;; ispell-local-dictionary: "english"
+;; End:
+# In Emacs org-mode: before exporting, comment this out FINISH
+
+# Org-mode Export LaTeX Customization Notes:
+# - Interpret 'bla_bla' as LaTeX Math bla subscript bla: #+OPTIONS ^:t. Interpret literally bla_bla: ^:nil.
+# - org export: turn off heading -> section numbering: #+OPTIONS: num:nil
+# - org export: change list numbering to alphabetical, sources:
+#   - https://orgmode.org/manual/Plain-lists-in-LaTeX-export.html
+#   - https://tex.stackexchange.com/a/129960
+#   - must be inserted before each list:
+#     #+ATTR_LATEX: :environment enumerate
+#     #+ATTR_LATEX: :options [label=\alph*)]
+# - allow org to recognize alphabetical lists a)...: M-x customize-variable org-list-allow-alphabetical
+
+
+# -----------------------
+# General Export Options:
+#+OPTIONS: ^:nil ':nil *:t -:t ::t <:t H:3 \n:nil arch:headline 
+#+OPTIONS: broken-links:nil c:nil creator:nil d:(not "LOGBOOK") date:t e:t
+#+OPTIONS: email:nil f:t inline:t p:nil pri:nil prop:nil stat:t tags:t
+#+OPTIONS: tasks:t tex:t timestamp:t title:t todo:t |:t
+
+#+OPTIONS: author:nil
+#+OPTIONS: num:t # t or nil: disable export latex section numbering for org headings
+#+OPTIONS: toc:t # t or nil: no table of contents (doesn't work if num:nil)
+
+#+TITLE: RWTH Computer Cluster Notes
+#+DATE: <2019-02-26 Tue>
+#+AUTHOR: Johannes Wasmer
+# #+EMAIL: johannes.wasmer@gmail.com
+#+LANGUAGE: de
+#+SELECT_TAGS: export
+#+EXCLUDE_TAGS: noexport
+#+CREATOR: Emacs 25.2.2 (Org mode 9.1.13)
+
+# ---------------------
+# LaTeX Export Options:
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS:
+#+LATEX_HEADER: \usepackage[english]{babel}
+#+LATEX_HEADER: \usepackage[top=0.5in,bottom=0.5in,left=1in,right=1in,includeheadfoot]{geometry} % wider page; load BEFORE fancyhdr
+#+LATEX_HEADER: \usepackage[inline]{enumitem} % for customization of itemize, enumerate envs
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER:
+#+LATEX_HEADER_EXTRA:
+#+DESCRIPTION:
+#+KEYWORDS:
+#+SUBTITLE: Usage
+#+LATEX_COMPILER: pdflatex
+#+DATE: \today
+
+first is newest
+* [[https://doc.itc.rwth-aachen.de/display/CC/Home][doc.itc/Compute Cluster]]
+** Usage
+*** [[https://doc.itc.rwth-aachen.de/display/CC/Access][Access]]
+*** [[https://doc.itc.rwth-aachen.de/display/CC/Using+the+Batch+System][Manuals/Batch (LSF)]] deprecated by Apr2019
+*** [[https://doc.itc.rwth-aachen.de/display/CC/Using+the+SLURM+Batch+System][Manuals/Batch (SLURM)]]
+** [[https://doc.itc.rwth-aachen.de/display/CCP/General][Parallel Programming]]
+* My Summary 2018/2019
+** Login
+from [[https://doc.itc.rwth-aachen.de/display/CC/Login+via+ssh][doc.itc > login via ssh]]:
+
+#+BEGIN_SRC bash
+# with (-Y = trusted X11 forwarding:
+ssh -Y -l jw782093 login18-1.hpc.itc.rwth-aachen.de
+
+# -X = also with X11 forwarding for GUIs:
+ssh -X -l jw782093 login18-1.hpc.itc.rwth-aachen.de
+
+# basic: ssh -l username login18-1.hpc.itc.rwth-aachen.de
+ssh -l jw782093 login18-1.hpc.itc.rwth-aachen.de
+#+END_SRC
+
+Under Windows:
+- xlaunch + putty.exe (turn on x11 forwarding, Data->local username)
+
+Graphical File Manager supporting =fish= (eg KDE Dolphin):
+#+BEGIN_SRC bash
+# fish://username@login18-1.hpc.itc.rwth-aachen.de
+fish://jw782093@login18-1.hpc.itc.rwth-aachen.de
+#+END_SRC
+
+** Moving data local <-> cluster
+terminal
+#+BEGIN_SRC bash
+# scp /local/file user@host.dom:/home/username
+scp /home/johannes/bla.cpp jw782093@login18-1.hpc.itc.rwth-aachen.de:/home/jw782093
+#+END_SRC
+** Some terminal commands
+#+BEGIN_SRC bash
+# no. of cores
+cat /etc/proc
+lscpu
+nproc
+
+# info about cores
+cpuinfo
+# next core-id is situated on different socket
+
+# current no. of users
+w | wc -l
+
+# info: distribution Lx-Caches wrt NUMAnodes.
+hwloc-ls
+
+# gui-tool, needs X11 forwarding enabled
+lstopo
+
+# not installed by default:
+# likwid-topology
+# similar to hwloc / lstopo.
+
+# distance between sockets and nearest memory:
+# numactl --hardware
+#+END_SRC
+
+** Module System
+#+BEGIN_SRC bash
+# all modules
+module list
+
+# switch MPI compiler
+module switch openmpi intelmpi
+#+END_SRC
+** Compilation & Running
+*** MPI
+Use Cluster environment variables instead of programs:
+| ~$CXX~     | ~icpc~ or ~gcc~ depending on which is loaded |
+| ~$GCC~     | ~gcc~                                        |
+| ~$MPICC~   | ~mpicc~                                      |
+| ~$MPIEXEC~ | ~mpiexec~                                    |
+
+Some compilation and run examples:
+#+BEGIN_SRC bash
+gcc -o hello hello.c
+./hello
+mpiexec -np 3 ./hello
+
+mpicc -std=c99 error.c -o error
+mpiexec -np 3 error
+
+mpicc ranks.c -o ranks
+./ranks
+mpiexec -np 3 ranks
+#+END_SRC
+
+*** OpenMP
+**** Cluster, command line
+Compilation with cluster compilation flags:
+#+BEGIN_SRC bash
+$ echo $CXX
+icpc
+
+$CXX $FLAGS_DEBUG C-ser-pi.c -o C-ser-pi.exe
+$CXX $FLAGS_DEBUG $FLAGS_AUTOPAR -O3 -par-report3 C-ser-pi.c -o C-ser-pi_autopar.exe
+$CXX $FLAGS_DEBUG $FLAGS_OPENMP -O3 C-omp-pi_opt1.c -o C-omp-pi_opt1.exe
+$CXX $FLAGS_DEBUG $FLAGS_OPENMP -O3 C-omp-pi_opt2a.c -o C-omp-pi_opt2a.exe
+$CXX $FLAGS_DEBUG $FLAGS_OPENMP -O3 C-omp-pi_opt2a_missing-critical.c -o C-omp-pi_opt2a_missing-critical.exe
+$CXX $FLAGS_DEBUG $FLAGS_OPENMP -O3 C-omp-pi_opt2b.c -o C-omp-pi_opt2b.exe
+
+export OMP_NUM_THREADS=8
+./C-omp-pi_op2b.exe
+#+END_SRC
+
+Running:
+#+BEGIN_SRC bash
+# set num_threads just for this run
+OMP_NUM_THREADS=4 ./program
+
+# set num_threads global
+export OMP_NUM_THREADS=4
+./program
+#+END_SRC
+
+**** Using CMake
+CMake template for C/C++ OpenMP
+#+BEGIN_SRC makefile
+cmake_minimum_required(VERSION 3.10)
+project(myprog LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 14)
+
+find_package(OpenMP REQUIRED)
+
+set(SOURCE_FILES main.cpp)
+add_executable(myprog main.cpp)
+target_link_libraries(myprog PRIVATE OpenMP::OpenMP_CXX)
+
+
+## # Setting up CMake with OpenMP
+## # From:
+## # [1] https://stackoverflow.com/a/40534056
+## # [2] https://stackoverflow.com/a/12404666
+## # [3] https://stackoverflow.com/a/51448364
+##
+## [1] solution hardcoded for gcc:
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp")
+##
+## [2] solution working with any compiler 2016:
+#find_package(OpenMP)
+#if (OPENMP_FOUND)
+#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+#endif ()
+##
+## [3] solution for CMake >3.9, 2018:
+#cmake_minimum_required(VERSION 3.9)
+#project(solver LANGUAGES CXX)
+#
+#find_package(OpenMP REQUIRED)
+#add_executable(solver solver.cc)
+#target_link_libraries(solver PRIVATE OpenMP::OpenMP_CXX)
+#+END_SRC
+Build:
+#+BEGIN_SRC bash
+mkdir build
+cd build
+cmake ..
+make
+#+END_SRC
+** Batch (LSF = deprecated; now it's SLURM)
+*** DEPRECATED Example script: LAMMPS with MPI
+Submit with  =bsub < run_parallel.sh=.
+#+BEGIN_SRC bash
+#!/usr/bin/env zsh
+  
+###  8 processes, all on one node
+#BSUB -J CMS_Project_Simulation_Run
+#BSUB -n 8 
+#BSUB -R "span[ptile=2]"
+#BSUB -m mpi-s
+#BSUB -o std.out
+#BSUB -e std.err
+  
+### Limit for maximum memory per slot (in MB)
+#BSUB -M 1024
+#BSUB -S 600
+  
+### The time limit for the job in minutes (reaching this time limit, the process is signaled and killed)
+#BSUB -W 80
+  
+### load the necessary module files
+module load CHEMISTRY
+module load lammps
+export OMP_NUM_THREADS=12
+#BSUB -a openmpi
+  
+### start the MPI binary
+$MPIEXEC $FLAGS_MPI_BATCH lmp_rwth -sf omp -in runfile_parallel.in
+#+END_SRC
+
+* Config
+** FIXED <2019-11-20 Wed> broke python ~pip3.6~ wrapper; dirtyfix: ~export PATH=~/.local/bin:$PATH~ 
+*** short version
+- broke ~pip3.6~ wrapper.
+- ~pip3.6 install --user bla~~ now throws error.
+- but ~python3.6 -m pip install --user bla~ (ie without wrapper) still works.
+- in order to circumvent wrapper (just for convenience), added ~export
+  PATH=~/.local/bin:$PATH~ to ~~/.profile~.
+- with that can use ~pip3.6 install --user bla~ again. *but could make problems in other areas!*
+
+To use ~pip3.6~ in future:
+- log in
+- ~source ~/.profile~
+~ effect: using local pip3.6 with ~/usr/bin/python3.6~
+
+UPDATE:
+- just found out that cluster has python 3.7 after all as of <2019-11-20 Wed>:
+#+begin_example
+# module avail python
+module load python/3.7.3
+# now pip3 = pip3.7
+#+end_example
+*** long version
+<2019-11-20 Wed> tried to make jupyter server [[https://doc.itc.rwth-aachen.de/display/CC/Jupyter+Notebook][run on cluster]] use my virtualenv
+python3.6 instead of the system/user python3.6. didn't seem to work. so i had to
+install the modules i need on the system/user python like so:
+#+begin_example
+module switch intel gcc
+module load python/3.6.0 # since python is still py2.7 by default i guess
+python3.6 -m pip install --user --no-cache-dir numpy
+# ...
+# Requirement already satisfied: numpy in /rwthfs/rz/SW/UTIL.common/Python/3.6.0/x86_64/extra/lib/python3.6/site-packages (1.11.3)
+# You are using pip version 9.0.1, however version 19.3.1 is available.
+# You should consider upgrading via the 'pip install --upgrade pip' command.
+# ...
+#+end_example
+And then I did a stupid thing:
+#+begin_example
+pip3.6 install --user --upgrade pip
+# ...
+# Successfully installed pip-19.3.1
+#+end_example
+Because this upgrade seemingly broke pip3.6:
+#+begin_example
+pip3.6 install --user --no-cache-dir lxml
+# Traceback (most recent call last):
+#   File "/usr/local_rwth/sw/python/3.6.0/x86_64/bin/pip3.6", line 7, in <module>
+#     from pip import main
+# ImportError: cannot import name 'main'
+#+end_example
+
+The reason for this is a [[https://github.com/pypa/pip/issues/5599][a broken wrapper due to update to pip 10 or higher]] (pip
+github issue #5599). As this issue explains, the problem is...
+#+begin_quote
+It may be that you're simply running the "wrong" wrapper script. Maybe you did a
+--user install of a new version of pip, but your PATH is set to run the system
+version of the wrapper rather than the user-local one installed with pip. In
+that case, you can simply fix your PATH. That's usually the issue for people who
+do pip install --user --upgrade pip and get the pip.main error.
+#+end_quote
+What the wrapper does is, it lets you write ~pip3.6~ instead of ~python3.6 -m
+pip~. I confirmed this by the following:
+#+begin_example
+which pip3.6
+# /usr/local_rwth/sw/python/3.6.0/x86_64/bin/pip3.6
+# this version probably was the 9.0.1 version of pip3.6 mentioned above.
+python3.6 -m pip --version
+pip 19.3.1 from /home/jw782093/.local/lib/python3.6/site-packages/pip (python 3.6)
+#+end_example
+So the important thing is I still CAN use ~pip3.6~ by calling ~python3.6 -m pip~
+instead of ~pip3.6~. Only the wrapper is broken. As the issue above explains:
+#+begin_quote
+At this point, you're usually done - the fundamental cause of all these problems
+is running a wrapper script which is written expecting to see a version of pip
+older than pip 10 (that's why it imports pip.main) under a Python interpreter
+that sees a copy of pip that's version 10 or later.
+#+end_quote
+
+So the current solution is that I prepended my locally installed pip3.6 to my
+~PATH~ by adding the line ~export PATH=~/.local/bin:$PATH~ to my ~~/profile~.
+Effect:
+#+begin_example
+# freshly logged in
+# ...
+# not sure if these two are really needed
+module switch intel gcc
+module load python/3.6.0
+which pip3.6
+# /usr/local_rwth/sw/python/3.6.0/x86_64/bin/pip3.6
+source ~/.profile
+which pip3.6
+# /home/jw782093/.local/bin/pip3.6
+#+end_example
+With this, happy end:
+#+begin_example
+pip3.6 install --user --no-cache-dir lxml
+# ...
+# Successfully installed lxml-4.4.1
+#+end_example
+Note that loading python 3.6 as module *does make a difference*, but
+unfortunately, the module python is *the older python3*:
+#+begin_example
+# freshly logged in
+which python3.6
+# /usr/bin/python3.6
+python3.6 -V
+# Python 3.6.8
+module switch intel gcc
+module load python/3.6.0
+python3.6 -V
+# Python 3.6.0
+#+end_example
+I have no idea if the fact that i did the userlocal upgrade to pip (pip3.6) v
+19.3.1 and the install of library lxml-4.4.1 while the python3.6.0 from module
+was loaded means that i now can't use them while the default python3.6.8 is
+active/used. we'll see. that would suck.
+* python
+** python <2019-11-20 Wed> run jupyter notebook on cluster
+
+*** SUCCESS <2019-11-20 Wed> run jupyter notebook on cluster
+ reference: [[https://doc.itc.rwth-aachen.de/display/CC/Jupyter+Notebook][itc.rwth - cluster - Jupyter Notebook]]
+
+**** start jupyter server
+ template script from reference:
+ #+begin_src shell
+ #!/usr/local_rwth/bin/zsh
+ 
+ #SBATCH --nodes=1
+ #SBATCH --ntasks-per-node=1
+ #SBATCH --mem-per-cpu=8G
+ #SBATCH --time=1-0:00:00
+ #SBATCH --job-name=jupyter-notebook
+ #SBATCH --output=jupyter-notebook-%J.log
+ 
+ # get tunneling info
+ XDG_RUNTIME_DIR=""
+ port=$(shuf -i8000-9999 -n1)
+ node=$(hostname -s)
+ 
+ # Load the latest python
+ module switch intel gcc
+ module load python/3.6.0
+ 
+ #Install or upgrade jupyter as local user
+ pip3.6 install --user --upgrade --force-reinstall --no-cache-dir jupyter
+ 
+ PYTHON_USER_BASE=$(python3.6 -m site --user-base)
+ $PYTHON_USER_BASE/bin/jupyter-notebook --no-browser --port=${port} --ip=${node}
+ #+end_src
+ Notes on template script:
+ - why load ~gcc~ at all? comment out
+ - as of <2019-11-20 Wed>, use ~module load python/3.7.3~ and subsequently ~pip3
+   install ...~ (redirects to currently relevant 3.x version). this step has to
+   be done only once, so you can as well do it on the cmdline and not put it in
+   the script: ~python3 -m pip install --user --no-cache-dir jupyter~.
+ - the ~pip3 install ...~ line is only needed the first time and not afterwards
+ - the jupyter home will be the cwd from where you send this to slurm (below).
+   adding a ~cd ~/myproject~ to the script or somesuch doesn't have any effect.
+ - the cwd is also where the session log will be created, ie
+   ~jupyter-notebook-11104684.log~.
+
+ so, adopted from template:
+ #+begin_src shell
+ #!/usr/local_rwth/bin/zsh
+ 
+ #SBATCH --nodes=1
+ #SBATCH --ntasks-per-node=1
+ #SBATCH --mem-per-cpu=8G
+ #SBATCH --time=1-0:00:00
+ #SBATCH --job-name=jupyter-notebook
+ #SBATCH --output=jupyter-notebook-%J.log
+ 
+ # get tunneling info
+ XDG_RUNTIME_DIR=""
+ port=$(shuf -i8000-9999 -n1)
+ node=$(hostname -s)
+ 
+ # Load the latest python
+ # module switch intel gcc # why??
+ module load python/3.7.3
+  
+ PYTHON_USER_BASE=$(python3 -m site --user-base)
+ $PYTHON_USER_BASE/bin/jupyter-notebook --no-browser --port=${port} --ip=${node}
+ #+end_src
+
+ Now sumbit script to SLURM:
+ #+begin_src shell
+ sbatch ~/jupyter-server/start-jupyter-server_rwth-cluster.sh
+ # check status: PD = Pending, R = Running
+ squeue -u yourID
+ #+end_src
+
+ Once running, open newly created log file, wait till   
+
+
+
+
+
+**** connect
+*** FAIL <2019-11-20 Wed> access jupyter server running on cluster via ssh
+ Reference: [[https://fizzylogic.nl/2017/11/06/edit-jupyter-notebooks-over-ssh/][start editing python notebooks over SSH]]
+
+ i did this locally:
+ #+begin_example
+ ssh -v -N -L 8080:localhost:8755 jw782093@login18-1.hpc.itc.rwth-aachen.de
+ #+end_example
+
+ The =8755= port i got from the running jupyter server instance on the cluster.
+ The =8080= is the local port (or the other way round). Then, typed
+ =http://localhost:8080/= into local browser. the local terminal with the ssh
+ tunnel produced a bunch of messages with error 'connection refused' or similar.
+ gave up.
+
+*** SUCCESS <2019-11-20 Wed> install ipykernel in virtualenv / pipenv
+ Reference: [[https://anbasile.github.io/programming/2017/06/25/jupyter-venv/][Using jupyter notebooks with a virtual environment]]
+ I did this:
+ #+begin_example
+ $~ source ~/virtualenvs/dft-tutorial/bin/activate
+ (dft-tutorial) ~$ pip install ipykernel
+ (dft-tutorial) ~$ ipython kernel install --user --name=dft_tutorial
+ # Installed kernelspec dft_tutorial in /rwthfs/rz/cluster/home/jw782093/.local/share/jupyter/kernels/dft_tutorial
+ #+end_example
+
+ Then I did a whole lot of other stuff (installing ~pipenv~, switching python
+ modules, installing another virtualenv with the newer python, etc).
+
+ Then, using the new python from ~load module python/3.7.3~ started
+ jupyter-server and accessed via FastX. The surprising thing was that the kernel
+ =dft_tutorial= appeared there! I could run a notebook with it and import ~lxml~.
+ Strange. Ah, of course, because it's installed in ~~/.local/share/jupyter/~.
+
+ So the same also works for ~pipenv~. Cool! So I don't need to switch virtual
+ environment when starting the jupyter server script at all. just use the kernel
+ of the respective environment after the server has started.
+
+** python <2019-11-20 Wed> using virtual environment on cluster
+*** SUCCESS <2019-11-20 Wed> pipenv
+ ~pipenv~ installation:
+ #+begin_example
+ # install pipenv
+ pip install --user --no-cache-dir pipenv
+
+ # # to put pipenv on your PATH, do the following:
+ $ python3 -m site --user-base
+ # this should return a path like '/home/myTIM-ID/.local'.
+ # # append this to your PATH by putting the following in
+ # # your ~/.bashrc (AFTER module load python/3.7.3):
+ # export PATH=$PATH:~/.local/bin
+ # # Logout and login again.
+ # # now pipenv should be available.
+ #+end_example
+
+ ~pipenv~ usage:
+ #+begin_example
+ # create env in project
+ cd project
+ pipenv --python 3.7
+
+ # install dependencies
+ pipenv install
+
+ # activate environment
+ pipenv shell
+ # exit with 'exit'
+ #+end_example
+
+*** SUCCESS <2019-11-20 Wed> pip + virtualenv
+
+ #+begin_example
+ $ mkdir ~/virtualenvs # create folder for all your virtual environments
+ $ cd ~/virtualenvs
+ $ virtualenv -p python3 dft-tutorial # create env, using python3
+ # # alternative: actually, the package needs at least python3.6:
+ # virtualenv --python=python3.6 dft-tutorial
+
+ # to use, activate env:
+ $ source ~/virtualenvs/dft-tutorial/bin/activate
+ # now '(dft-tutorial)' appears in front of prompt. to deactivate:
+ (dft-tutorial) $ deactivate
+
+ # install some project requirements (env is active)
+ (dft-tutorial) $ pip install -r project/requirements.txt
+ #+end_example
+
+* Deprecated since summer 2019
+** Login
+Cluster Phi:
+#+BEGIN_SRC bash
+ssh -l cluster.rz.rwth-aachen.de
+ssh -l cluster-phi.rz.rwth-aachen.de
+#+END_SRC
+
+* ITC News
+** [[https://doc.itc.rwth-aachen.de/display/CC/2019/02/19/IMPORTANT+NEWS+for+users+of+the+RWTH+Compute+Cluster%253A+CLAIX-2018][Replacement Bull->CLAIX Cluster (new login, batch)]]
+In effect by ~April 2019.
+TODO: update affected notes when deprecated.
+* [[file:~/Desktop/Archive/Reference/computer/rwth_cluster/parallelProgramming/primer-8.4.0.pdf][Primer v2016 PDF (local)]]
+
+
